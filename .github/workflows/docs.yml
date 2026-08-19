@@ -25,8 +25,7 @@ jobs:
           path: .site-build
 
   deploy:
-    # one-click publish: Actions tab -> docs -> Run workflow
-    if: github.event_name == 'workflow_dispatch'
+    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     environment:
