@@ -1,0 +1,24 @@
+{
+  "slug": "spike-bounce",
+  "category": "gps",
+  "taxonomy": [
+    53,
+    54
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "gps_spikes"
+    }
+  ],
+  "input_sha256": "035da9775778328c8c16d168c17d3984f0976cc222179951f8b9f7765b90bb3f",
+  "source": "synthetic",
+  "notes": "two impossible bounces dropped; sustained tunnel jump kept"
+}

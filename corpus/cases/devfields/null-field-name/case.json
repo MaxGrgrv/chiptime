@@ -1,0 +1,23 @@
+{
+  "slug": "null-field-name",
+  "category": "devfields",
+  "taxonomy": [
+    22
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "dev_null_name"
+    }
+  ],
+  "input_sha256": "8f19c0bc93504ac132a4baffb4bf4826ba6ecc86f39ccd6908fd396de7580f8f",
+  "source": "synthetic",
+  "notes": "empty field name (RunScribe / fitparse #62): synthesized name, data preserved, no crash"
+}

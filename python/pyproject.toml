@@ -1,0 +1,73 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "chiptime"
+version = "0.4.0"
+description = "Recovery-grade FIT file processing: parse anything, lose nothing silently, explain everything."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "Maxim Grigoryev" }]
+keywords = ["fit", "garmin", "fitness", "activity", "parser", "recovery", "repair", "cycling", "running"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Typing :: Typed",
+]
+# Contract: the core has ZERO runtime dependencies. Any addition here is a
+# design decision requiring an ADR (see docs/dependencies/DEPENDENCY_MAP.md).
+dependencies = []
+
+[project.urls]
+Homepage = "https://maxgrgrv.github.io/chiptime/"
+Documentation = "https://maxgrgrv.github.io/chiptime/"
+Repository = "https://github.com/MaxGrgrv/chiptime"
+Changelog = "https://maxgrgrv.github.io/chiptime/changelog/"
+Issues = "https://github.com/MaxGrgrv/chiptime/issues"
+
+[project.optional-dependencies]
+pandas = ["pandas>=2.0"]
+
+[project.scripts]
+chiptime = "chiptime.cli:main"
+
+[dependency-groups]
+docs = [
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.26",
+    "mkdocs-llmstxt>=0.2",
+    "mkdocs-git-revision-date-localized-plugin>=1.2",
+]
+dev = [
+    "pytest>=8.3",
+    "hypothesis>=6.112",
+    "mypy>=1.11",
+    "ruff>=0.6.8",
+]
+# Only for corpus/tools/scoreboard.py (M2) and profile cross-checks.
+# Never installed by default; never imported by chiptime itself.
+baselines = [
+    "fitparse>=1.2",
+    "fitdecode>=0.10",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chiptime"]
+
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

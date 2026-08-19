@@ -1,0 +1,23 @@
+{
+  "slug": "multi-string-arrays",
+  "category": "protocol",
+  "taxonomy": [
+    33
+  ],
+  "tier": 3,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "multi_string"
+    }
+  ],
+  "input_sha256": "c154dcdf69819542a8555b3f1d046608b2fba9a2309d37f23db88c91fe72a23c",
+  "source": "synthetic",
+  "notes": "embedded-NUL string arrays split; junk after final terminator ignored (muktihari#623/#436)"
+}

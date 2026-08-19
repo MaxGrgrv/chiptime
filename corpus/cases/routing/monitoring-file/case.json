@@ -1,0 +1,23 @@
+{
+  "slug": "monitoring-file",
+  "category": "routing",
+  "taxonomy": [
+    80
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "monitoring_file"
+    }
+  ],
+  "input_sha256": "65bfea65655799bf852c028693f2d6d10856c510cd81f651cd3e7dea4dc19f1f",
+  "source": "synthetic",
+  "notes": "monitoring file with unknown messages decodes without crash"
+}

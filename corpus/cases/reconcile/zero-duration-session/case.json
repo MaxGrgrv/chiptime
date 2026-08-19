@@ -1,0 +1,23 @@
+{
+  "slug": "zero-duration-session",
+  "category": "reconcile",
+  "taxonomy": [
+    97
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "zero_duration"
+    }
+  ],
+  "input_sha256": "a9415eee8c0214a5f4a44bb72748e57ec43c95e40afc4ab58b5da53eaa3afd16",
+  "source": "synthetic",
+  "notes": "zero declared duration with records present"
+}

@@ -1,0 +1,136 @@
+site_name: chiptime
+site_description: "Recovery-grade FIT file processing: parse anything, lose nothing silently, explain everything."
+site_url: https://maxgrgrv.github.io/chiptime/
+repo_url: https://github.com/MaxGrgrv/chiptime
+repo_name: MaxGrgrv/chiptime
+edit_uri: edit/main/website/
+docs_dir: website
+site_dir: .site-build
+strict: true
+
+validation:
+  nav:
+    omitted_files: info   # 86 generated per-code pages live outside the nav
+
+theme:
+  name: material
+  font:
+    text: Inter
+    code: JetBrains Mono
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle: { icon: material/weather-night, name: Dark mode }
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle: { icon: material/weather-sunny, name: Light mode }
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - toc.follow
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.action.edit
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/chip
+
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: false
+      fallback_to_build_date: true
+  - llmstxt:
+      markdown_description: |
+        chiptime is recovery-grade FIT file processing: parse anything, lose
+        nothing silently, explain everything. Python library + CLI, zero
+        runtime dependencies, MIT; deterministic canonical JSON; stable
+        machine codes for errors, warnings, provenance, and insights.
+
+        Rules for agents working with chiptime: FIT sentinels decode to null,
+        not values — and null never equals 0 (coasting is 0 W, dropout is
+        null). Check `provenance[]` before trusting any repaired or
+        reinterpreted field. Prefer `lenient` mode; route on CLI exit codes
+        (0 clean, 2 recovered-with-loss, 3 unusable, 4 not-FIT, 64 usage).
+        Thresholds (FTP, zones, HR anchors) must come from the user or the
+        file — never estimate them from the workout itself.
+      full_output: llms-full.txt
+      sections:
+        Start here:
+          - index.md
+          - getting-started.md
+        Guides:
+          - guides/*.md
+        Reference:
+          - reference/*.md
+          - reference/codes/*.md
+        Migrate:
+          - switch/*.md
+        Concepts:
+          - concepts/*.md
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [python/src]
+          options:
+            docstring_style: google
+            show_source: false
+            show_root_heading: true
+            members_order: source
+            separate_signature: true
+            show_signature_annotations: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - toc: { permalink: true }
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed: { alternate_style: true }
+  - pymdownx.highlight: { anchor_linenums: true }
+  - pymdownx.inlinehilite
+  - pymdownx.snippets: { base_path: [".", "docs"], check_paths: true }
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Guides:
+      - Parse anything: guides/parse-anything.md
+      - Repair crash files: guides/repair.md
+      - Analyze workouts: guides/analyze.md
+      - Built for agents: guides/agents.md
+      - Storing the output: guides/storage.md
+      - The conformance corpus: guides/corpus.md
+  - Reference:
+      - Python API — core: reference/api-core.md
+      - Python API — model: reference/api-model.md
+      - Python API — metrics: reference/api-metrics.md
+      - CLI: reference/cli.md
+      - Codes registry: reference/codes/index.md
+  - Migrate:
+      - Overview: switch/index.md
+      - From fitparse: switch/from-fitparse.md
+      - From fitdecode: switch/from-fitdecode.md
+  - Concepts:
+      - The contract: concepts/contract.md
+      - Determinism: concepts/determinism.md
+      - Edge-case taxonomy: concepts/edge-cases.md
+      - Architecture: concepts/architecture.md
+  - Changelog: changelog.md

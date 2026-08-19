@@ -1,0 +1,37 @@
+name: docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}   # deploy is manual until the repo is public + Pages enabled
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # git-revision-date plugin needs history
+      - uses: astral-sh/setup-uv@v6
+      - name: Build (strict)
+        run: uv run --project python --group docs mkdocs build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .site-build
+
+  deploy:
+    # one-click publish: Actions tab -> docs -> Run workflow
+    if: github.event_name == 'workflow_dispatch'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

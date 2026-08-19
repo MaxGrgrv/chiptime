@@ -1,0 +1,24 @@
+{
+  "slug": "hr-event-timestamp-12",
+  "category": "sensors",
+  "taxonomy": [
+    29,
+    72
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "hr_plugin"
+    }
+  ],
+  "input_sha256": "ca1db96d92e9a6a01f2d4e054fb6b8ce8e09a551f2eb3b31f47748aefa96f2c0",
+  "source": "synthetic",
+  "notes": "HRM-plugin packed 12-bit HR sample timestamps expanded w/ rollover (fitparse#122 \u2014 open there since 2019)"
+}

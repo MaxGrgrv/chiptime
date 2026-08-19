@@ -1,0 +1,23 @@
+{
+  "slug": "null-island",
+  "category": "gps",
+  "taxonomy": [
+    51
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "null_island"
+    }
+  ],
+  "input_sha256": "656e8d2b9aa5b5904ef44a301f319d5d47583883e6fc9362f2a45043ebfafd81",
+  "source": "synthetic",
+  "notes": "(0,0) and sentinel fixes interleaved with valid ones"
+}

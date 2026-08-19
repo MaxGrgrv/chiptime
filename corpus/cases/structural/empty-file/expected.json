@@ -1,0 +1,1 @@
+{"chiptime_schema":1,"errors":[{"byte_offset":0,"code":"FIT_EMPTY","detail":"file contains no bytes","suggestion":null}],"mode":"lenient","ok":false,"parts":[],"provenance":[],"recovery":null,"source":{"sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","size_bytes":0,"unwrapped":[]},"warnings":[]}

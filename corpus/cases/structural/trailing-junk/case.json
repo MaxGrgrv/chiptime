@@ -1,0 +1,28 @@
+{
+  "slug": "trailing-junk",
+  "category": "structural",
+  "taxonomy": [
+    13
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "raise:FIT_TRAILING_JUNK",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "run_basic"
+    },
+    {
+      "op": "append",
+      "repeat_byte": 171,
+      "count": 57
+    }
+  ],
+  "input_sha256": "85bd20b5ef9e0386924404ba47e18eb86cfe7c8d61cc5bd63c97232d33247d17",
+  "source": "synthetic",
+  "notes": "junk after final CRC ignored with a warning"
+}

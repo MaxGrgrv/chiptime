@@ -1,0 +1,31 @@
+{
+  "slug": "header-crc-zero",
+  "category": "structural",
+  "taxonomy": [
+    5
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "ride_smooth"
+    },
+    {
+      "op": "overwrite",
+      "offset": 12,
+      "data": "0000"
+    },
+    {
+      "op": "fix_file_crc"
+    }
+  ],
+  "input_sha256": "e6a9abf271415e224c3ad3aca47a181a02d1e044763228c5d25711f8fc1c8208",
+  "source": "synthetic",
+  "notes": "header CRC 0x0000 is a LEGAL skip, not an error"
+}

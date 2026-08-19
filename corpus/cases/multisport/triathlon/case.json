@@ -1,0 +1,23 @@
+{
+  "slug": "triathlon",
+  "category": "multisport",
+  "taxonomy": [
+    75
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "multisport"
+    }
+  ],
+  "input_sha256": "14dbeb507fe80aad6bb9fe85c310be720099fd37a370fc2aff7b71f797ad6ef0",
+  "source": "synthetic",
+  "notes": "swim + transition + bike; records bounded per session; laps attached to owners"
+}

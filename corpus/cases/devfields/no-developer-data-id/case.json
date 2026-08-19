@@ -1,0 +1,23 @@
+{
+  "slug": "no-developer-data-id",
+  "category": "devfields",
+  "taxonomy": [
+    22
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "dev_no_data_id"
+    }
+  ],
+  "input_sha256": "78319f6c6185f68b3acc575551b0a9b92df88a8c180549ab3a163d94f2a57a1f",
+  "source": "synthetic",
+  "notes": "field_description without developer_data_id: resolves anyway with warning (fitparse #124)"
+}

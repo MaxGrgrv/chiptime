@@ -1,0 +1,23 @@
+{
+  "slug": "compressed-timestamps",
+  "category": "protocol",
+  "taxonomy": [
+    21
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "compressed_ts"
+    }
+  ],
+  "input_sha256": "9145b4f7e00066716134bfec2f9546355e43406db34293b7f03f9ff5c1acb203",
+  "source": "synthetic",
+  "notes": "5-bit offsets incl. one 32s rollover"
+}

@@ -1,0 +1,23 @@
+{
+  "slug": "accumulator-rollover",
+  "category": "protocol",
+  "taxonomy": [
+    30
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "accumulator_wrap"
+    }
+  ],
+  "input_sha256": "a3cb8031d4ac9f00631335ab111dc7fd0fa892b11632da67eda2c03c58a56106",
+  "source": "synthetic",
+  "notes": "accumulated_power wraps uint32; unwrapped with provenance"
+}

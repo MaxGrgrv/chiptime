@@ -1,0 +1,15 @@
+# Single ruff config for the whole monorepo — python/, corpus/tools/, scripts/
+# all resolve HERE, so local runs and CI can never disagree by config path.
+line-length = 100
+target-version = "py311"
+src = ["python/src", "python/tests"]
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "RET", "RUF"]
+
+[lint.per-file-ignores]
+# sys.path bootstrap before imports is the standard pattern for repo scripts
+"scripts/*" = ["E402"]
+"corpus/tools/*" = ["E402"]
+# generated (ADR-0004); do not hand-wrap
+"python/src/chiptime/profile/generated.py" = ["E501"]

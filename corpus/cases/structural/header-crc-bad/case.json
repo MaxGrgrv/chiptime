@@ -1,0 +1,31 @@
+{
+  "slug": "header-crc-bad",
+  "category": "structural",
+  "taxonomy": [
+    5
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "raise:FIT_HEADER_CRC_MISMATCH",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "ride_smooth"
+    },
+    {
+      "op": "overwrite",
+      "offset": 12,
+      "data": "3412"
+    },
+    {
+      "op": "fix_file_crc"
+    }
+  ],
+  "input_sha256": "1878c43958a96ff48e4d5f88dc297fc8490b249c139cefbb63cb610c150fdffd",
+  "source": "synthetic",
+  "notes": "nonzero header CRC that does not match"
+}

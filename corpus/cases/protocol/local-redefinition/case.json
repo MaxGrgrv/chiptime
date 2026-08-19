@@ -1,0 +1,23 @@
+{
+  "slug": "local-redefinition",
+  "category": "protocol",
+  "taxonomy": [
+    20
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "redefinition_stress"
+    }
+  ],
+  "input_sha256": "dfce2e7b075380e2bac25e514a416d220c96dc576fbae319f04305be50ff3c02",
+  "source": "synthetic",
+  "notes": "local id 0 legally remapped repeatedly"
+}

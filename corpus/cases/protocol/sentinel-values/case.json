@@ -1,0 +1,23 @@
+{
+  "slug": "sentinel-values",
+  "category": "protocol",
+  "taxonomy": [
+    26
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "sentinel_soup"
+    }
+  ],
+  "input_sha256": "f1cc4bd03526ec20493464a69692761aab9faaa98a102563fa2534f753c17c6b",
+  "source": "synthetic",
+  "notes": "0xFF HR / 0xFFFF power / 0x7FFFFFFF position / z-type zero -> null"
+}

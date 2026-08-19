@@ -1,0 +1,23 @@
+{
+  "slug": "string-edges",
+  "category": "protocol",
+  "taxonomy": [
+    33
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "string_edges"
+    }
+  ],
+  "input_sha256": "426e44caa6563449d7f047016c4971b631cd5cac5c46654333456459a0fd1113",
+  "source": "synthetic",
+  "notes": "unterminated + invalid-UTF-8 strings decode lossily with warnings"
+}

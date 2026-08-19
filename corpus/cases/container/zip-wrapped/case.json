@@ -1,0 +1,27 @@
+{
+  "slug": "zip-wrapped",
+  "category": "container",
+  "taxonomy": [
+    14
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "ride_smooth"
+    },
+    {
+      "op": "zip_wrap",
+      "name": "2026-06-01-ride.fit"
+    }
+  ],
+  "input_sha256": "29a5c474b429e80fad3ec0e538a595588a0b03081f2bfc72183633724fd2ea8d",
+  "source": "synthetic",
+  "notes": "Garmin Connect-style zip export unwraps transparently"
+}

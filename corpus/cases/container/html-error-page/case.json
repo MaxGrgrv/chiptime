@@ -1,0 +1,23 @@
+{
+  "slug": "html-error-page",
+  "category": "container",
+  "taxonomy": [
+    15
+  ],
+  "tier": 2,
+  "expect": "reject",
+  "modes": {
+    "strict": "raise:NOT_FIT_FORMAT",
+    "lenient": "reject",
+    "forensic": "reject"
+  },
+  "build": [
+    {
+      "op": "payload",
+      "kind": "html"
+    }
+  ],
+  "input_sha256": "1c342a536d29fc4ffc39d122f4099277921262f868872e0e164681158be1861a",
+  "source": "synthetic",
+  "notes": "download-gone-wrong HTML error page"
+}

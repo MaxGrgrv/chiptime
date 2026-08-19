@@ -1,0 +1,58 @@
+name: ci
+on:
+  push: {branches: [main]}
+  pull_request:
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ["3.11", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - run: uv python install ${{ matrix.python }}
+      - name: Sync
+        working-directory: python
+        run: uv sync --python ${{ matrix.python }}
+      - name: Lint
+        working-directory: python
+        run: uv run ruff check . ../corpus/tools ../scripts
+      - name: Format
+        working-directory: python
+        run: uv run ruff format --check . ../corpus/tools ../scripts
+      - name: Types
+        working-directory: python
+        run: uv run mypy
+      - name: Corpus integrity (sha256 guards)
+        run: uv run --project python python corpus/tools/gen_all.py
+      - name: Tests (incl. conformance + determinism + truncation sweep)
+        working-directory: python
+        run: uv run pytest
+  package-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - name: Build wheel + sdist
+        working-directory: python
+        run: uv build
+      - name: Install wheel into a clean env and smoke it
+        run: |
+          uv venv /tmp/smoke --python 3.11
+          uv pip install --python /tmp/smoke/bin/python python/dist/*.whl
+          /tmp/smoke/bin/python -c "import chiptime; print(chiptime.__version__)"
+          /tmp/smoke/bin/chiptime codes | head -3
+  cross-os-determinism:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - name: Hash all snapshots
+        run: sha256sum corpus/cases/*/*/expected.json | sha256sum
+      # The macOS test job parses the same corpus byte-identically (conformance
+      # runner compares against these committed snapshots) — cross-OS
+      # determinism is therefore enforced by the matrix, this job just makes
+      # the invariant visible in the summary.

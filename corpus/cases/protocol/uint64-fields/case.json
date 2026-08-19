@@ -1,0 +1,23 @@
+{
+  "slug": "uint64-fields",
+  "category": "protocol",
+  "taxonomy": [
+    35
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "uint64_fields"
+    }
+  ],
+  "input_sha256": "73ee8c25c1f7c86bb11abcee25ca85fb5d0ffc4664a64b5a64f8d1442b11a79a",
+  "source": "synthetic",
+  "notes": "uint64 beyond 2^53 serialized as decimal string in canonical JSON"
+}

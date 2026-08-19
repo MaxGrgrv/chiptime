@@ -1,0 +1,23 @@
+{
+  "slug": "invalid-base-type",
+  "category": "protocol",
+  "taxonomy": [
+    25
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "raise:FIT_BASE_TYPE_INVALID",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "invalid_base_type"
+    }
+  ],
+  "input_sha256": "271339703a98f355d8c2b6ceb9d37493e5baf5196b47a2e4b09b72ac45470bf6",
+  "source": "synthetic",
+  "notes": "bogus base type on one field: per-field raw salvage, others decode"
+}

@@ -1,0 +1,23 @@
+{
+  "slug": "gpx-renamed",
+  "category": "container",
+  "taxonomy": [
+    15
+  ],
+  "tier": 2,
+  "expect": "reject",
+  "modes": {
+    "strict": "raise:NOT_FIT_FORMAT",
+    "lenient": "reject",
+    "forensic": "reject"
+  },
+  "build": [
+    {
+      "op": "payload",
+      "kind": "gpx"
+    }
+  ],
+  "input_sha256": "6979f41d3cc46e7927b30d7d6d4b0af333be7293d8bcac0b135c69d5017cf15b",
+  "source": "synthetic",
+  "notes": "GPX saved with .fit extension; error names the real format"
+}

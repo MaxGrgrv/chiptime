@@ -1,0 +1,23 @@
+{
+  "slug": "pre-2010-timestamps",
+  "category": "temporal",
+  "taxonomy": [
+    39
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "old_timestamps"
+    }
+  ],
+  "input_sha256": "077590578fff5f17cac458bbab63904982a5b6113155016549efa4bcc29b6122",
+  "source": "synthetic",
+  "notes": "plausible deltas, absurd absolute time: flagged, timeline preserved"
+}

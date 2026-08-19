@@ -1,0 +1,23 @@
+{
+  "slug": "compressed-speed-distance",
+  "category": "protocol",
+  "taxonomy": [
+    29
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "csd_legacy"
+    }
+  ],
+  "input_sha256": "cc43bd17d3855f1efbdbc693709eea0733a6429fcca59cce94765796774a9b6c",
+  "source": "synthetic",
+  "notes": "legacy 12-bit packed speed/distance incl. a 256m rollover, expanded"
+}

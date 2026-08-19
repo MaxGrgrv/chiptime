@@ -1,0 +1,23 @@
+{
+  "slug": "left-right-balance",
+  "category": "sensors",
+  "taxonomy": [
+    65
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "lr_balance"
+    }
+  ],
+  "input_sha256": "044801b09cdadb3ccf0ebd3995bdf4e9f3e49e4985490c738af296564481ef2c",
+  "source": "synthetic",
+  "notes": "bit-packed balance decoded to right_balance_pct; exact 0x80 no longer an 'enum'"
+}

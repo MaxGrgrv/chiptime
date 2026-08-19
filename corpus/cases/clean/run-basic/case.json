@@ -1,0 +1,23 @@
+{
+  "slug": "run-basic",
+  "category": "clean",
+  "taxonomy": [
+    27
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "run_basic"
+    }
+  ],
+  "input_sha256": "e5347f5595faa706ea0d9f3522effd2ba6f862382088da204cd92b88b7186ddb",
+  "source": "synthetic",
+  "notes": "clean running seed"
+}

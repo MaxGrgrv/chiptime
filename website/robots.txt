@@ -1,0 +1,20 @@
+# chiptime docs — humans and agents equally welcome
+User-agent: *
+Allow: /
+
+# AI crawlers: explicitly welcome. Start with the manifest:
+#   /llms.txt       curated index + behavioral rules for agents
+#   /llms-full.txt  the entire docs corpus as one markdown file
+# Every page is also available as raw markdown at <page>/index.md
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-Web
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://maxgrgrv.github.io/chiptime/sitemap.xml

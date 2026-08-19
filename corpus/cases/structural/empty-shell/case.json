@@ -1,0 +1,23 @@
+{
+  "slug": "empty-shell",
+  "category": "structural",
+  "taxonomy": [
+    16
+  ],
+  "tier": 1,
+  "expect": "reject",
+  "modes": {
+    "strict": "reject",
+    "lenient": "reject",
+    "forensic": "reject"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "empty_shell"
+    }
+  ],
+  "input_sha256": "de7d5693a679c4dac00280fca5cf2caa47a6d20ded35de6fefc8dce0ec770ff3",
+  "source": "synthetic",
+  "notes": "16-byte valid-but-empty container (seen in the wild from fitfiletools): honest FIT_NO_CONTENT, no fabrication, no raise (spec-legal)"
+}

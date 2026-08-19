@@ -1,0 +1,23 @@
+{
+  "slug": "stryd-known-vendor",
+  "category": "devfields",
+  "taxonomy": [
+    22
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "dev_fields_stryd"
+    }
+  ],
+  "input_sha256": "10609fbfc9a43a5657da183a3e6146a680f120d1e9f473227fe8e25c8244b541",
+  "source": "synthetic",
+  "notes": "known-vendor resolution: Stryd power + LSS promoted to canonical streams"
+}

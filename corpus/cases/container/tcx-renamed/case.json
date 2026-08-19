@@ -1,0 +1,23 @@
+{
+  "slug": "tcx-renamed",
+  "category": "container",
+  "taxonomy": [
+    15
+  ],
+  "tier": 2,
+  "expect": "reject",
+  "modes": {
+    "strict": "raise:NOT_FIT_FORMAT",
+    "lenient": "reject",
+    "forensic": "reject"
+  },
+  "build": [
+    {
+      "op": "payload",
+      "kind": "tcx"
+    }
+  ],
+  "input_sha256": "4b24a3963207d2e9bd18c6db1f0b8fccae451d095eebde4898a7a0f7566387d4",
+  "source": "synthetic",
+  "notes": "TCX in disguise"
+}

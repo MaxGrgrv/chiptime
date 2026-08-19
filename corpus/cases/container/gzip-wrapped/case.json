@@ -1,0 +1,26 @@
+{
+  "slug": "gzip-wrapped",
+  "category": "container",
+  "taxonomy": [
+    14
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "ride_smooth"
+    },
+    {
+      "op": "gzip_wrap"
+    }
+  ],
+  "input_sha256": "b32cc21627158e09509e36c7cbf43a58a80345384ac2290564ab8535fe374554",
+  "source": "synthetic",
+  "notes": "gz-compressed .fit unwraps transparently"
+}

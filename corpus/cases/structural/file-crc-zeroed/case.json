@@ -1,0 +1,26 @@
+{
+  "slug": "file-crc-zeroed",
+  "category": "structural",
+  "taxonomy": [
+    4
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "raise:FIT_CRC_MISMATCH",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "run_basic"
+    },
+    {
+      "op": "zero_file_crc"
+    }
+  ],
+  "input_sha256": "78b7199b5acaf429c15474531dcf834d9c752af48a2bed377ffb0a83f2917d12",
+  "source": "synthetic",
+  "notes": "CRC trailer zeroed: triaged as unterminated-write class"
+}

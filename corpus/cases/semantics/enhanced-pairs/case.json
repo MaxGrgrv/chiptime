@@ -1,0 +1,24 @@
+{
+  "slug": "enhanced-pairs",
+  "category": "semantics",
+  "taxonomy": [
+    28,
+    61
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "enhanced_pairs"
+    }
+  ],
+  "input_sha256": "da451dddf9570b1b2d418d8dfeeddbf23aa482b62e75054cf04ea4a64bad3bf4",
+  "source": "synthetic",
+  "notes": "one stream per quantity; enhanced wins incl. 16-bit saturation; provenance on merge"
+}

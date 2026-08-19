@@ -1,0 +1,24 @@
+{
+  "slug": "array-fields",
+  "category": "protocol",
+  "taxonomy": [
+    34,
+    72
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "hrv_arrays"
+    }
+  ],
+  "input_sha256": "dddf7b6f86ca1908b64d2b135c4c89eb2d334b72b7428584c81bf50b881dcf32",
+  "source": "synthetic",
+  "notes": "hrv time arrays, sentinel-padded tails trimmed, interior nulls kept"
+}

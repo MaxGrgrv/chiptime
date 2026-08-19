@@ -1,0 +1,1 @@
+{"chiptime_schema":1,"errors":[{"byte_offset":0,"code":"NOT_FIT_FORMAT","detail":"content is JSON","suggestion":"route this file to a parser for the named format"}],"mode":"lenient","ok":false,"parts":[],"provenance":[],"recovery":null,"source":{"sha256":"8de005fed92a6cd22c82847d478f2cd05c620d51acb5045bf22de2d556f4999b","size_bytes":36,"unwrapped":[]},"warnings":[]}

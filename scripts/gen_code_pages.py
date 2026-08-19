@@ -1,0 +1,154 @@
+#!/usr/bin/env python3
+"""Generate one docs page per machine code (long-tail discoverability).
+
+Run from repo root:  uv run --project python python scripts/gen_code_pages.py
+Regenerate whenever the registries change; pages are committed (generated,
+never hand-edited — same policy as docs/for-agents.md).
+"""
+
+from __future__ import annotations
+
+import pathlib
+import sys
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "python" / "src"))
+
+from chiptime.errors import ERROR_CODES, PROVENANCE_CODES, WARNING_CODES  # isort:skip
+from chiptime.metrics import INSIGHT_CODES  # isort:skip
+
+OUT = ROOT / "website" / "reference" / "codes"
+
+CATEGORIES = {
+    "error": (
+        ERROR_CODES,
+        "Error — the file violates the FIT structure this code names. In "
+        "`lenient`/`forensic` mode it lands in `errors[]` on the result; in "
+        "`strict` mode it raises a `chiptime.FitError` subclass carrying this "
+        "code, a human `detail`, and (where useful) a `suggestion`.",
+    ),
+    "warning": (
+        WARNING_CODES,
+        "Warning — chiptime saw something suspicious, handled it, and "
+        "continued. Appears in `warnings[]` on the result in every mode.",
+    ),
+    "provenance": (
+        PROVENANCE_CODES,
+        "Provenance — a record of something chiptime *did* to your data "
+        "(dropped, repaired, synthesized, reinterpreted, ignored). Appears "
+        "in `provenance[]` with an `action`, a scope, and machine `data` — "
+        "the never-lose-data-silently contract in practice.",
+    ),
+    "insight": (
+        INSIGHT_CODES,
+        "Insight — a notable observation from the optional analytics layer "
+        "(`chiptime analyze` / `chiptime.metrics.analyze`). Appears in a "
+        "report's `insights[]` with a human message and numeric `evidence`.",
+    ),
+}
+
+
+def corpus_evidence() -> dict[str, list[str]]:
+    """code -> corpus case paths whose committed expectations mention it."""
+    hits: dict[str, list[str]] = {}
+    for case_dir in sorted((ROOT / "corpus" / "cases").glob("*/*")):
+        blob = ""
+        for name in ("expected.json", "case.json"):
+            f = case_dir / name
+            if f.exists():
+                blob += f.read_text()
+        for cat in ("error", "warning", "provenance"):
+            for code in CATEGORIES[cat][0]:
+                if f'"{code}"' in blob:
+                    hits.setdefault(code, []).append(f"{case_dir.parent.name}/{case_dir.name}")
+    return hits
+
+
+def main() -> None:
+    OUT.mkdir(parents=True, exist_ok=True)
+    for old in OUT.glob("*.md"):
+        old.unlink()
+    evidence = corpus_evidence()
+
+    index_rows: list[str] = []
+    parse_snippet = (
+        "import chiptime\n\n"
+        'result = chiptime.parse("activity.fit")\n'
+        "for d in [*result.errors, *result.warnings, *result.provenance]:\n"
+        '    if d.code == "{code}":\n'
+        '        print(d.code, "-", d.detail)'
+    )
+    insight_snippet = (
+        "import chiptime\nfrom chiptime import metrics\n\n"
+        'report = metrics.analyze(chiptime.parse("activity.fit"))\n'
+        "for ins in report.sessions[0].insights:\n"
+        '    if ins.code == "{code}":\n'
+        "        print(ins.message, ins.evidence)"
+    )
+    for cat, (registry, blurb) in CATEGORIES.items():
+        snippet_tpl = insight_snippet if cat == "insight" else parse_snippet
+        for code, meaning in registry.items():
+            slug = code.lower().replace("_", "-")
+            snippet = snippet_tpl.format(code=code)
+            cases = evidence.get(code, [])
+            case_md = ""
+            if cases:
+                links = " · ".join(
+                    f"[`{c}`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/{c})"
+                    for c in cases[:6]
+                )
+                case_md = (
+                    f"\n## Proven by corpus cases\n\nThis code's behavior is "
+                    f"pinned by committed conformance cases: {links}\n"
+                )
+            page = f"""---
+description: "{code}: {meaning} — what this chiptime {cat} code means and how to handle it."
+---
+
+# `{code}`
+
+> Generated from the code registries by `scripts/gen_code_pages.py` — do not hand-edit.
+
+**{meaning}**
+
+{blurb}
+{case_md}
+## Handling it
+
+```python
+{snippet}
+```
+
+All codes are stable machine contract — grep logs for the string `{code}`,
+branch on it in pipelines, and see the [codes registry](index.md) for the
+full list.
+"""
+            (OUT / f"{slug}.md").write_text(page)
+            index_rows.append(f"| [`{code}`]({slug}.md) | {cat} | {meaning} |")
+
+    n = len(index_rows)
+    desc = (
+        f"Every chiptime machine code — {n} errors, warnings, provenance "
+        "entries, and insight codes — each with its own page."
+    )
+    (OUT / "index.md").write_text(f"""---
+description: {desc}
+---
+
+# Codes registry
+
+> Generated by `scripts/gen_code_pages.py` from the code registries — do not hand-edit.
+
+Every diagnostic chiptime emits carries a stable machine code. Each code has
+its own page; the complete agent-facing contract (schema, exit codes) lives in
+[Built for agents](../../guides/agents.md).
+
+| Code | Kind | Meaning |
+|---|---|---|
+{chr(10).join(index_rows)}
+""")
+    print(f"wrote {n} code pages + index to {OUT}")
+
+
+if __name__ == "__main__":
+    main()

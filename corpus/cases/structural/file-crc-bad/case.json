@@ -1,0 +1,26 @@
+{
+  "slug": "file-crc-bad",
+  "category": "structural",
+  "taxonomy": [
+    4
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "raise:FIT_CRC_MISMATCH",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "ride_smooth"
+    },
+    {
+      "op": "break_file_crc"
+    }
+  ],
+  "input_sha256": "d20e474b646c5852a71fd35e458fa4cd7574801ca00b644550e96d5cc7238887",
+  "source": "synthetic",
+  "notes": "wrong file CRC over intact content: warn + continue (fitparse #9 class)"
+}

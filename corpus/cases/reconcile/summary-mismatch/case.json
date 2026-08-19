@@ -1,0 +1,25 @@
+{
+  "slug": "summary-mismatch",
+  "category": "reconcile",
+  "taxonomy": [
+    92,
+    93,
+    58
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "summary_mismatch"
+    }
+  ],
+  "input_sha256": "4f2ed312658e07cf258427533c363bc693deeabb9499c55d203c56091c886757",
+  "source": "synthetic",
+  "notes": "summary lies about elapsed/distance/power/ascent; avg>max; all exposed, none auto-corrected"
+}

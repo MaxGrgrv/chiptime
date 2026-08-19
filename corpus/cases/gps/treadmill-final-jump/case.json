@@ -1,0 +1,23 @@
+{
+  "slug": "treadmill-final-jump",
+  "category": "gps",
+  "taxonomy": [
+    78
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "treadmill_jump"
+    }
+  ],
+  "input_sha256": "a2a5b20116fb1be952e0853da1fbe51dc78f8647dac40350b478a5a5ed7ef9da",
+  "source": "synthetic",
+  "notes": "manual end-of-run distance correction: no spurious flags"
+}

@@ -1,0 +1,29 @@
+{
+  "slug": "garbage-block-midfile",
+  "category": "structural",
+  "taxonomy": [
+    10,
+    17
+  ],
+  "tier": 1,
+  "expect": "partial",
+  "modes": {
+    "strict": "raise:FIT_DEFINITION_INVALID",
+    "lenient": "partial",
+    "forensic": "partial"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "ride_smooth"
+    },
+    {
+      "op": "overwrite",
+      "offset": 1500,
+      "data": "55555555555555555555555555555555555555555555555555555555555555555555555555555555"
+    }
+  ],
+  "input_sha256": "bc71faa880903869d0dad403c17920d6fff17126f14237a304d218f951560631",
+  "source": "synthetic",
+  "notes": "bad flash sector: 40 trashed bytes; resync resumes at re-emitted definition"
+}

@@ -1,0 +1,23 @@
+{
+  "slug": "float-nan-inf",
+  "category": "protocol",
+  "taxonomy": [
+    35
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "float_fields"
+    }
+  ],
+  "input_sha256": "0c2d039edfe7f9af931a2f3223cf2750655fa717b88c26750f3ca5f7a43f041d",
+  "source": "synthetic",
+  "notes": "NaN/Inf floats null with diagnostic"
+}

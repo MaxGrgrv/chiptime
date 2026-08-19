@@ -1,0 +1,23 @@
+{
+  "slug": "dev-index-reused",
+  "category": "devfields",
+  "taxonomy": [
+    22
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "dev_index_reused"
+    }
+  ],
+  "input_sha256": "3554f8a84520eaa0161fc913786bc07b30c7e12433a3b390694b34c588432ae7",
+  "source": "synthetic",
+  "notes": "developer_data_index reused by a second app mid-file: forward semantics + warning"
+}

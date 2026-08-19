@@ -1,0 +1,23 @@
+{
+  "slug": "zero-duration-lap",
+  "category": "reconcile",
+  "taxonomy": [
+    94
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "zero_duration_lap"
+    }
+  ],
+  "input_sha256": "cee827d5307c101cf16acc01ef24c792bf77c7fcb19acb0968092f6c3055002e",
+  "source": "synthetic",
+  "notes": "double lap-press zero-duration lap flagged"
+}

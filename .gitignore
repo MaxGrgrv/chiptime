@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node (for the future JS implementation)
+node_modules/
+*.tsbuildinfo
+
+# Editors
+.idea/
+.vscode/
+
+# Claude workspace — local-only, never committed
+.claude/
+CLAUDE.md
+
+# Real-device corpus tier: NEVER committed (ADR-0007 — PII)
+corpus/private/
+.site-build/
+
+# Internal-only research (competitive analysis stays private)
+docs/internal/

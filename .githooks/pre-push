@@ -1,0 +1,16 @@
+#!/bin/sh
+# chiptime pre-push gate: what CI checks, checked BEFORE the push exists.
+# Installed via: git config core.hooksPath .githooks   (documented in CLAUDE.md)
+set -e
+cd "$(git rev-parse --show-toplevel)"
+echo "pre-push gate: ruff (full scope)"
+(cd python && uv run ruff check . ../corpus/tools ../scripts)
+echo "pre-push gate: ruff format"
+(cd python && uv run ruff format --check . ../corpus/tools ../scripts)
+echo "pre-push gate: mypy"
+(cd python && uv run mypy)
+echo "pre-push gate: corpus integrity"
+uv run --project python python corpus/tools/gen_all.py > /dev/null
+echo "pre-push gate: pytest"
+(cd python && uv run pytest -q)
+echo "pre-push gate: all green"

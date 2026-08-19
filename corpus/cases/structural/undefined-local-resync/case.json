@@ -1,0 +1,23 @@
+{
+  "slug": "undefined-local-resync",
+  "category": "structural",
+  "taxonomy": [
+    19
+  ],
+  "tier": 1,
+  "expect": "partial",
+  "modes": {
+    "strict": "raise:FIT_UNDEFINED_LOCAL_TYPE",
+    "lenient": "partial",
+    "forensic": "partial"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "undefined_local"
+    }
+  ],
+  "input_sha256": "f9bd4c8ea8d64f84332f66b7edddf28209d2ceac3b6f0c393e6afbe8888ff9cb",
+  "source": "synthetic",
+  "notes": "fitparse #105 class: data for a lost definition; both sides salvaged"
+}

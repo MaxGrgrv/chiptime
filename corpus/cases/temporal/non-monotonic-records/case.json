@@ -1,0 +1,24 @@
+{
+  "slug": "non-monotonic-records",
+  "category": "temporal",
+  "taxonomy": [
+    41,
+    42
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "nonmonotonic"
+    }
+  ],
+  "input_sha256": "300442113e51db7b260abeb0abc329b1d8dc7fa26712696903e166b09979c9a5",
+  "source": "synthetic",
+  "notes": "backwards clock jump + duplicate second: stable sort, decision recorded"
+}

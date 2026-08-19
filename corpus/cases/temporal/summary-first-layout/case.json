@@ -1,0 +1,23 @@
+{
+  "slug": "summary-first-layout",
+  "category": "temporal",
+  "taxonomy": [
+    50
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "summary_first"
+    }
+  ],
+  "input_sha256": "1c6c7b5317837755f70f3c84a504d19c24577cef2ddc4a01cbfce01e6aa854af",
+  "source": "synthetic",
+  "notes": "Dec-2023 Garmin layout change: summaries precede records; order-independent assembly required"
+}

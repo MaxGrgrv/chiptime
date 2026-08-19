@@ -1,0 +1,24 @@
+{
+  "slug": "float-sentinel-vs-nan",
+  "category": "protocol",
+  "taxonomy": [
+    26,
+    35
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "float_sentinel_vs_nan"
+    }
+  ],
+  "input_sha256": "3fee9d2e670554c1c3c7ef0cc27da34fe7d82a5967c9296f181478bdb02215d4",
+  "source": "synthetic",
+  "notes": "all-ones float = silent absence; genuine NaN = nulled with warning (muktihari#39)"
+}

@@ -1,0 +1,23 @@
+{
+  "slug": "summary-only-activity",
+  "category": "routing",
+  "taxonomy": [
+    79
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "summary_only"
+    }
+  ],
+  "input_sha256": "48d1abc3a8951cc79b40230c4656d3ecadd6b7c0df6bc7bb416967860f1d7e1c",
+  "source": "synthetic",
+  "notes": "manual activity: session + zero records is valid output, not an error"
+}

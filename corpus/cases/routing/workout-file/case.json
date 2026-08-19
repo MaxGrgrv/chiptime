@@ -1,0 +1,23 @@
+{
+  "slug": "workout-file",
+  "category": "routing",
+  "taxonomy": [
+    80
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "workout_file"
+    }
+  ],
+  "input_sha256": "b44aef861c412143abac1bfce6a8b7d9412aa0500e923de1ee2e959fbe29ab7b",
+  "source": "synthetic",
+  "notes": "file_id.type=workout routes correctly"
+}

@@ -1,0 +1,36 @@
+{
+  "slug": "header-size-invalid",
+  "category": "structural",
+  "taxonomy": [
+    6
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "raise:FIT_HEADER_INVALID",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "ride_smooth"
+    },
+    {
+      "op": "overwrite",
+      "offset": 0,
+      "data": "10"
+    },
+    {
+      "op": "insert",
+      "offset": 12,
+      "data": "0000"
+    },
+    {
+      "op": "fix_file_crc"
+    }
+  ],
+  "input_sha256": "989bb780573ae923a468170b9ae5f65272402f50f83ee9bb4cf5cd5e3432eb23",
+  "source": "synthetic",
+  "notes": "16-byte header from an ancient/odd encoder; magic present so proceed"
+}

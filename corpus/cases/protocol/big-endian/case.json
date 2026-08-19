@@ -1,0 +1,23 @@
+{
+  "slug": "big-endian",
+  "category": "protocol",
+  "taxonomy": [
+    32
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "big_endian_mixed"
+    }
+  ],
+  "input_sha256": "554c3feec7996dcf54c79df0c4eeef9ccf082bb17d639844cf3160a09dddcee1",
+  "source": "synthetic",
+  "notes": "big-endian definition among little-endian ones"
+}

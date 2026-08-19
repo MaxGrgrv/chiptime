@@ -1,0 +1,23 @@
+{
+  "slug": "empty-file",
+  "category": "structural",
+  "taxonomy": [
+    1
+  ],
+  "tier": 1,
+  "expect": "reject",
+  "modes": {
+    "strict": "raise:FIT_EMPTY",
+    "lenient": "reject",
+    "forensic": "reject"
+  },
+  "build": [
+    {
+      "op": "payload",
+      "kind": "empty"
+    }
+  ],
+  "input_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "source": "synthetic",
+  "notes": "device crashed before writing anything"
+}

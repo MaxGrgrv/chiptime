@@ -1,0 +1,23 @@
+{
+  "slug": "json-error",
+  "category": "container",
+  "taxonomy": [
+    15
+  ],
+  "tier": 2,
+  "expect": "reject",
+  "modes": {
+    "strict": "raise:NOT_FIT_FORMAT",
+    "lenient": "reject",
+    "forensic": "reject"
+  },
+  "build": [
+    {
+      "op": "payload",
+      "kind": "json"
+    }
+  ],
+  "input_sha256": "8de005fed92a6cd22c82847d478f2cd05c620d51acb5045bf22de2d556f4999b",
+  "source": "synthetic",
+  "notes": "JSON error body saved as .fit"
+}

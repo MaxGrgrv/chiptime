@@ -1,0 +1,24 @@
+{
+  "slug": "timestamp-as-bytes",
+  "category": "temporal",
+  "taxonomy": [
+    17,
+    88
+  ],
+  "tier": 3,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "ts_as_bytes"
+    }
+  ],
+  "input_sha256": "a6dc8d4a12a325508d0f2b6bbae87106dc42315e45d6f2dcc555144b4fe29a76",
+  "source": "synthetic",
+  "notes": "field 253 declared byte[4] reassembled (Xiaomi pipeline, fitdecode#33)"
+}

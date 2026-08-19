@@ -1,0 +1,23 @@
+{
+  "slug": "event-subfields",
+  "category": "protocol",
+  "taxonomy": [
+    31
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "event_subfields"
+    }
+  ],
+  "input_sha256": "c5d1fe4a0ae65ac837f8b2163f56ca7ae8170befd35bc28a351e837fc8d02e83",
+  "source": "synthetic",
+  "notes": "event.data resolved to timer_trigger; auto_pause gap classified from it"
+}

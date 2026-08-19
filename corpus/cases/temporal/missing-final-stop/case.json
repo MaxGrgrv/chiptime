@@ -1,0 +1,23 @@
+{
+  "slug": "missing-final-stop",
+  "category": "temporal",
+  "taxonomy": [
+    45
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "missing_final_stop"
+    }
+  ],
+  "input_sha256": "a1e594d84158ae2f4660bfea7431c7a857097f47ff94c7d3bb431d902c502bf5",
+  "source": "synthetic",
+  "notes": "crash before stop: timer closed at last record with provenance"
+}

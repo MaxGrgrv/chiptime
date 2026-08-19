@@ -1,0 +1,23 @@
+{
+  "slug": "frame-shift-insert",
+  "category": "protocol",
+  "taxonomy": [
+    11
+  ],
+  "tier": 1,
+  "expect": "partial",
+  "modes": {
+    "strict": "raise:FIT_UNDEFINED_LOCAL_TYPE",
+    "lenient": "partial",
+    "forensic": "partial"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "frame_shift"
+    }
+  ],
+  "input_sha256": "0fa4a195f6fa456663e463167a80c54d5662f50b1a1008435ae4bd2c3d7c4329",
+  "source": "synthetic",
+  "notes": "one inserted byte misaligns frames; re-anchored at next definition; shifted region may decode as bogus messages (documented limitation)"
+}

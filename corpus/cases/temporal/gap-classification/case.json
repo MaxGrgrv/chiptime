@@ -1,0 +1,26 @@
+{
+  "slug": "gap-classification",
+  "category": "temporal",
+  "taxonomy": [
+    43,
+    44,
+    45,
+    46
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "gaps_timers"
+    }
+  ],
+  "input_sha256": "5b9a4e6fd0bfc963b6046f0fd6e6a25de70db3a5b37a207a778efa74cca8bb70",
+  "source": "synthetic",
+  "notes": "every gap kind in one file; two timer intervals; three durations derived"
+}

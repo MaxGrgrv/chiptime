@@ -1,0 +1,23 @@
+{
+  "slug": "late-field-description",
+  "category": "devfields",
+  "taxonomy": [
+    22
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "dev_late_description"
+    }
+  ],
+  "input_sha256": "e46fb220c28434fe227d71f6b302bcef12e1960b49a61fe17eacf346fe9c01b3",
+  "source": "synthetic",
+  "notes": "field_description after its data: earlier records back-filled with provenance"
+}

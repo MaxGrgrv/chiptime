@@ -1,0 +1,29 @@
+{
+  "slug": "chained-two-activities",
+  "category": "structural",
+  "taxonomy": [
+    12
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "ride_smooth"
+    },
+    {
+      "op": "chain",
+      "seeds": [
+        "run_basic"
+      ]
+    }
+  ],
+  "input_sha256": "9625e7160c0ade30aa0d5ec3e58c6e23f0765300858b3697cb1a5b5506eed930",
+  "source": "synthetic",
+  "notes": "two complete FIT files concatenated; both parts parsed"
+}

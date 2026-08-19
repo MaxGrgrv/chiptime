@@ -1,0 +1,23 @@
+{
+  "slug": "pool-lengths",
+  "category": "swim",
+  "taxonomy": [
+    73
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "pool_swim"
+    }
+  ],
+  "input_sha256": "ca03c877d0f3bc52d03228312ff0c9dd8715ae3b222c1603f67cb0180d936287",
+  "source": "synthetic",
+  "notes": "active lengths, zero-length artifact, implausible implied pool size"
+}

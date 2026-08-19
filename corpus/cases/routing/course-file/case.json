@@ -1,0 +1,23 @@
+{
+  "slug": "course-file",
+  "category": "routing",
+  "taxonomy": [
+    80
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "course_file"
+    }
+  ],
+  "input_sha256": "f510017b3a6dafe6aec2614f80a7a67ff1621dc3ecde9ccffcb21cbe3d1be3c2",
+  "source": "synthetic",
+  "notes": "file_id.type=course routes correctly"
+}

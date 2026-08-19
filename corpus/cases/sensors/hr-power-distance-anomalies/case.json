@@ -1,0 +1,25 @@
+{
+  "slug": "hr-power-distance-anomalies",
+  "category": "sensors",
+  "taxonomy": [
+    59,
+    62,
+    63
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "sensor_anomalies"
+    }
+  ],
+  "input_sha256": "93bae72c8bad4befc2d04ebc172f5ebe7a4518ac1ef34030d6807ff87c87f81b",
+  "source": "synthetic",
+  "notes": "HR spikes+flatline, 4kW power spike, distance decrease+reset \u2014 all flagged, none edited"
+}

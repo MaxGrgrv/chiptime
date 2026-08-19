@@ -1,0 +1,23 @@
+{
+  "slug": "missing-field-description",
+  "category": "devfields",
+  "taxonomy": [
+    22
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "dev_missing_description"
+    }
+  ],
+  "input_sha256": "e7a76bd200bc1d6827595a0715106cc0ac4420e5a366a40de2a09f8f9cf88cb7",
+  "source": "synthetic",
+  "notes": "dev data with no field_description: synthesized name, raw kept (fitparse #124 sibling)"
+}

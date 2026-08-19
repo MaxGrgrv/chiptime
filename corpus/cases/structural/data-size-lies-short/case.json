@@ -1,0 +1,30 @@
+{
+  "slug": "data-size-lies-short",
+  "category": "structural",
+  "taxonomy": [
+    7
+  ],
+  "tier": 1,
+  "expect": "partial",
+  "modes": {
+    "strict": "raise:FIT_TRUNCATED",
+    "lenient": "partial",
+    "forensic": "partial"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "ride_smooth"
+    },
+    {
+      "op": "set_data_size",
+      "value": 3469
+    },
+    {
+      "op": "fix_header_crc"
+    }
+  ],
+  "input_sha256": "a19bb5329778214b9d24574b5f6ace53d1d9d1c19f0e6271671ace10725924bb",
+  "source": "synthetic",
+  "notes": "declared data_size cuts mid-record; trust actual content"
+}

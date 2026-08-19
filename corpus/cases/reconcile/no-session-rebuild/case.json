@@ -1,0 +1,24 @@
+{
+  "slug": "no-session-rebuild",
+  "category": "reconcile",
+  "taxonomy": [
+    95,
+    96
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "no_session"
+    }
+  ],
+  "input_sha256": "d399cca7e98d341968fb33f984925b32e8c4ce7093ecac5a9c5eef04c6855dd3",
+  "source": "synthetic",
+  "notes": "crash-before-summary: session rebuilt from records; missing activity flagged"
+}

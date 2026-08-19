@@ -1,0 +1,25 @@
+{
+  "slug": "ride-smooth",
+  "category": "clean",
+  "taxonomy": [
+    27,
+    64,
+    68
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "ride_smooth"
+    }
+  ],
+  "input_sha256": "0292af062d667ff719820028c8f3ae0ab149f506f1f742135e7eca8e6fce543f",
+  "source": "synthetic",
+  "notes": "clean cycling seed: scale/offset, real-zero power, per-stream dropout"
+}
