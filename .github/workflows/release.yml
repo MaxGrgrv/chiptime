@@ -3,6 +3,7 @@ name: release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch: {}   # manual re-release of whatever version pyproject holds
 
 jobs:
   build:
