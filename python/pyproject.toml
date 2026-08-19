@@ -46,6 +46,7 @@ docs = [
     "mkdocstrings[python]>=0.26",
     "mkdocs-llmstxt>=0.2",
     "mkdocs-git-revision-date-localized-plugin>=1.2",
+    "mkdocs-rss-plugin>=1.15",
 ]
 dev = [
     "pytest>=8.3",
