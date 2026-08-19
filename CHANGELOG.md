@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1 — 2026-08-19
+
+- Verified on Python 3.14 (full suite, strict typing, byte-identical
+  corpus output); classifiers and CI matrix now cover 3.11–3.14.
+  `requires-python >=3.11` is unchanged — newer Pythons were never
+  blocked, the metadata just lagged.
+
 ## 0.4.0 — 2026-08-18 (M2.7: analytics layer)
 
 `chiptime.metrics` grows from a module into the analytics package (ADR-0008):

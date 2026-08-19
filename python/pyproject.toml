@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "chiptime"
-version = "0.4.0"
+version = "0.4.1"
 description = "Recovery-grade FIT file processing: parse anything, lose nothing silently, explain everything."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -19,6 +19,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Information Analysis",
     "Typing :: Typed",
 ]
