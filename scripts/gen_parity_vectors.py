@@ -18,6 +18,7 @@ the thing that actually has to match. Deterministic: no wall clock, no randomnes
 
 from __future__ import annotations
 
+import hashlib
 import json
 import pathlib
 import sys
@@ -345,6 +346,85 @@ def timestamp_vectors() -> None:
     )
 
 
+def inflate_vectors() -> None:
+    """DEFLATE/gzip vectors from CPython's zlib (F35, amendment D3).
+
+    inflate.ts is the one module with no Python twin, and the corpus reaches it
+    through two cases. DEFLATE has three block types and an implementation that gets
+    stored and fixed-Huffman right would pass both, so the probes force all three:
+    level 0 emits stored blocks, tiny inputs emit fixed-Huffman, and varied input
+    emits dynamic-Huffman. Long repetitive inputs push back-references past the
+    32 KiB window.
+    """
+    import zlib
+
+    probes: list[tuple[str, bytes]] = [
+        ("empty", b""),
+        ("one-byte", b"A"),
+        ("tiny", b"hello"),
+        ("ascii", b"the quick brown fox jumps over the lazy dog" * 3),
+        ("repetitive", b"ABCD" * 5000),  # back-references far past the window
+        ("window-crossing", bytes(range(256)) * 200),
+        ("incompressible", bytes((i * 2654435761) % 256 for i in range(70000))),
+        ("nul-heavy", bytes(40000)),
+        ("fit-like", b"\x0e\x10\x9c\x08" + bytes(range(64)) * 500),
+    ]
+    rows = []
+    for name, raw in probes:
+        for level in range(10):
+            co = zlib.compressobj(level, zlib.DEFLATED, -15)  # raw deflate
+            deflated = co.compress(raw) + co.flush()
+            rows.append(
+                {
+                    "name": f"{name}@{level}",
+                    "deflate": deflated.hex(),
+                    "gzip": zlib.compress(raw, level).hex(),  # zlib wrapper
+                    "sha256": hashlib.sha256(raw).hexdigest(),
+                    "size": len(raw),
+                }
+            )
+    _write("inflate.json", rows)
+
+    # Corrupt streams, recorded against the API intake actually uses. gzip.decompress
+    # requires a complete stream, unlike zlib.decompressobj which happily returns a
+    # partial result -- comparing against the wrong one would have taught the port the
+    # wrong lenience.
+    import gzip as gziplib
+
+    payload = b"the quick brown fox" * 50
+    whole = zlib.compress(payload, 6)  # zlib wrapper, as gzip.compress-like
+    gz = gziplib.compress(payload)
+    variants = [
+        ("gz-truncated-half", gz[: len(gz) // 2]),
+        ("gz-truncated-header", gz[:3]),
+        ("gz-empty", b""),
+        ("gz-garbage", bytes.fromhex("deadbeefcafebabe")),
+        ("gz-bad-magic", b"XX" + gz[2:]),
+        ("gz-flipped-body", gz[:20] + bytes([gz[20] ^ 0xFF]) + gz[21:]),
+        ("zlib-truncated", whole[: len(whole) // 2]),
+    ]
+    rows = []
+    for name, blob in variants:
+        try:
+            gziplib.decompress(blob) if name.startswith("gz") else zlib.decompress(blob)
+            raises = False
+        except Exception:
+            raises = True
+        rows.append({"name": name, "hex": blob.hex(), "pythonRaises": raises})
+    _write("inflate-bad.json", rows)
+
+
+def sha256_vectors() -> None:
+    """SHA-256 over byte patterns spanning the block and length-field boundaries."""
+    probes = [b"", b"a", b"abc", b"\x00", bytes(range(256))]
+    probes += [bytes(n) for n in (55, 56, 57, 63, 64, 65, 119, 120, 127, 128, 129, 1000)]
+    probes += [b"the quick brown fox" * 100]
+    _write(
+        "sha256.json",
+        [{"hex": p.hex(), "digest": hashlib.sha256(p).hexdigest()} for p in probes],
+    )
+
+
 def crc_vectors() -> None:
     """crc16 over adversarial byte patterns (F33).
 
@@ -377,6 +457,8 @@ def main() -> None:
     crc_vectors()
     utf8_vectors()
     timestamp_vectors()
+    inflate_vectors()
+    sha256_vectors()
 
 
 if __name__ == "__main__":

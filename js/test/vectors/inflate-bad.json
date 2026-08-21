@@ -1,0 +1,37 @@
+[
+  {
+    "name": "gz-truncated-half",
+    "hex": "1f8b08004ae3886a02ff2bc94855282ccd4cce56482aca2f",
+    "pythonRaises": true
+  },
+  {
+    "name": "gz-truncated-header",
+    "hex": "1f8b08",
+    "pythonRaises": true
+  },
+  {
+    "name": "gz-empty",
+    "hex": "",
+    "pythonRaises": false
+  },
+  {
+    "name": "gz-garbage",
+    "hex": "deadbeefcafebabe",
+    "pythonRaises": true
+  },
+  {
+    "name": "gz-bad-magic",
+    "hex": "585808004ae3886a02ff2bc94855282ccd4cce56482aca2fcf5348cbaf2819151a151a151acc4200e08dd320b6030000",
+    "pythonRaises": true
+  },
+  {
+    "name": "gz-flipped-body",
+    "hex": "1f8b08004ae3886a02ff2bc94855282ccd4cce56b72aca2fcf5348cbaf2819151a151a151acc4200e08dd320b6030000",
+    "pythonRaises": true
+  },
+  {
+    "name": "zlib-truncated",
+    "hex": "789c2bc94855282ccd4cce56482aca2fcf53",
+    "pythonRaises": true
+  }
+]

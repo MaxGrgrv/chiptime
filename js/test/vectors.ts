@@ -45,6 +45,23 @@ export interface TimestampVector {
   iso: string;
   local: string;
 }
+export interface InflateVector {
+  name: string;
+  deflate: string;
+  gzip: string;
+  sha256: string;
+  size: number;
+}
+export interface BadInflateVector {
+  name: string;
+  hex: string;
+  /** What CPython's gzip.decompress / zlib.decompress does — the API intake uses. */
+  pythonRaises: boolean;
+}
+export interface Sha256Vector {
+  hex: string;
+  digest: string;
+}
 export interface NumericVectors {
   pyRound: [number, number][];
   pyRoundN: [number, number, number][];
@@ -60,6 +77,9 @@ export const baseTypeVectors = load<BaseTypeVector[]>("base-types.json");
 export const crcVectors = load<CrcVector[]>("crc16.json");
 export const utf8Vectors = load<Utf8Vector[]>("utf8.json");
 export const timestampVectors = load<TimestampVector[]>("timestamps.json");
+export const inflateVectors = load<InflateVector[]>("inflate.json");
+export const badInflateVectors = load<BadInflateVector[]>("inflate-bad.json");
+export const sha256Vectors = load<Sha256Vector[]>("sha256.json");
 
 export function fromHex(hex: string): Uint8Array {
   const out = new Uint8Array(hex.length / 2);
