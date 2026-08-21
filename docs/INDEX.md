@@ -64,7 +64,7 @@ Plan: [m3-typescript-plan.md](m3-typescript-plan.md) · contract: [ADR-0009](arc
 | Feature | Status | Spec | Implementation |
 |---|---|---|---|
 | F31 JS scaffolding, canonical JSON, number kernel | DONE | [spec](features/f31-js-scaffolding-canonical-numeric.md) | [impl](implementation/f31-js-scaffolding-canonical-numeric.md) |
-| F32 Profile dual emitter (Python + TS) | PLANNED | — | — |
+| F32 Profile tables for TypeScript | CRITIQUED | [spec](features/f32-js-profile-tables.md) | — |
 | F33 Frames + decode core (TS) | PLANNED | — | — |
 | F34 Intake, inflate, recovery, result, CLI (TS) | PLANNED | — | — |
 | F35 Semantics — full corpus parity (npm 0.1.0) | PLANNED | — | — |
