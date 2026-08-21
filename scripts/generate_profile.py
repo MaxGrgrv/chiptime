@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """Generate chiptime's full profile tables from a locally-downloaded FIT SDK.
 
+SDK distribution note (2026): the SDK zip was discontinued with release
+21.194.00 (2026-02-10). Profile.xlsx now ships from the FIT SDK Tools
+repository (github.com/garmin/fit-sdk-tools); per-language SDKs moved to
+package managers. Licensing is unchanged — Profile.xlsx is still never
+committed here, only our generated output.
+
 Usage:
     python scripts/generate_profile.py ~/Downloads/FitSDKRelease_21.158.00.zip
 

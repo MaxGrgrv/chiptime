@@ -307,7 +307,10 @@ def scrub(
     Args:
         src: Path, bytes, or binary file object.
         identity: Drop `user_profile` and identity fields.
-        serials: Null device serial numbers and ANT device ids.
+        serials: Null device serial numbers and ANT device ids. Note that
+            platforms are reported to use `file_id.serial_number` when
+            deciding whether an activity counts toward challenges and
+            badges — keep them if you intend to re-upload.
         body_metrics: Drop `zones_target` and physiology fields (FTP, max HR,
             VO2max…).
         gps_radius_m: Conceal every GPS point within this many metres of the

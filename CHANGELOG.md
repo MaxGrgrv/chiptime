@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- `chiptime parse` now prints the *content* of declared-vs-derived
+  discrepancies, not just a count: "ascent_m: device says 86, records say
+  51.2 (delta -34.8)". Platforms silently pick different sides of these
+  disagreements, which is why the same file yields different numbers in
+  different apps; chiptime shows you both.
+- Privacy guide documents two trade-offs it previously left implicit:
+  stripping `file_id.serial_number` may cost credit toward platform
+  challenges and badges (use `--keep-serials` when re-uploading), and
+  Strava's *Export Original* does not apply privacy zones.
+
 ## 0.7.0 — 2026-08-21
 
 - **New: `chiptime reveal`** — see what a file discloses about you before you

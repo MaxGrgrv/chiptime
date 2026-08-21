@@ -460,6 +460,15 @@ def _summary(r: chiptime.ParseResult) -> None:
             if s.discrepancies:
                 bits.append(f"discrepancies={len(s.discrepancies)}")
             print(f"session[{i}] {s.sport}: " + "  ".join(bits))
+            for d in s.discrepancies[:4]:
+                # the device's claim vs what its own records prove; platforms
+                # silently pick different sides of this and users get four answers
+                print(
+                    f"    {d.field}: device says {d.declared:g}, records say "
+                    f"{d.derived:g} (delta {d.delta:+g})"
+                )
+            if len(s.discrepancies) > 4:
+                print(f"    … and {len(s.discrepancies) - 4} more")
         if a.gaps:
             kinds = ", ".join(f"{g.kind}({g.duration_s:.0f}s)" for g in a.gaps[:6])
             print(f"gaps: {kinds}" + (" …" if len(a.gaps) > 6 else ""))

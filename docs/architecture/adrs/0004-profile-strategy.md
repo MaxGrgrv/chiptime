@@ -8,7 +8,9 @@ Message/field definitions ("Global FIT Profile") ship in Garmin's SDK under the 
 ## Decision
 1. **M1/M2 ship a hand-authored core profile** (`chiptime/profile/core.py`): the ~15 message types the semantic layer actually interprets (file_id, record, session, lap, event, activity, device_info, sport, length, hrv, field_description, developer_data_id, file_creator, user_profile, course/workout minimums) with field numbers, base types, scale/offset, units, and the enums we map. These are functional interface facts required for interoperability — the GoldenCheetah approach, and the material the license's §1 permits using in one's own software.
 2. **Accuracy is verified, not trusted**: `scripts/check_profile_against_fitdecode.py` (dev-only, `baselines` group) diffs our tables against fitdecode's MIT-licensed generated profile and fails on mismatch. Run at authoring time and in `/verify` when profile files change. fitdecode is never imported by chiptime itself.
-3. **Breadth comes later via the generator**: `scripts/generate_profile.py` (written when needed) converts a *maintainer-downloaded* SDK profile into `profile/generated.py` under our license with a provenance header (SDK version, date) — the 14-years-unchallenged fitparse/fitdecode pattern. Never run in CI; its output is reviewed and committed by a human.
+3. **Breadth comes later via the generator**: `scripts/generate_profile.py` (written when needed) converts a *maintainer-downloaded* SDK profile into `profile/generated.py` under our license with a provenance header (SDK version, date) — the long-established open-source pattern. Never run in CI; its output is reviewed and committed by a human.
+
+   *Distribution note (2026-08-21):* the SDK zip was discontinued with release 21.194.00 (2026-02-10); `Profile.xlsx` now ships from the FIT SDK Tools repository (github.com/garmin/fit-sdk-tools). The licensing constraints in CLAUDE.md are unchanged.
 4. **Profile absence is never fatal** (contract #6): any message/field not in our tables decodes as `unknown_*` with raw values preserved. A stale or narrow profile degrades to less *naming*, never to failure.
 
 ## Consequences

@@ -11,6 +11,12 @@ and max heart rate, threshold power. Most people have never seen this,
 because nothing surfaces it. Then they email the file to a coach, or attach
 it to a forum post asking why their watch is misbehaving.
 
+!!! tip "Exporting from Strava does not apply your privacy zones"
+    Strava's *Export Original* hands back the file your device wrote —
+    privacy zones are a display feature of the website, not a property of
+    the file. If you downloaded it from Strava, assume the coordinates are
+    unmasked.
+
 ## First, look
 
 ```bash
@@ -61,6 +67,14 @@ open("clean.fit", "wb").write(result.data)
 Metadata categories are on by default because removing them costs you no
 measurements. Location scrubbing is opt-in, because it does. Keep any
 category with `--keep-identity`, `--keep-serials`, `--keep-body-metrics`.
+
+!!! warning "Serial numbers and platform credit"
+    Garmin is reported to use `file_id.serial_number` when deciding whether
+    an activity counts toward challenges and badges. If you scrub a file
+    you intend to **re-upload to Garmin Connect**, pass `--keep-serials`;
+    if you are sharing the file with a person, remove them. Privacy and
+    platform credit genuinely pull in opposite directions here, and only
+    you know which you want.
 
 ## How location concealment works
 
