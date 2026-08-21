@@ -85,6 +85,8 @@ class ProtocolError(FitError): ...
 # Single source of truth; docs/for-agents.md is generated from these tables.
 
 ERROR_CODES: dict[str, str] = {
+    "SCRUB_NOTHING_SELECTED": "scrub() was called with every category disabled and no "
+    "location option; nothing was written.",
     "TRIM_NO_WINDOW": "trim() was called without a window; pass after= and/or before=.",
     "TRIM_BAD_BOUND": "A trim bound could not be interpreted as a time; use an ISO "
     "timestamp or a relative offset like '+5m' / '-10m'.",
@@ -116,6 +118,8 @@ ERROR_CODES: dict[str, str] = {
 # Warnings reuse defect codes where a defect was "seen and continued" — the
 # location (warnings[] vs errors[]) tells the treatment; the code stays stable.
 WARNING_CODES: dict[str, str] = {
+    "SCRUB_ALL_POSITIONS_CONCEALED": "Every GPS point fell inside the concealment radius, "
+    "so the scrubbed file has no route left at all.",
     "SPORT_PAIR_IMPLAUSIBLE": "Sport was edited while a non-generic sub-sport was left in "
     "place; verify the pair is what you intended (chiptime never guesses a replacement).",
     "FIT_CRC_MISMATCH": "File CRC is wrong but content decodes; continued.",
@@ -168,6 +172,14 @@ WARNING_CODES: dict[str, str] = {
 }
 
 PROVENANCE_CODES: dict[str, str] = {
+    "PII_IDENTITY_REMOVED": "Identity data (profile, name, age, gender, body size) removed "
+    "at the user's request.",
+    "PII_SERIALS_REMOVED": "Device serial numbers and ANT device ids removed at the user's "
+    "request.",
+    "PII_BODY_METRICS_REMOVED": "Configured physiology (threshold power, max/resting heart "
+    "rate, VO2max) removed at the user's request; workout measurements are untouched.",
+    "PII_LOCATION_CONCEALED": "GPS coordinates near the route endpoints were nulled at the "
+    "user's request; they decode as absent, never as zero.",
     "TRIM_RECORDS_DROPPED": "Records (and pool lengths) outside the requested trim window "
     "were removed at the user's explicit request.",
     "TRIM_LAP_DROPPED": "A lap not wholly inside the trim window was removed; its in-window "

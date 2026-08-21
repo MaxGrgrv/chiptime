@@ -50,6 +50,7 @@ The local file path is never serialized.
 
 | Code | Meaning |
 |---|---|
+| `SCRUB_NOTHING_SELECTED` | scrub() was called with every category disabled and no location option; nothing was written. |
 | `TRIM_NO_WINDOW` | trim() was called without a window; pass after= and/or before=. |
 | `TRIM_BAD_BOUND` | A trim bound could not be interpreted as a time; use an ISO timestamp or a relative offset like '+5m' / '-10m'. |
 | `TRIM_NO_RECORDS` | The file has no record messages, so trimmed totals could not be recomputed; nothing was written. |
@@ -77,6 +78,7 @@ The local file path is never serialized.
 
 | Code | Meaning |
 |---|---|
+| `SCRUB_ALL_POSITIONS_CONCEALED` | Every GPS point fell inside the concealment radius, so the scrubbed file has no route left at all. |
 | `SPORT_PAIR_IMPLAUSIBLE` | Sport was edited while a non-generic sub-sport was left in place; verify the pair is what you intended (chiptime never guesses a replacement). |
 | `FIT_CRC_MISMATCH` | File CRC is wrong but content decodes; continued. |
 | `FIT_HEADER_CRC_MISMATCH` | Header CRC is wrong; continued. |
@@ -122,6 +124,10 @@ The local file path is never serialized.
 
 | Code | Meaning |
 |---|---|
+| `PII_IDENTITY_REMOVED` | Identity data (profile, name, age, gender, body size) removed at the user's request. |
+| `PII_SERIALS_REMOVED` | Device serial numbers and ANT device ids removed at the user's request. |
+| `PII_BODY_METRICS_REMOVED` | Configured physiology (threshold power, max/resting heart rate, VO2max) removed at the user's request; workout measurements are untouched. |
+| `PII_LOCATION_CONCEALED` | GPS coordinates near the route endpoints were nulled at the user's request; they decode as absent, never as zero. |
 | `TRIM_RECORDS_DROPPED` | Records (and pool lengths) outside the requested trim window were removed at the user's explicit request. |
 | `TRIM_LAP_DROPPED` | A lap not wholly inside the trim window was removed; its in-window records were kept. |
 | `TRIM_SUMMARIES_REBUILT` | Session and activity totals were recomputed from the records that survived a trim, so the file cannot carry stale summaries. |

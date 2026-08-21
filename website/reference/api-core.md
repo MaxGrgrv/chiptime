@@ -19,6 +19,8 @@ input → complete result.
 | A broken file made uploadable | `repair` |
 | Metadata changed (sport, device, clock) | `edit` |
 | An activity cropped, totals rebuilt | `trim` |
+| To know what a file discloses | `reveal` |
+| Personal data removed before sharing | `scrub` |
 | "Will this platform accept it?" | `validate` |
 
 `parse` reads everything into a `ParseResult`; the iterators yield as they go
@@ -50,6 +52,16 @@ and skip the semantic layer entirely. `repair` and `validate` are built *on*
 ::: chiptime.trim
 
 ::: chiptime.trim.TrimResult
+
+## Privacy
+
+::: chiptime.reveal
+
+::: chiptime.scrub
+
+::: chiptime.privacy.PrivacyReport
+
+::: chiptime.privacy.ScrubResult
 
 ## Validate
 

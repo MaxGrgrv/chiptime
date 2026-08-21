@@ -1,5 +1,5 @@
 ---
-description: Every chiptime machine code — 98 errors, warnings, provenance entries, and insight codes — each with its own page.
+description: Every chiptime machine code — 104 errors, warnings, provenance entries, and insight codes — each with its own page.
 ---
 
 # Codes registry
@@ -12,6 +12,7 @@ its own page; the complete agent-facing contract (schema, exit codes) lives in
 
 | Code | Kind | Meaning |
 |---|---|---|
+| [`SCRUB_NOTHING_SELECTED`](scrub-nothing-selected.md) | error | scrub() was called with every category disabled and no location option; nothing was written. |
 | [`TRIM_NO_WINDOW`](trim-no-window.md) | error | trim() was called without a window; pass after= and/or before=. |
 | [`TRIM_BAD_BOUND`](trim-bad-bound.md) | error | A trim bound could not be interpreted as a time; use an ISO timestamp or a relative offset like '+5m' / '-10m'. |
 | [`TRIM_NO_RECORDS`](trim-no-records.md) | error | The file has no record messages, so trimmed totals could not be recomputed; nothing was written. |
@@ -34,6 +35,7 @@ its own page; the complete agent-facing contract (schema, exit codes) lives in
 | [`FIT_MISSING_TIMESTAMP_ANCHOR`](fit-missing-timestamp-anchor.md) | error | A compressed-timestamp record has no timestamp anchor. |
 | [`FIT_TRAILING_JUNK`](fit-trailing-junk.md) | error | Bytes after the final CRC are not a chained FIT file. |
 | [`REPAIR_NOTHING_TO_SALVAGE`](repair-nothing-to-salvage.md) | error | Nothing usable survives parsing; repair refuses to fabricate data (#16). |
+| [`SCRUB_ALL_POSITIONS_CONCEALED`](scrub-all-positions-concealed.md) | warning | Every GPS point fell inside the concealment radius, so the scrubbed file has no route left at all. |
 | [`SPORT_PAIR_IMPLAUSIBLE`](sport-pair-implausible.md) | warning | Sport was edited while a non-generic sub-sport was left in place; verify the pair is what you intended (chiptime never guesses a replacement). |
 | [`FIT_CRC_MISMATCH`](fit-crc-mismatch.md) | warning | File CRC is wrong but content decodes; continued. |
 | [`FIT_HEADER_CRC_MISMATCH`](fit-header-crc-mismatch.md) | warning | Header CRC is wrong; continued. |
@@ -74,6 +76,10 @@ its own page; the complete agent-facing contract (schema, exit codes) lives in
 | [`LAP_COVERAGE_GAP`](lap-coverage-gap.md) | warning | Laps do not cover the session span (#94). |
 | [`TIMESTAMP_DECLARED_AS_BYTES`](timestamp-declared-as-bytes.md) | warning | Field 253 declared as byte[4]; reassembled (Xiaomi-pipeline class). |
 | [`HR_EXPANSION_NO_ANCHOR`](hr-expansion-no-anchor.md) | warning | hr.event_timestamp_12 appeared before any full event_timestamp; samples not expandable. |
+| [`PII_IDENTITY_REMOVED`](pii-identity-removed.md) | provenance | Identity data (profile, name, age, gender, body size) removed at the user's request. |
+| [`PII_SERIALS_REMOVED`](pii-serials-removed.md) | provenance | Device serial numbers and ANT device ids removed at the user's request. |
+| [`PII_BODY_METRICS_REMOVED`](pii-body-metrics-removed.md) | provenance | Configured physiology (threshold power, max/resting heart rate, VO2max) removed at the user's request; workout measurements are untouched. |
+| [`PII_LOCATION_CONCEALED`](pii-location-concealed.md) | provenance | GPS coordinates near the route endpoints were nulled at the user's request; they decode as absent, never as zero. |
 | [`TRIM_RECORDS_DROPPED`](trim-records-dropped.md) | provenance | Records (and pool lengths) outside the requested trim window were removed at the user's explicit request. |
 | [`TRIM_LAP_DROPPED`](trim-lap-dropped.md) | provenance | A lap not wholly inside the trim window was removed; its in-window records were kept. |
 | [`TRIM_SUMMARIES_REBUILT`](trim-summaries-rebuilt.md) | provenance | Session and activity totals were recomputed from the records that survived a trim, so the file cannot carry stale summaries. |

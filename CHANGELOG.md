@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.7.0 — 2026-08-21
+
+- **New: `chiptime reveal`** — see what a file discloses about you before you
+  share it: device serials, identity fields, configured physiology, and the
+  fact that your route starts and ends at real places. Read-only, and route
+  endpoints are rounded to ~1 km so the report itself is safe to paste.
+- **New: `chiptime scrub`** — remove it and write a file that still parses and
+  uploads. Identity, serials, and body metrics are removed by default (they
+  cost no measurements); location concealment is opt-in via `--gps-radius M`,
+  which hides every point within M metres of the route's first or last fix —
+  wherever it occurs, so loops that pass home mid-route are covered.
+- Concealed coordinates decode as **absent, never zero** — "no reading" must
+  not become a point in the Gulf of Guinea. Totals are untouched.
+- Fields that share a name but not a meaning are distinguished:
+  `session.max_heart_rate` (what you reached in the workout) is training data
+  and stays; `zones_target.max_heart_rate` (your configured maximum) is
+  personal and goes.
+
 ## 0.6.0 — 2026-08-21
 
 - **New: `chiptime trim`** — crop an activity by time window (`--after +5m`,

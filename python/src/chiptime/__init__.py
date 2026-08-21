@@ -19,11 +19,12 @@ from chiptime.errors import (
     ProtocolError,
     TruncatedError,
 )
+from chiptime.privacy import PrivacyReport, ScrubError, ScrubResult, reveal, scrub
 from chiptime.repair import NotRepairableError, RepairResult, repair
 from chiptime.result import Mode, ParseResult
 from chiptime.trim import TrimError, TrimResult, trim
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 __all__ = [
     "CrcMismatchError",
@@ -36,8 +37,11 @@ __all__ = [
     "NotFitError",
     "NotRepairableError",
     "ParseResult",
+    "PrivacyReport",
     "ProtocolError",
     "RepairResult",
+    "ScrubError",
+    "ScrubResult",
     "TrimError",
     "TrimResult",
     "TruncatedError",
@@ -47,5 +51,7 @@ __all__ = [
     "iter_messages",
     "parse",
     "repair",
+    "reveal",
+    "scrub",
     "trim",
 ]

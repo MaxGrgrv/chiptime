@@ -24,4 +24,6 @@ Note: the parser-behavior backlog is [edge-case-taxonomy.md](edge-case-taxonomy.
 | Middle-section removal / splice | F27 | Creates a deliberate time gap with its own semantics | When a user asks to cut a middle section, not just ends |
 | `--rebase-distance` after trimming the start | F27 | Derived totals are already correct; rebasing edits measurements | If a platform renders trimmed rides as starting mid-distance |
 | Trim length-only pool-swim files (no record messages) | F27 | Session totals cannot be rebuilt from lengths alone; real watches write records too | When a real length-only file needs trimming |
+| Exact-coordinate mode for `reveal` | F28 | Coarse (2dp) is the safe default; precise output mainly enables accidental leaks in pasted reports | If a real workflow needs exact values locally |
+| Field-level scrub escape hatch (`--scrub-field X`) | F28 | Categories cover the real jobs; arbitrary fields is speculative | If users report a category gap |
 

@@ -83,6 +83,25 @@ def main(argv: list[str] | None = None) -> int:
         "--before", help="keep records at/before this: ISO time, or '-10m' from the end"
     )
 
+    p_reveal = sub.add_parser("reveal", help="what does this file disclose about you?")
+    p_reveal.add_argument("file")
+    p_reveal.add_argument("--json", action="store_true")
+
+    p_scrub = sub.add_parser("scrub", help="remove personal data and write a clean file")
+    p_scrub.add_argument("file")
+    p_scrub.add_argument("-o", "--output", required=True)
+    p_scrub.add_argument("--mode", choices=["strict", "lenient", "forensic"], default="lenient")
+    p_scrub.add_argument(
+        "--gps-radius",
+        dest="gps_radius",
+        type=float,
+        help="conceal GPS within this many metres of the route's start/end",
+    )
+    p_scrub.add_argument("--drop-all-gps", dest="drop_all_gps", action="store_true")
+    p_scrub.add_argument("--keep-identity", dest="keep_identity", action="store_true")
+    p_scrub.add_argument("--keep-serials", dest="keep_serials", action="store_true")
+    p_scrub.add_argument("--keep-body-metrics", dest="keep_body_metrics", action="store_true")
+
     p_an = sub.add_parser("analyze", help="per-sport workout report + insights (optional layer)")
     p_an.add_argument("file")
     p_an.add_argument("--mode", choices=["strict", "lenient", "forensic"], default="lenient")
@@ -112,6 +131,10 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_edit(args)
     if args.command == "trim":
         return _cmd_trim(args)
+    if args.command == "reveal":
+        return _cmd_reveal(args)
+    if args.command == "scrub":
+        return _cmd_scrub(args)
     return _cmd_codes()
 
 
@@ -232,6 +255,76 @@ def _cmd_trim(args: argparse.Namespace) -> int:
     )
     if not result.output_strict_ok:
         print("warning: output does not parse strictly; inspect before uploading", file=sys.stderr)
+        return 2
+    return 0
+
+
+def _cmd_reveal(args: argparse.Namespace) -> int:
+    try:
+        report = chiptime.reveal(args.file)
+    except chiptime.FitError as e:
+        print(f"{e.code}: {e.detail}", file=sys.stderr)
+        return 4 if e.code in ("NOT_FIT_FORMAT", "FIT_TOO_SMALL") else 3
+    except OSError as e:
+        print(f"cannot read {args.file}: {e}", file=sys.stderr)
+        return 64
+
+    if args.json:
+        import json
+
+        print(json.dumps(report.to_dict(), sort_keys=True, separators=(",", ":")))
+        return 0
+
+    if not report.findings:
+        print("this file discloses nothing chiptime recognises as personal")
+        return 0
+    print("this file discloses:")
+    for finding in report.findings:
+        print(f"  [{finding.category}] {finding.detail}")
+    start, end = report.start_coarse, report.end_coarse
+    if start is not None and end is not None:
+        print(
+            f"  route start ≈ {start[0]}, {start[1]} · end ≈ {end[0]}, {end[1]}"
+            "   (rounded to ~1 km so this report is safe to share)"
+        )
+    if report.clean_categories:
+        print(f"  clean: {', '.join(report.clean_categories)}")
+    print("\nremove it with: chiptime scrub FILE -o clean.fit --gps-radius 500")
+    return 0
+
+
+def _cmd_scrub(args: argparse.Namespace) -> int:
+    try:
+        result = chiptime.scrub(
+            args.file,
+            identity=not args.keep_identity,
+            serials=not args.keep_serials,
+            body_metrics=not args.keep_body_metrics,
+            gps_radius_m=args.gps_radius,
+            drop_all_gps=args.drop_all_gps,
+            mode=args.mode,
+        )
+    except chiptime.FitError as e:
+        print(f"{e.code}: {e.detail}", file=sys.stderr)
+        if e.suggestion:
+            print(f"suggestion: {e.suggestion}", file=sys.stderr)
+        return 4 if e.code in ("NOT_FIT_FORMAT", "FIT_TOO_SMALL") else 3
+    except OSError as e:
+        print(f"cannot read {args.file}: {e}", file=sys.stderr)
+        return 64
+
+    with open(args.output, "wb") as f:
+        f.write(result.data)
+    if result.provenance:
+        for entry in result.provenance:
+            print(f"{entry.code}: {entry.detail}")
+    else:
+        print("nothing personal found to remove; the file was re-encoded unchanged")
+    for warn in result.warnings:
+        print(f"{warn.code}: {warn.detail}", file=sys.stderr)
+    print(f"wrote {args.output} ({len(result.data)} bytes)")
+    if not result.output_strict_ok:
+        print("warning: output does not parse strictly; inspect it", file=sys.stderr)
         return 2
     return 0
 
