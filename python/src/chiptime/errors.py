@@ -85,6 +85,9 @@ class ProtocolError(FitError): ...
 # Single source of truth; docs/for-agents.md is generated from these tables.
 
 ERROR_CODES: dict[str, str] = {
+    "DISTANCE_SCALE_OUT_OF_RANGE": "Rescaling distance by the requested factor would "
+    "overflow a field's wire type; nothing was written.",
+    "DISTANCE_NOT_MEASURED": "The file records no distance to rescale.",
     "SCRUB_NOTHING_SELECTED": "scrub() was called with every category disabled and no "
     "location option; nothing was written.",
     "TRIM_NO_WINDOW": "trim() was called without a window; pass after= and/or before=.",
@@ -118,6 +121,8 @@ ERROR_CODES: dict[str, str] = {
 # Warnings reuse defect codes where a defect was "seen and continued" — the
 # location (warnings[] vs errors[]) tells the treatment; the code stays stable.
 WARNING_CODES: dict[str, str] = {
+    "DISTANCE_RESCALED_PAIR": "Distance was rescaled; speed was scaled by the same "
+    "factor so the stream stays internally consistent.",
     "SCRUB_ALL_POSITIONS_CONCEALED": "Every GPS point fell inside the concealment radius, "
     "so the scrubbed file has no route left at all.",
     "SPORT_PAIR_IMPLAUSIBLE": "Sport was edited while a non-generic sub-sport was left in "
@@ -172,6 +177,8 @@ WARNING_CODES: dict[str, str] = {
 }
 
 PROVENANCE_CODES: dict[str, str] = {
+    "DISTANCE_RESCALED": "Recorded distance (and speed) scaled to a user-supplied "
+    "total, with summaries updated so records and totals still agree.",
     "PII_IDENTITY_REMOVED": "Identity data (profile, name, age, gender, body size) removed "
     "at the user's request.",
     "PII_SERIALS_REMOVED": "Device serial numbers and ANT device ids removed at the user's "

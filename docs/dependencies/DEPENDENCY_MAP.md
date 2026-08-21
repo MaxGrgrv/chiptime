@@ -35,6 +35,7 @@ Compact form (full dependency sections live in each spec; every edge verified bi
 | F26 edit (metadata) | F3 (decode), F12 (encoder), F13 (repair pattern), F11 (CLI) | F27/F28/F30 (share the transform+re-encode skeleton), M3 |
 | F27 trim (crop) | F3, F7/F9 (build_activity, derived totals), F12, F13 (`_summary_message`), F11 | F30 |
 | F28 privacy (reveal/scrub) | F3, F12, F11, ADR-0007 | M3 (TS twin), client-side browser tool |
+| F29 doctor + calibration | F13 repair, F14 validate, F26 edit, F11 CLI | — (composition layer) |
 
 ## Module Dependencies
 

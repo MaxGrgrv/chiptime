@@ -26,4 +26,6 @@ Note: the parser-behavior backlog is [edge-case-taxonomy.md](edge-case-taxonomy.
 | Trim length-only pool-swim files (no record messages) | F27 | Session totals cannot be rebuilt from lengths alone; real watches write records too | When a real length-only file needs trimming |
 | Exact-coordinate mode for `reveal` | F28 | Coarse (2dp) is the safe default; precise output mainly enables accidental leaks in pasted reports | If a real workflow needs exact values locally |
 | Field-level scrub escape hatch (`--scrub-field X`) | F28 | Categories cover the real jobs; arbitrary fields is speculative | If users report a category gap |
+| `chiptime doctor --fix` (prescribe and execute) | F29 | Prescribing and executing are different levels of consent; chaining verbs is one line | If users ask for a one-shot fix path |
+| Promote `VAL_GC_NO_TIMER_STOP` from warning to error | F29 | Rule has a single second-hand source; a false rejection is worse than a missed one | When a real file proves Garmin Connect requires it |
 

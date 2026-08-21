@@ -106,6 +106,16 @@ def _garmin_connect(result: chiptime.ParseResult) -> list[Finding]:
                     " non-monotonic files; a chiptime repair re-emits sorted)",
                 )
             )
+    events = [m for m in (part.messages if part else []) if m.name == "event"]
+    if events and not any("stop" in str(m.get("event_type") or "") for m in events):
+        out.append(
+            Finding(
+                "warning",
+                "VAL_GC_NO_TIMER_STOP",
+                "activity has timer events but never a stop; Garmin Connect is reported to "
+                "require a stop event (community-observed, not documented)",
+            )
+        )
     if any(w.code == "LOCAL_TIMESTAMP_IMPLAUSIBLE" for w in result.warnings):
         out.append(
             Finding(

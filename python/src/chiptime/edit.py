@@ -18,7 +18,7 @@ from chiptime.decode import fit_ts_to_iso, fit_ts_to_iso_local
 from chiptime.encode import encodable_from_message, encode_messages
 from chiptime.errors import Diagnostic, FitError, ProvenanceEntry
 from chiptime.message import FieldValue, Message
-from chiptime.profile import ENUMS, MESSAGES
+from chiptime.profile import BASE_TYPES, ENUMS, MESSAGES
 from chiptime.result import Mode, ParseResult
 
 Source = Any
@@ -245,6 +245,96 @@ def _shift_time(
     return out, prov
 
 
+# Fields that must scale together with distance, or the file contradicts
+# itself: a speed stream that integrates to a different distance is exactly
+# the kind of lie the trim work exists to prevent.
+_DISTANCE_FIELDS = ("distance", "total_distance")
+_SPEED_FIELDS = (
+    "speed",
+    "enhanced_speed",
+    "avg_speed",
+    "max_speed",
+    "enhanced_avg_speed",
+    "enhanced_max_speed",
+)
+
+
+def _wire_base_types(msg: Message) -> dict[str, int]:
+    """field name → wire base type code, for bounds checking before we write."""
+    mdef = MESSAGES.get(msg.global_num)
+    if mdef is None or msg.wire is None:
+        return {}
+    num_to_name = {n: f.name for n, f in mdef.fields.items()}
+    return {num_to_name[ws.num]: ws.base_type for ws in msg.wire.fields if ws.num in num_to_name}
+
+
+def _fits(raw: float, base_type: int) -> bool:
+    """Would this value survive the wire type it has to be written into?"""
+    bt = BASE_TYPES.get(base_type)
+    if bt is None or bt.invalid is None or bt.struct_code is None:
+        return True
+    if bt.name.startswith("float"):
+        return True
+    if bt.name.startswith(("uint", "enum", "byte")):
+        return 0 <= raw < bt.invalid  # the invalid pattern is not a usable value
+    limit = bt.invalid  # signed types: invalid is the positive limit
+    return -limit <= raw <= limit
+
+
+def _rescale_distance(
+    messages: list[Message], target_m: float, current_m: float
+) -> tuple[list[Message], list[ProvenanceEntry]]:
+    """Scale recorded distance to a user-supplied total, taking speed with it."""
+    if current_m <= 0:
+        raise EditError(
+            "DISTANCE_NOT_MEASURED",
+            "this file records no distance to rescale",
+            suggestion="check `chiptime parse` output; no bytes were written",
+        )
+    factor = target_m / current_m
+    out: list[Message] = []
+    touched = 0
+    for m in messages:
+        new = m
+        wire_types = _wire_base_types(m)
+        for fname in (*_DISTANCE_FIELDS, *_SPEED_FIELDS):
+            fv = new.fields.get(fname)
+            if fv is None or not isinstance(fv.raw, (int, float)) or isinstance(fv.raw, bool):
+                continue
+            scaled_raw = (
+                type(fv.raw)(round(fv.raw * factor))
+                if isinstance(fv.raw, int)
+                else (fv.raw * factor)
+            )
+            base_type = wire_types.get(fname)
+            if base_type is not None and not _fits(scaled_raw, base_type):
+                raise EditError(
+                    "DISTANCE_SCALE_OUT_OF_RANGE",
+                    (
+                        f"scaling by {factor:.3f} would push {m.name}.{fname} to "
+                        f"{scaled_raw}, which does not fit its wire type"
+                    ),
+                    suggestion=(
+                        "the requested distance is too far from the recorded one; "
+                        "no bytes were written"
+                    ),
+                )
+            value = fv.value * factor if isinstance(fv.value, (int, float)) else fv.value
+            new = _set(new, fname, scaled_raw, value)
+            touched += 1
+        out.append(new)
+    prov = [
+        _prov(
+            "DISTANCE_RESCALED",
+            "file",
+            f"distance rescaled {current_m:.0f}m → {target_m:.0f}m (factor {factor:.4f}); "
+            f"speed scaled identically across {touched} field(s)",
+            {"factor": factor, "from_m": current_m, "to_m": target_m, "fields": touched},
+        )
+    ]
+    return out, prov
+
+
 def edit(
     src: Source,
     *,
@@ -253,6 +343,7 @@ def edit(
     manufacturer: str | int | None = None,
     product: int | None = None,
     time_shift_s: int | None = None,
+    total_distance_m: float | None = None,
     mode: Mode = "lenient",
 ) -> EditResult:
     """Change what a file *says about itself*, then prove it still parses.
@@ -269,6 +360,9 @@ def edit(
         manufacturer: New recording-device manufacturer, name or number.
         product: New product id (numeric — products are vendor-specific).
         time_shift_s: Signed seconds added to every profile-typed timestamp.
+        total_distance_m: Set the activity's true distance (treadmill
+            calibration). Records and speed are scaled by the same factor so
+            the stream and the summaries still agree.
         mode: Parse policy for reading the input. ``strict`` refuses to edit
             a file that does not parse strictly — editing implies you
             believe the file is sound; use `repair` first if it is not.
@@ -282,11 +376,16 @@ def edit(
             time shift would leave the representable range. No bytes are
             written in any of these cases.
     """
-    if all(v is None for v in (sport, sub_sport, manufacturer, product, time_shift_s)):
+    if all(
+        v is None for v in (sport, sub_sport, manufacturer, product, time_shift_s, total_distance_m)
+    ):
         raise EditError(
             "NO_EDIT_REQUESTED",
             "edit() was called without any edit to perform",
-            suggestion="pass sport=, sub_sport=, manufacturer=, product=, or time_shift_s=",
+            suggestion=(
+                "pass sport=, sub_sport=, manufacturer=, product=, time_shift_s=, "
+                "or total_distance_m="
+            ),
         )
 
     parsed = chiptime.parse(src, mode=mode)
@@ -303,6 +402,16 @@ def edit(
         provenance += prov
     if time_shift_s:
         messages, prov = _shift_time(messages, time_shift_s)
+        provenance += prov
+    if total_distance_m is not None:
+        activity = parsed.activity
+        current = None
+        if activity and activity.sessions:
+            session = activity.sessions[0]
+            current = session.derived.distance_m or (
+                session.declared.distance_m if session.declared else None
+            )
+        messages, prov = _rescale_distance(messages, total_distance_m, current or 0.0)
         provenance += prov
 
     data = encode_messages([encodable_from_message(m) for m in messages])

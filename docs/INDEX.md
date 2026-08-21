@@ -54,6 +54,7 @@ Master index of all documentation. Updated with every feature change.
 | F26 `edit` metadata surgery (M2.8) | DONE | [spec](features/f26-edit-metadata.md) | [impl](implementation/f26-edit-metadata.md) |
 | F27 `trim` crop + rebuild (M2.8) | DONE | [spec](features/f27-trim.md) | [impl](implementation/f27-trim.md) |
 | F28 `reveal` + `scrub` privacy (M2.8) | DONE | [spec](features/f28-privacy-scrub.md) | [impl](implementation/f28-privacy-scrub.md) |
+| F29 `doctor` + distance calibration (M2.8) | DONE | [spec](features/f29-make-it-upload.md) | [impl](implementation/f29-make-it-upload.md) |
 
 ## ADRs
 

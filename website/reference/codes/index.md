@@ -1,5 +1,5 @@
 ---
-description: Every chiptime machine code — 104 errors, warnings, provenance entries, and insight codes — each with its own page.
+description: Every chiptime machine code — 108 errors, warnings, provenance entries, and insight codes — each with its own page.
 ---
 
 # Codes registry
@@ -12,6 +12,8 @@ its own page; the complete agent-facing contract (schema, exit codes) lives in
 
 | Code | Kind | Meaning |
 |---|---|---|
+| [`DISTANCE_SCALE_OUT_OF_RANGE`](distance-scale-out-of-range.md) | error | Rescaling distance by the requested factor would overflow a field's wire type; nothing was written. |
+| [`DISTANCE_NOT_MEASURED`](distance-not-measured.md) | error | The file records no distance to rescale. |
 | [`SCRUB_NOTHING_SELECTED`](scrub-nothing-selected.md) | error | scrub() was called with every category disabled and no location option; nothing was written. |
 | [`TRIM_NO_WINDOW`](trim-no-window.md) | error | trim() was called without a window; pass after= and/or before=. |
 | [`TRIM_BAD_BOUND`](trim-bad-bound.md) | error | A trim bound could not be interpreted as a time; use an ISO timestamp or a relative offset like '+5m' / '-10m'. |
@@ -35,6 +37,7 @@ its own page; the complete agent-facing contract (schema, exit codes) lives in
 | [`FIT_MISSING_TIMESTAMP_ANCHOR`](fit-missing-timestamp-anchor.md) | error | A compressed-timestamp record has no timestamp anchor. |
 | [`FIT_TRAILING_JUNK`](fit-trailing-junk.md) | error | Bytes after the final CRC are not a chained FIT file. |
 | [`REPAIR_NOTHING_TO_SALVAGE`](repair-nothing-to-salvage.md) | error | Nothing usable survives parsing; repair refuses to fabricate data (#16). |
+| [`DISTANCE_RESCALED_PAIR`](distance-rescaled-pair.md) | warning | Distance was rescaled; speed was scaled by the same factor so the stream stays internally consistent. |
 | [`SCRUB_ALL_POSITIONS_CONCEALED`](scrub-all-positions-concealed.md) | warning | Every GPS point fell inside the concealment radius, so the scrubbed file has no route left at all. |
 | [`SPORT_PAIR_IMPLAUSIBLE`](sport-pair-implausible.md) | warning | Sport was edited while a non-generic sub-sport was left in place; verify the pair is what you intended (chiptime never guesses a replacement). |
 | [`FIT_CRC_MISMATCH`](fit-crc-mismatch.md) | warning | File CRC is wrong but content decodes; continued. |
@@ -76,6 +79,7 @@ its own page; the complete agent-facing contract (schema, exit codes) lives in
 | [`LAP_COVERAGE_GAP`](lap-coverage-gap.md) | warning | Laps do not cover the session span (#94). |
 | [`TIMESTAMP_DECLARED_AS_BYTES`](timestamp-declared-as-bytes.md) | warning | Field 253 declared as byte[4]; reassembled (Xiaomi-pipeline class). |
 | [`HR_EXPANSION_NO_ANCHOR`](hr-expansion-no-anchor.md) | warning | hr.event_timestamp_12 appeared before any full event_timestamp; samples not expandable. |
+| [`DISTANCE_RESCALED`](distance-rescaled.md) | provenance | Recorded distance (and speed) scaled to a user-supplied total, with summaries updated so records and totals still agree. |
 | [`PII_IDENTITY_REMOVED`](pii-identity-removed.md) | provenance | Identity data (profile, name, age, gender, body size) removed at the user's request. |
 | [`PII_SERIALS_REMOVED`](pii-serials-removed.md) | provenance | Device serial numbers and ANT device ids removed at the user's request. |
 | [`PII_BODY_METRICS_REMOVED`](pii-body-metrics-removed.md) | provenance | Configured physiology (threshold power, max/resting heart rate, VO2max) removed at the user's request; workout measurements are untouched. |

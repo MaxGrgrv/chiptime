@@ -1,7 +1,21 @@
 # Changelog
 
-## Unreleased
+## 0.8.0 — 2026-08-21
 
+- **New: `chiptime doctor`** — the answer to "it won't upload and nothing
+  tells me why". Reads a stubborn file, reports what blocks it on a given
+  platform, and prints the exact command that fixes it. Exit 0 clean,
+  2 fixable, 3 no known fix. The advice is executed end-to-end in the test
+  suite (diagnose → run the prescribed command → confirm it now uploads),
+  so it cannot quietly rot.
+- **New: `chiptime edit --total-distance`** — treadmill and footpod
+  calibration doesn't travel inside the file; this sets the true distance and
+  scales records *and* speed by the same factor, so the stream and the
+  summary still agree. Refuses with `DISTANCE_SCALE_OUT_OF_RANGE` rather than
+  overflowing a field's wire type.
+- Garmin Connect profile gained `VAL_GC_NO_TIMER_STOP`, shipped deliberately
+  as a **warning**: the rule is community-observed rather than documented,
+  and a false rejection would be worse than a missing check.
 - `chiptime parse` now prints the *content* of declared-vs-derived
   discrepancies, not just a count: "ascent_m: device says 86, records say
   51.2 (delta -34.8)". Platforms silently pick different sides of these

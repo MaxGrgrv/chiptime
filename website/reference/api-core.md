@@ -16,6 +16,7 @@ input → complete result.
 | The workout, fully interpreted | `parse` — the main call, 99% of uses |
 | To stream a huge file in constant memory | `iter_messages` |
 | Wire-level bytes forensics | `iter_frames` |
+| To know why a platform refuses a file | `doctor` |
 | A broken file made uploadable | `repair` |
 | Metadata changed (sport, device, clock) | `edit` |
 | An activity cropped, totals rebuilt | `trim` |
@@ -36,6 +37,14 @@ and skip the semantic layer entirely. `repair` and `validate` are built *on*
 ::: chiptime.iter_messages
 
 ::: chiptime.iter_frames
+
+## Doctor
+
+::: chiptime.doctor
+
+::: chiptime.doctor.Diagnosis
+
+::: chiptime.doctor.Remedy
 
 ## Repair
 

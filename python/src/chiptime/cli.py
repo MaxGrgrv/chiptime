@@ -67,6 +67,12 @@ def main(argv: list[str] | None = None) -> int:
     p_edit.add_argument("--manufacturer", help="new recording-device manufacturer, name or number")
     p_edit.add_argument("--product", type=int, help="new product id (numeric)")
     p_edit.add_argument(
+        "--total-distance",
+        dest="total_distance",
+        type=float,
+        help="set the true distance in metres; records and speed scale to match",
+    )
+    p_edit.add_argument(
         "--time-shift",
         dest="time_shift",
         help="signed offset applied to every timestamp: seconds, or ±HH:MM",
@@ -82,6 +88,14 @@ def main(argv: list[str] | None = None) -> int:
     p_trim.add_argument(
         "--before", help="keep records at/before this: ISO time, or '-10m' from the end"
     )
+
+    p_doc = sub.add_parser("doctor", help="why won't this upload, and what should I run?")
+    p_doc.add_argument("file")
+    p_doc.add_argument(
+        "--platform", choices=["strict-spec", "garmin-connect", "strava"], default="garmin-connect"
+    )
+    p_doc.add_argument("--mode", choices=["strict", "lenient", "forensic"], default="lenient")
+    p_doc.add_argument("--json", action="store_true")
 
     p_reveal = sub.add_parser("reveal", help="what does this file disclose about you?")
     p_reveal.add_argument("file")
@@ -131,6 +145,8 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_edit(args)
     if args.command == "trim":
         return _cmd_trim(args)
+    if args.command == "doctor":
+        return _cmd_doctor(args)
     if args.command == "reveal":
         return _cmd_reveal(args)
     if args.command == "scrub":
@@ -181,10 +197,20 @@ def _parse_time_shift(raw: str | None) -> int | None:
 
 def _cmd_edit(args: argparse.Namespace) -> int:
     shift = _parse_time_shift(args.time_shift)
-    if not any((args.sport, args.sub_sport, args.manufacturer, args.product is not None, shift)):
+    if not any(
+        (
+            args.sport,
+            args.sub_sport,
+            args.manufacturer,
+            args.product is not None,
+            shift,
+            args.total_distance is not None,
+        )
+    ):
         print("error: edit requires at least one change", file=sys.stderr)
         print(
-            "suggestion: --sport / --sub-sport / --manufacturer / --product / --time-shift",
+            "suggestion: --sport / --sub-sport / --manufacturer / --product /"
+            " --time-shift / --total-distance",
             file=sys.stderr,
         )
         return 64
@@ -196,6 +222,7 @@ def _cmd_edit(args: argparse.Namespace) -> int:
             manufacturer=args.manufacturer,
             product=args.product,
             time_shift_s=shift,
+            total_distance_m=args.total_distance,
             mode=args.mode,
         )
     except chiptime.NotFitError as e:
@@ -257,6 +284,49 @@ def _cmd_trim(args: argparse.Namespace) -> int:
         print("warning: output does not parse strictly; inspect before uploading", file=sys.stderr)
         return 2
     return 0
+
+
+def _cmd_doctor(args: argparse.Namespace) -> int:
+    try:
+        diagnosis = chiptime.doctor(args.file, platform=args.platform, mode=args.mode)
+    except chiptime.NotFitError as e:
+        print(f"{e.code}: {e.detail}", file=sys.stderr)
+        return 4
+    except chiptime.FitError as e:
+        print(f"{e.code}: {e.detail}", file=sys.stderr)
+        return 3
+    except OSError as e:
+        print(f"cannot read {args.file}: {e}", file=sys.stderr)
+        return 64
+
+    if args.json:
+        import json
+
+        print(json.dumps(diagnosis.to_dict(), sort_keys=True, separators=(",", ":")))
+        return 0 if diagnosis.will_upload else (2 if diagnosis.remedies else 3)
+
+    print(f"{args.file} → {diagnosis.platform}")
+    print(f"  {diagnosis.summary}")
+    if diagnosis.will_upload:
+        print("\n  ✓ nothing blocking; this file should upload")
+    else:
+        print(f"\n  ✗ {len(diagnosis.blocking)} blocking issue(s):")
+        for f in diagnosis.blocking:
+            print(f"      {f.code}: {f.detail}")
+    for f in diagnosis.advisory:
+        print(f"  ! {f.code}: {f.detail}")
+    if diagnosis.remedies:
+        print("\n  try:")
+        for remedy in diagnosis.remedies:
+            print(f"      {remedy.command}")
+            print(f"        {remedy.reason}")
+    if diagnosis.unresolved:
+        print("\n  no automatic fix for:")
+        for f in diagnosis.unresolved:
+            print(f"      {f.code}: {f.detail}")
+    if diagnosis.will_upload:
+        return 0
+    return 2 if diagnosis.remedies else 3
 
 
 def _cmd_reveal(args: argparse.Namespace) -> int:

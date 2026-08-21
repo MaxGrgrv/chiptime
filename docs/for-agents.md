@@ -50,6 +50,8 @@ The local file path is never serialized.
 
 | Code | Meaning |
 |---|---|
+| `DISTANCE_SCALE_OUT_OF_RANGE` | Rescaling distance by the requested factor would overflow a field's wire type; nothing was written. |
+| `DISTANCE_NOT_MEASURED` | The file records no distance to rescale. |
 | `SCRUB_NOTHING_SELECTED` | scrub() was called with every category disabled and no location option; nothing was written. |
 | `TRIM_NO_WINDOW` | trim() was called without a window; pass after= and/or before=. |
 | `TRIM_BAD_BOUND` | A trim bound could not be interpreted as a time; use an ISO timestamp or a relative offset like '+5m' / '-10m'. |
@@ -78,6 +80,7 @@ The local file path is never serialized.
 
 | Code | Meaning |
 |---|---|
+| `DISTANCE_RESCALED_PAIR` | Distance was rescaled; speed was scaled by the same factor so the stream stays internally consistent. |
 | `SCRUB_ALL_POSITIONS_CONCEALED` | Every GPS point fell inside the concealment radius, so the scrubbed file has no route left at all. |
 | `SPORT_PAIR_IMPLAUSIBLE` | Sport was edited while a non-generic sub-sport was left in place; verify the pair is what you intended (chiptime never guesses a replacement). |
 | `FIT_CRC_MISMATCH` | File CRC is wrong but content decodes; continued. |
@@ -124,6 +127,7 @@ The local file path is never serialized.
 
 | Code | Meaning |
 |---|---|
+| `DISTANCE_RESCALED` | Recorded distance (and speed) scaled to a user-supplied total, with summaries updated so records and totals still agree. |
 | `PII_IDENTITY_REMOVED` | Identity data (profile, name, age, gender, body size) removed at the user's request. |
 | `PII_SERIALS_REMOVED` | Device serial numbers and ANT device ids removed at the user's request. |
 | `PII_BODY_METRICS_REMOVED` | Configured physiology (threshold power, max/resting heart rate, VO2max) removed at the user's request; workout measurements are untouched. |
