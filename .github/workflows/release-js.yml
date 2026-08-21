@@ -1,0 +1,99 @@
+name: release-js
+
+# npm releases only. PyPI lives in release.yml, and the two are deliberately
+# separate files rather than one workflow with tag-prefix conditionals:
+#
+#   - PyPI's trusted publisher binds to repo + *workflow filename*, so release.yml
+#     cannot be renamed or absorbed without breaking it.
+#   - A broken npm publish must never block a PyPI hotfix, or the reverse.
+#   - The two registries need different environments and different permissions.
+#
+# Tag namespacing keeps them from colliding: `v*` releases Python, `js-v*` releases
+# npm. Without this, tagging `v0.1.0` for an npm release would fire release.yml and
+# publish whatever version python/pyproject.toml happens to hold.
+#
+# When the version lines merge into lockstep (ADR-0009 §9), add `v*` to the trigger
+# below. The version guard makes that safe: a tag whose number disagrees with
+# js/package.json fails loudly instead of publishing the wrong thing.
+
+on:
+  push:
+    tags: ["js-v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release, e.g. js-v0.1.0 (must match js/package.json)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    # A tag push does not run ci.yml (it triggers on branches and PRs), so without
+    # this a release could ship a red commit. Publishing is the one place where
+    # "the gates already ran somewhere" is not good enough.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with: { node-version: "20", cache: npm, cache-dependency-path: js/package-lock.json }
+      - uses: astral-sh/setup-uv@v6
+      - run: npm ci
+        working-directory: js
+      - name: Version must match the tag
+        run: |
+          tag="${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}"
+          want="${tag#js-v}"
+          have="$(node -p "require('./package.json').version")"
+          if [ "$want" != "$have" ]; then
+            echo "tag $tag implies version $want, but js/package.json holds $have" >&2
+            exit 1
+          fi
+          echo "releasing chiptime@$have"
+        working-directory: js
+      - name: Lint, types, guards, tests
+        run: npm run check
+        working-directory: js
+      - name: Determinism and packaging
+        run: |
+          npm run determinism
+          npm run smoke
+        working-directory: js
+      - name: Parity with the Python twin
+        run: |
+          uv sync --project python
+          uv run --project python python scripts/gen_parity_vectors.py
+          git diff --exit-code -- js/test/vectors
+          uv run --project python python scripts/gen_profile_ts.py
+          git diff --exit-code -- js/src/profile/generated.ts
+          uv run --project python python scripts/check_profile_parity.py
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      # OIDC, for npm trusted publishing and for build provenance. No token lives in
+      # this repository: npm verifies the workflow identity directly.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: js/package-lock.json
+          registry-url: "https://registry.npmjs.org"
+      - run: npm ci
+        working-directory: js
+      - run: npm run build
+        working-directory: js
+      - name: Publish to npm with provenance
+        # --provenance attaches a signed attestation linking the tarball to this
+        # commit and this workflow run. For a library whose entire claim is
+        # deterministic, auditable output, "you can verify what built this" is the
+        # same argument one layer down.
+        run: npm publish --provenance --access public
+        working-directory: js

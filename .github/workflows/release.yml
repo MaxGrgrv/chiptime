@@ -1,12 +1,59 @@
 name: release
 
+# PyPI releases only. npm lives in release-js.yml — see the header there for why the
+# two are separate files rather than one workflow with tag-prefix conditionals.
+#
+# NOTE: this filename is load-bearing. PyPI's trusted publisher binds to repo +
+# workflow filename, so renaming this file breaks publishing until the binding is
+# updated on PyPI.
+#
+# Tag namespacing: `v*` releases Python, `js-v*` releases npm. They must not overlap.
+
 on:
   push:
     tags: ["v*"]
   workflow_dispatch: {}   # manual re-release of whatever version pyproject holds
 
+permissions:
+  contents: read
+
 jobs:
+  verify:
+    # A tag push does not run ci.yml (it triggers on branches and PRs), so without
+    # this a release could ship a red commit. Publishing is the one place where
+    # "the gates already ran somewhere" is not good enough.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync
+        working-directory: python
+      - name: Version must match the tag
+        # Skipped on workflow_dispatch, which exists precisely to re-release the
+        # version pyproject already holds.
+        if: github.event_name == 'push'
+        run: |
+          want="${GITHUB_REF_NAME#v}"
+          have="$(uv run --project python python -c 'import chiptime; print(chiptime.__version__)')"
+          if [ "$want" != "$have" ]; then
+            echo "tag $GITHUB_REF_NAME implies version $want, but chiptime.__version__ is $have" >&2
+            exit 1
+          fi
+          echo "releasing chiptime==$have"
+      - name: Lint, format, types
+        working-directory: python
+        run: |
+          uv run ruff check . ../corpus/tools ../scripts
+          uv run ruff format --check . ../corpus/tools ../scripts
+          uv run mypy
+      - name: Corpus integrity
+        run: uv run --project python python corpus/tools/gen_all.py
+      - name: Tests
+        working-directory: python
+        run: uv run pytest
+
   build:
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

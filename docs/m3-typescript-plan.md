@@ -84,6 +84,24 @@ the moment the corpus goes green, "parity" stops being a plan.
 The write verbs (F38–F40) come after analytics (F37) only to keep the version mirror legible;
 they are independent of each other and could be reordered without cost.
 
+## Releasing
+
+Two workflows, deliberately not one. `release.yml` publishes to PyPI on `v*`;
+`release-js.yml` publishes to npm on `js-v*`.
+
+| Decision | Why |
+|---|---|
+| Separate files, not tag-prefix conditionals in one | PyPI's trusted publisher binds to repo + **workflow filename**, so `release.yml` cannot be renamed or absorbed without breaking publishing. A broken npm release must also never block a PyPI hotfix. |
+| Namespaced tags (`v*` vs `js-v*`) | Without it, tagging `v0.1.0` for an npm release fires `release.yml` and ships whatever version `python/pyproject.toml` holds. |
+| Package name **unscoped** (`chiptime`, not `@scope/chiptime`) | The product is twin implementations; the story rests on `pip install chiptime` / `npm install chiptime` being symmetric. A scope breaks the symmetry exactly where it matters and reads as a personal build rather than the reference implementation (PRD §12.5). Cost accepted: unscoped names can be claimed by others, so availability is re-checked immediately before publishing. |
+| A `verify` job in **both**, gating publish | A tag push does not run `ci.yml` (it triggers on branches and PRs), so without this a release can ship a red commit. This closed a pre-existing gap on the PyPI side too. |
+| Tag-vs-version guard in both | A tag whose number disagrees with the package it releases fails loudly instead of publishing the wrong version. This is also what makes the eventual lockstep merge safe: adding `v*` to `release-js.yml`'s trigger cannot mis-publish. |
+| npm publishes with `--provenance` | A signed attestation linking the tarball to this commit and this workflow run. For a library whose whole claim is deterministic, auditable output, "you can verify what built this" is the same argument one layer down. |
+
+Maintainer prerequisites before the first npm publish: an npm **trusted publisher** registered
+for this repo and `release-js.yml` (no token in the repo), an `npm` environment in GitHub, and
+`private: true` removed from `js/package.json`.
+
 ## Known hazards, and where each is handled
 
 | Hazard | Where it lands | Handling |
