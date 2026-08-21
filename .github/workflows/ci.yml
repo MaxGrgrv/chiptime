@@ -119,6 +119,8 @@ jobs:
         run: uv run --project python python scripts/check_frame_parity.py
       - name: Message parity across every corpus case (values, diagnostics, provenance)
         run: uv run --project python python scripts/check_message_parity.py
+      - name: parse() parity — 11 cases vs committed expected.json, all three modes
+        run: uv run --project python python scripts/check_parse_parity.py
   cross-os-determinism:
     needs: test
     runs-on: ubuntu-latest

@@ -63,6 +63,26 @@
       "types": "./dist/esm/decode.d.ts",
       "import": "./dist/esm/decode.js",
       "require": "./dist/cjs/decode.js"
+    },
+    "./intake": {
+      "types": "./dist/esm/intake.d.ts",
+      "import": "./dist/esm/intake.js",
+      "require": "./dist/cjs/intake.js"
+    },
+    "./inflate": {
+      "types": "./dist/esm/inflate.d.ts",
+      "import": "./dist/esm/inflate.js",
+      "require": "./dist/cjs/inflate.js"
+    },
+    "./result": {
+      "types": "./dist/esm/result.d.ts",
+      "import": "./dist/esm/result.js",
+      "require": "./dist/cjs/result.js"
+    },
+    "./sha256": {
+      "types": "./dist/esm/sha256.d.ts",
+      "import": "./dist/esm/sha256.js",
+      "require": "./dist/cjs/sha256.js"
     }
   },
   "files": ["dist", "README.md", "LICENSE"],

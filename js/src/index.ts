@@ -15,7 +15,10 @@
  */
 
 export type { Mode } from "./api.js";
-export { iterFrames, iterMessages } from "./api.js";
+export { iterFrames, iterMessages, parse } from "./api.js";
+export type { ParseOptions } from "./api.js";
+export type { FitPart, RecoveryReport, SourceInfo } from "./result.js";
+export { ParseResult } from "./result.js";
 export {
   CrcMismatchError,
   EmptyFileError,

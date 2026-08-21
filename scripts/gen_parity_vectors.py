@@ -393,7 +393,10 @@ def inflate_vectors() -> None:
 
     payload = b"the quick brown fox" * 50
     whole = zlib.compress(payload, 6)  # zlib wrapper, as gzip.compress-like
-    gz = gziplib.compress(payload)
+    # mtime=0: gzip.compress stamps a wall clock into the header otherwise, which
+    # would make this generator nondeterministic -- the one thing the whole project
+    # forbids, caught by the vector-freshness gate.
+    gz = gziplib.compress(payload, mtime=0)
     variants = [
         ("gz-truncated-half", gz[: len(gz) // 2]),
         ("gz-truncated-header", gz[:3]),
