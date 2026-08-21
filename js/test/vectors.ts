@@ -35,6 +35,16 @@ export interface CrcVector {
   seed?: number;
   crc: number;
 }
+export interface Utf8Vector {
+  hex: string;
+  /** What the decoder's string path produces: a string, an array of segments, or null. */
+  value: string | string[] | null;
+}
+export interface TimestampVector {
+  fit: number;
+  iso: string;
+  local: string;
+}
 export interface NumericVectors {
   pyRound: [number, number][];
   pyRoundN: [number, number, number][];
@@ -48,6 +58,8 @@ export const canonicalAsymmetry = load<AsymmetryVector[]>("canonical-asymmetry.j
 export const numericVectors = load<NumericVectors>("numeric.json");
 export const baseTypeVectors = load<BaseTypeVector[]>("base-types.json");
 export const crcVectors = load<CrcVector[]>("crc16.json");
+export const utf8Vectors = load<Utf8Vector[]>("utf8.json");
+export const timestampVectors = load<TimestampVector[]>("timestamps.json");
 
 export function fromHex(hex: string): Uint8Array {
   const out = new Uint8Array(hex.length / 2);

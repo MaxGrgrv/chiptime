@@ -6,8 +6,10 @@
  * exist.
  */
 
+import { Decoder } from "./decode.js";
 import { defectToError } from "./errors.js";
 import { type FrameEvent, readStream } from "./frames.js";
+import type { Message } from "./message.js";
 
 export type Mode = "strict" | "lenient" | "forensic";
 
@@ -69,5 +71,21 @@ export function* iterFrames(src: Uint8Array, options: { mode?: Mode } = {}): Gen
     }
     if (consumed <= offset || !looksLikeHeader(src, consumed)) break;
     offset = consumed;
+  }
+}
+
+/**
+ * Profile-applied message stream without building the semantic model.
+ *
+ * Mirrors `iter_messages`: `iterFrames` filtered to data frames through one
+ * `Decoder`. Note that Python never calls `finish()` here either, so diagnostics,
+ * provenance and late-resolved developer fields are NOT observable through this
+ * generator — they reach users at F35 through `parse()`. Construct a `Decoder`
+ * directly when you need them.
+ */
+export function* iterMessages(src: Uint8Array, options: { mode?: Mode } = {}): Generator<Message> {
+  const decoder = new Decoder();
+  for (const ev of iterFrames(src, options)) {
+    if (ev.kind === "data") yield decoder.decode(ev);
   }
 }

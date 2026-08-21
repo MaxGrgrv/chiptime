@@ -15,7 +15,7 @@
  */
 
 export type { Mode } from "./api.js";
-export { iterFrames } from "./api.js";
+export { iterFrames, iterMessages } from "./api.js";
 export {
   CrcMismatchError,
   EmptyFileError,

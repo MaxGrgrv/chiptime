@@ -1,6 +1,6 @@
 # Feature: F34 — The decoder for TypeScript: frames to messages
 
-> Status: CRITIQUED
+> Status: DONE
 
 ## Purpose
 

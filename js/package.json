@@ -58,7 +58,12 @@
       "import": "./dist/esm/profile/index.js",
       "require": "./dist/cjs/profile/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./decode": {
+      "types": "./dist/esm/decode.d.ts",
+      "import": "./dist/esm/decode.js",
+      "require": "./dist/cjs/decode.js"
+    }
   },
   "files": ["dist", "README.md", "LICENSE"],
   "sideEffects": false,

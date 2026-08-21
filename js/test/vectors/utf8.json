@@ -1,0 +1,78 @@
+[
+  {
+    "hex": "",
+    "value": null
+  },
+  {
+    "hex": "616263",
+    "value": "abc"
+  },
+  {
+    "hex": "c3a9",
+    "value": "\u00e9"
+  },
+  {
+    "hex": "e697a5e69cac",
+    "value": "\u65e5\u672c"
+  },
+  {
+    "hex": "f09f9a80",
+    "value": "\ud83d\ude80"
+  },
+  {
+    "hex": "f0808041",
+    "value": "\ufffd\ufffd\ufffdA"
+  },
+  {
+    "hex": "e08080",
+    "value": "\ufffd\ufffd\ufffd"
+  },
+  {
+    "hex": "fffe",
+    "value": "\ufffd\ufffd"
+  },
+  {
+    "hex": "80",
+    "value": "\ufffd"
+  },
+  {
+    "hex": "c3",
+    "value": "\ufffd"
+  },
+  {
+    "hex": "eda080",
+    "value": "\ufffd\ufffd\ufffd"
+  },
+  {
+    "hex": "f4908080",
+    "value": "\ufffd\ufffd\ufffd\ufffd"
+  },
+  {
+    "hex": "616263ffff646566",
+    "value": "abc\ufffd\ufffddef"
+  },
+  {
+    "hex": "e282",
+    "value": "\ufffd"
+  },
+  {
+    "hex": "c0af",
+    "value": "\ufffd\ufffd"
+  },
+  {
+    "hex": "f888808080",
+    "value": "\ufffd\ufffd\ufffd\ufffd\ufffd"
+  },
+  {
+    "hex": "610062",
+    "value": "a"
+  },
+  {
+    "hex": "00",
+    "value": null
+  },
+  {
+    "hex": "7f8081",
+    "value": "\u007f\ufffd\ufffd"
+  }
+]

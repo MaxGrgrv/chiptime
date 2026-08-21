@@ -274,6 +274,77 @@ def base_type_vectors() -> None:
     _write("base-types.json", rows)
 
 
+def utf8_vectors() -> None:
+    """bytes.decode("utf-8", errors="replace") over adversarial sequences (F34).
+
+    CPython and the WHATWG TextDecoder agree today, including on the maximal-subpart
+    cases where they could have disagreed about how many U+FFFD to emit. Recorded so
+    a runtime change fails a test rather than silently altering decoded strings.
+    """
+    probes = [
+        b"",
+        b"abc",
+        b"\xc3\xa9",
+        b"\xe6\x97\xa5\xe6\x9c\xac",
+        b"\xf0\x9f\x9a\x80",
+        b"\xf0\x80\x80\x41",
+        b"\xe0\x80\x80",
+        b"\xff\xfe",
+        b"\x80",
+        b"\xc3",
+        b"\xed\xa0\x80",
+        b"\xf4\x90\x80\x80",
+        b"abc\xff\xffdef",
+        b"\xe2\x82",
+        b"\xc0\xaf",
+        b"\xf8\x88\x80\x80\x80",
+        b"a\x00b",
+        b"\x00",
+        b"\x7f\x80\x81",
+    ]
+    # Recorded from the decoder's own string path, not from bytes.decode(): the
+    # segmentation rules (terminated segments, padding junk, empty-segment stop) are
+    # part of what has to match, and a raw-decode vector would test TextDecoder in
+    # isolation while missing them.
+    from chiptime.decode import Decoder
+
+    rows = []
+    for probe in probes:
+        # Reaching into the private method deliberately: the vector must record what the
+        # decoder's string path produces, not what a public wrapper would reshape.
+        fvalue = Decoder()._string(probe, "m", "f")
+        rows.append({"hex": probe.hex(), "value": fvalue.value})
+    _write("utf8.json", rows)
+
+
+def timestamp_vectors() -> None:
+    """fit_ts_to_iso / _local across the epoch, leap years and the uint32 ceiling (F34)."""
+    from chiptime.decode import fit_ts_to_iso, fit_ts_to_iso_local
+
+    probes = [
+        0,
+        1,
+        59,
+        60,
+        3599,
+        3600,
+        86399,
+        86400,
+        268435456,
+        1149238800,
+        # leap-year and century boundaries, measured from the FIT epoch
+        63072000,
+        946684800,
+        951782400,
+        4102444800,
+        0xFFFFFFFE,
+    ]
+    _write(
+        "timestamps.json",
+        [{"fit": p, "iso": fit_ts_to_iso(p), "local": fit_ts_to_iso_local(p)} for p in probes],
+    )
+
+
 def crc_vectors() -> None:
     """crc16 over adversarial byte patterns (F33).
 
@@ -304,6 +375,8 @@ def main() -> None:
     numeric_vectors()
     base_type_vectors()
     crc_vectors()
+    utf8_vectors()
+    timestamp_vectors()
 
 
 if __name__ == "__main__":

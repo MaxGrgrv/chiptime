@@ -56,7 +56,7 @@ Module-for-module with the table above, so a Python change has an obvious TypeSc
 | `errors.ts`, `codes.ts` | errors (leaf) | `FitError` hierarchy, `Defect`/`Diagnostic`/`ProvenanceEntry`, 103 transcoded codes | F33 ✅ |
 | `frames.ts`, `message.ts` | decode | Crash-proof frame reader, CRC, resync scanner; message shapes | F33 ✅ |
 | `api.ts` | api | `iterFrames` (chained-file loop, mode policy); grows a verb per feature | F33 ✅ |
-| `decode.ts` | decode | Frames → messages: base types, scale/offset, dev fields, components | F34 |
+| `decode.ts` | decode | Frames → messages: base types, scale/offset, sentinels, strings, timestamps, dev fields, components | F34 ✅ |
 | `intake.ts`, `inflate.ts`, `api.ts`, `result.ts`, `cli.ts` | intake / api / output / cli | Unwrap, recover, shape, and the first CLI verbs | F34 |
 | `model.ts`, `semantics/*` | semantics | The canonical model — full corpus parity | F35 |
 | `encode.ts`, `repair.ts`, `validate.ts` | encode / repair | Writer, salvage, platform profiles | F36 |
@@ -69,8 +69,12 @@ Invariants specific to this tree, enforced rather than documented:
   reaches `dist`, so the browser build cannot regress silently).
 - **`Math.round` is banned** outside `numeric.ts` — it is half-up where Python is half-to-even
   (`js/scripts/guards.mjs`, verified to exit non-zero on a probe).
-- **`Date` never appears on an output path**: `toISOString()` always emits milliseconds, which the
-  Python formatter does not (ADR-0009 §5). `canonical.ts` refuses a `Date` outright.
+- **`Date` never appears**: `toISOString()` always emits milliseconds, which the Python formatter
+  does not (ADR-0009 §5). `canonical.ts` refuses one outright, and `guards.mjs` bans the constructor
+  from `js/src` entirely.
+- **Bitwise masking is banned in timestamp math.** JavaScript's `&`/`|`/`~` are 32-bit signed and
+  FIT `date_time` is a `uint32` exceeding 2^31, so `decode.ts` uses modulo arithmetic. No test we
+  have would catch the difference — every corpus timestamp is below the threshold.
 - **The profile is transcoded, not re-derived** (ADR-0009 §8). Two CI gates: regenerate-and-diff
   for staleness, `check_profile_parity.py` for transcoding faults. Note what this means for the
   corpus — it proves the two implementations agree, not that either matches reality; the outward
