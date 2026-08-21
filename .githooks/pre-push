@@ -11,6 +11,8 @@ echo "pre-push gate: mypy"
 (cd python && uv run mypy)
 echo "pre-push gate: corpus integrity"
 uv run --project python python corpus/tools/gen_all.py > /dev/null
+echo "pre-push gate: docs build (strict)"
+uv run --project python --group docs mkdocs build --quiet
 echo "pre-push gate: pytest"
 (cd python && uv run pytest -q)
 echo "pre-push gate: all green"
