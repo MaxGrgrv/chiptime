@@ -172,6 +172,29 @@ def _invalid_raw(bt_name: str) -> int | float:
 # ── producers ───────────────────────────────────────────────────────────────
 
 
+# uint type code by width — the canonical numeric form for a reassembled field
+_UINT_BY_SIZE: dict[int, int] = {1: 0x02, 2: 0x84, 4: 0x86, 8: 0x8F}
+
+
+def _canonical_base_type(base_type: int, raw: Any, size: int) -> int:
+    """Base type to re-emit a field in.
+
+    Normally the wire type, but decode sometimes *reassembles* a field a
+    broken encoder mis-declared — field 253 written as ``byte[4]`` when it
+    is a timestamp (taxonomy #17/#88, the Xiaomi-pipeline class). Replaying
+    the source encoder's mistake would fail to pack an int into a bytes
+    field; emitting the numeric type the value actually is produces the
+    canonical wire form (ADR-0006). The reinterpretation itself was already
+    announced at parse time as a warning, so no data changes silently here.
+    """
+    bt = BASE_TYPES.get(base_type)
+    if bt is not None and bt.struct_code is not None:
+        return base_type  # already numeric
+    if not isinstance(raw, int) or isinstance(raw, bool):
+        return base_type  # genuine strings/bytes are untouched
+    return _UINT_BY_SIZE.get(size, base_type)
+
+
 def encodable_from_message(msg: Message) -> EncodableMessage:
     """Lossless re-emit from a decoded message's wire definition + raw values."""
     if msg.wire is None:
@@ -195,7 +218,10 @@ def encodable_from_message(msg: Message) -> EncodableMessage:
     seen_253 = False
     for ws in msg.wire.fields:
         seen_253 = seen_253 or ws.num == 253
-        specs.append(FieldSpecValue(ws.num, ws.base_type, by_num.get(ws.num), ws.size))
+        raw = by_num.get(ws.num)
+        specs.append(
+            FieldSpecValue(ws.num, _canonical_base_type(ws.base_type, raw, ws.size), raw, ws.size)
+        )
     if not seen_253 and "timestamp" in msg.fields:
         # compressed-header timestamp materialized (ADR-0006 §2)
         ts_raw = msg.fields["timestamp"].raw

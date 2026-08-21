@@ -18,3 +18,6 @@ Note: the parser-behavior backlog is [edge-case-taxonomy.md](edge-case-taxonomy.
 | VIRB timestamp_correlation support (fitdecode#6) | F22 | Niche action-camera domain | When a VIRB file lands |
 | Zone-based interval classification (per-zone min durations, intervals.icu-style) | F24 | Relative bands work threshold-free; zone rules need AthleteSettings adoption evidence | When users supply zones and ask for Z4/Z5 rep labeling |
 | Semantic Lap fields for lap_trigger/wkt_step_index | F24 | Would change canonical parse output (corpus-wide regen); analytics reads raw messages instead | When a second consumer needs triggers outside metrics |
+| `chiptime edit --validate PLATFORM` convenience flag | F26 | `chiptime validate` composes fine; one flag less | If users report the two-step flow is friction |
+| Auto-derive `sub_sport` when sport changes | F26 | Inference into metadata = the non-goal the PRD forbids; warn instead | Never, unless the warning proves insufficient in practice |
+

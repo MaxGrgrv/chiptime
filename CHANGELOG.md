@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.2 — 2026-08-21
+
+- **Fixed**: `repair` raised `EncodeError` on files whose field 253 was
+  declared `byte[4]` and reassembled during decode (the Xiaomi-pipeline
+  class, taxonomy #17/#88) — such files could not be repaired at all.
+  Reassembled fields now re-emit in canonical numeric form (ADR-0006)
+  instead of replaying the source encoder's mistake.
+- **Added**: identity round-trip gate — every corpus case (including the
+  real-file tier, up to ~73k messages) must survive parse → re-encode →
+  parse with every field value intact. This is the foundation the write
+  verbs stand on.
+
 ## 0.4.1 — 2026-08-19
 
 - Verified on Python 3.14 (full suite, strict typing, byte-identical

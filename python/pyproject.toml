@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "chiptime"
-version = "0.4.1"
+version = "0.4.2"
 description = "Recovery-grade FIT file processing: parse anything, lose nothing silently, explain everything."
 readme = "README.md"
 requires-python = ">=3.11"

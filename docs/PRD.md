@@ -64,11 +64,15 @@ Non-negotiable; enforced by `/critique` and `/verify` on every feature (also in 
 - Sport-specific depth (pool swim lengths, multisport bounding), device-quirk registry growth, known-vendor dev-field promotion (Stryd, CORE, Moxy, running dynamics), `[pandas]` extra.
 
 ### Non-goals
-- No analytics beyond reconciliation (no NP/TSS/CTL — downstream's job; we hand over honest streams).
+- Analytics are an **optional, separate layer** (`chiptime.metrics`, M2.7/ADR-0008) — never imported by the core,
+  computed only from evidence present in the file plus thresholds the user supplies. The core's job remains handing
+  over honest streams; no metric is ever estimated from a workout to fill a gap.
 - No visualization, no upload clients, no cloud service, no GUI.
 - No full TCX/GPX parsing — sniff, route, reject with a clear name.
 - No silent "corrections" of physiological data — plausibility flags by default, repairs opt-in, everything in provenance.
-- No auto-rewrite of declared sport, ever (flag implausibility instead).
+- **No auto-rewrite of declared sport, ever** — chiptime never infers intent and never mutates a file on its own;
+  implausibility is flagged, not fixed. User-directed edits (F26 `edit`) are a different act: explicit, opt-in,
+  recorded in provenance, and never inferred. The rule is about *who decides*, not about whether bytes can change.
 
 ## 6. System design
 
