@@ -18,6 +18,18 @@ const RULES = [
     message:
       "Math.round is half-up; Python's round() is half-to-even. Use pyRound/pyRoundN from numeric.ts.",
   },
+  {
+    // ADR-0009 §5. The real rule is "never on an output path", which is not
+    // greppable, so this is a blanket ban with an exemption list. Date.toISOString()
+    // always emits milliseconds where Python's strftime does not, so a Date that
+    // reaches output puts a wrong timestamp in canonical JSON. Use civilFromUnix and
+    // the integer formatters in decode.ts.
+    pattern: /\bnew Date\b|\bDate\.(now|parse|UTC)\s*\(/,
+    exempt: [],
+    message:
+      "Date is banned in js/src (ADR-0009 §5): toISOString() always emits milliseconds, " +
+      "which the Python formatter does not. Use civilFromUnix/fitTsToIso.",
+  },
 ];
 
 function* walk(dir) {
