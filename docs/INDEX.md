@@ -63,7 +63,7 @@ Plan: [m3-typescript-plan.md](m3-typescript-plan.md) · contract: [ADR-0009](arc
 
 | Feature | Status | Spec | Implementation |
 |---|---|---|---|
-| F31 JS scaffolding, canonical JSON, number kernel | PLANNED | — | — |
+| F31 JS scaffolding, canonical JSON, number kernel | CRITIQUED | [spec](features/f31-js-scaffolding-canonical-numeric.md) | — |
 | F32 Profile dual emitter (Python + TS) | PLANNED | — | — |
 | F33 Frames + decode core (TS) | PLANNED | — | — |
 | F34 Intake, inflate, recovery, result, CLI (TS) | PLANNED | — | — |

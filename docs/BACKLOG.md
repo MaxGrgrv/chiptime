@@ -28,4 +28,5 @@ Note: the parser-behavior backlog is [edge-case-taxonomy.md](edge-case-taxonomy.
 | Field-level scrub escape hatch (`--scrub-field X`) | F28 | Categories cover the real jobs; arbitrary fields is speculative | If users report a category gap |
 | `chiptime doctor --fix` (prescribe and execute) | F29 | Prescribing and executing are different levels of consent; chaining verbs is one line | If users ask for a one-shot fix path |
 | Promote `VAL_GC_NO_TIMER_STOP` from warning to error | F29 | Rule has a single second-hand source; a false rejection is worse than a missed one | When a real file proves Garmin Connect requires it |
-
+| `mean` / `median` / `pstdev` in `js/src/numeric.ts` | F31 | Only callers are `intervals.py:186`/`:403`, six features downstream; the exact-rational `pstdev` port wants its caller's real distributions to validate against, not invented vectors | F37 (analytics layer port) |
+| Guard bans on `Date` outside the timestamp formatter, and on comparator-less `.sort()` over numbers | F31 | The `Math.round` grep guard's natural siblings, but each belongs with the code it would protect | F33 (`Date`/`civilFromUnix`), F35 (sort sites in semantics) |
