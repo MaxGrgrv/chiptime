@@ -1,0 +1,38 @@
+[
+  {
+    "name": "float-two-to-the-53",
+    "input": "9007199254740992.0",
+    "pythonOutput": "9007199254740992",
+    "note": "every finite double >= 2**53 is integral, so TypeScript's value-based guard refuses the whole range while Python's type-based guard accepts it as a float (ADR-0009 \u00a74, F31 Risk 1)"
+  },
+  {
+    "name": "float-1e16",
+    "input": "1e16",
+    "pythonOutput": "10000000000000000",
+    "note": "every finite double >= 2**53 is integral, so TypeScript's value-based guard refuses the whole range while Python's type-based guard accepts it as a float (ADR-0009 \u00a74, F31 Risk 1)"
+  },
+  {
+    "name": "float-1e21",
+    "input": "1e21",
+    "pythonOutput": "1e+21",
+    "note": "every finite double >= 2**53 is integral, so TypeScript's value-based guard refuses the whole range while Python's type-based guard accepts it as a float (ADR-0009 \u00a74, F31 Risk 1)"
+  },
+  {
+    "name": "float-1e20-with-digits",
+    "input": "1.00000000000001e20",
+    "pythonOutput": "100000000000001000000",
+    "note": "every finite double >= 2**53 is integral, so TypeScript's value-based guard refuses the whole range while Python's type-based guard accepts it as a float (ADR-0009 \u00a74, F31 Risk 1)"
+  },
+  {
+    "name": "float-max",
+    "input": "1.7976931348623157e308",
+    "pythonOutput": "1.7976931348623157e+308",
+    "note": "every finite double >= 2**53 is integral, so TypeScript's value-based guard refuses the whole range while Python's type-based guard accepts it as a float (ADR-0009 \u00a74, F31 Risk 1)"
+  },
+  {
+    "name": "float-rounds-up-to-integral",
+    "input": "9007199254740991.5",
+    "pythonOutput": "9007199254740992",
+    "note": "every finite double >= 2**53 is integral, so TypeScript's value-based guard refuses the whole range while Python's type-based guard accepts it as a float (ADR-0009 \u00a74, F31 Risk 1)"
+  }
+]

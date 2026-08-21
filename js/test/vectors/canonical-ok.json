@@ -1,0 +1,232 @@
+[
+  {
+    "name": "null",
+    "input": "null",
+    "expected": "null"
+  },
+  {
+    "name": "true",
+    "input": "true",
+    "expected": "true"
+  },
+  {
+    "name": "false",
+    "input": "false",
+    "expected": "false"
+  },
+  {
+    "name": "empty-object",
+    "input": "{}",
+    "expected": "{}"
+  },
+  {
+    "name": "empty-array",
+    "input": "[]",
+    "expected": "[]"
+  },
+  {
+    "name": "int-zero",
+    "input": "0",
+    "expected": "0"
+  },
+  {
+    "name": "int-negative-zero",
+    "input": "-0",
+    "expected": "0"
+  },
+  {
+    "name": "int-one",
+    "input": "1",
+    "expected": "1"
+  },
+  {
+    "name": "int-negative",
+    "input": "-1",
+    "expected": "-1"
+  },
+  {
+    "name": "int-max-safe",
+    "input": "9007199254740991",
+    "expected": "9007199254740991"
+  },
+  {
+    "name": "int-min-safe",
+    "input": "-9007199254740991",
+    "expected": "-9007199254740991"
+  },
+  {
+    "name": "float-zero",
+    "input": "0.0",
+    "expected": "0"
+  },
+  {
+    "name": "float-negative-zero",
+    "input": "-0.0",
+    "expected": "0"
+  },
+  {
+    "name": "float-integral",
+    "input": "1.0",
+    "expected": "1"
+  },
+  {
+    "name": "float-half",
+    "input": "1.5",
+    "expected": "1.5"
+  },
+  {
+    "name": "float-tenth",
+    "input": "0.1",
+    "expected": "0.1"
+  },
+  {
+    "name": "float-third",
+    "input": "0.3333333333333333",
+    "expected": "0.3333333333333333"
+  },
+  {
+    "name": "float-1e-6",
+    "input": "0.000001",
+    "expected": "0.000001"
+  },
+  {
+    "name": "float-1e-7",
+    "input": "1e-7",
+    "expected": "1e-7"
+  },
+  {
+    "name": "float-1e-21",
+    "input": "1e-21",
+    "expected": "1e-21"
+  },
+  {
+    "name": "float-smallest-subnormal",
+    "input": "5e-324",
+    "expected": "5e-324"
+  },
+  {
+    "name": "float-exponent-boundary-low",
+    "input": "0.000001",
+    "expected": "0.000001"
+  },
+  {
+    "name": "float-repr-shortest",
+    "input": "0.30000000000000004",
+    "expected": "0.30000000000000004"
+  },
+  {
+    "name": "float-negative",
+    "input": "-2.5",
+    "expected": "-2.5"
+  },
+  {
+    "name": "float-large-non-integral",
+    "input": "4503599627370495.5",
+    "expected": "4503599627370495.5"
+  },
+  {
+    "name": "string-empty",
+    "input": "\"\"",
+    "expected": "\"\""
+  },
+  {
+    "name": "string-ascii",
+    "input": "\"abc\"",
+    "expected": "\"abc\""
+  },
+  {
+    "name": "string-quote-backslash",
+    "input": "\"a\\\"b\\\\c\"",
+    "expected": "\"a\\\"b\\\\c\""
+  },
+  {
+    "name": "string-control-chars",
+    "input": "\"\\u0000\\u0001\\u001f\"",
+    "expected": "\"\\u0000\\u0001\\u001f\""
+  },
+  {
+    "name": "string-named-escapes",
+    "input": "\"\\b\\f\\n\\r\\t\"",
+    "expected": "\"\\b\\f\\n\\r\\t\""
+  },
+  {
+    "name": "string-del-is-literal",
+    "input": "\"\\u007f\"",
+    "expected": "\"\u007f\""
+  },
+  {
+    "name": "string-latin1",
+    "input": "\"\\u00e9\"",
+    "expected": "\"\u00e9\""
+  },
+  {
+    "name": "string-cjk",
+    "input": "\"\\u65e5\\u672c\"",
+    "expected": "\"\u65e5\u672c\""
+  },
+  {
+    "name": "string-astral-emoji",
+    "input": "\"\\ud83d\\ude80\"",
+    "expected": "\"\ud83d\ude80\""
+  },
+  {
+    "name": "string-combining-mark",
+    "input": "\"e\\u0301\"",
+    "expected": "\"e\u0301\""
+  },
+  {
+    "name": "string-nel-and-nbsp",
+    "input": "\"\\u0085\\u00a0\"",
+    "expected": "\"\u0085\u00a0\""
+  },
+  {
+    "name": "keys-ascii-case",
+    "input": "{\"b\":1,\"A\":2,\"a\":3,\"B\":4}",
+    "expected": "{\"A\":2,\"B\":4,\"a\":3,\"b\":1}"
+  },
+  {
+    "name": "keys-empty-and-short",
+    "input": "{\"\":1,\"a\":2,\"aa\":3}",
+    "expected": "{\"\":1,\"a\":2,\"aa\":3}"
+  },
+  {
+    "name": "keys-digits-vs-letters",
+    "input": "{\"1\":1,\"10\":2,\"2\":3,\"a\":4}",
+    "expected": "{\"1\":1,\"10\":2,\"2\":3,\"a\":4}"
+  },
+  {
+    "name": "keys-code-unit-vs-code-point",
+    "input": "{\"\\uff3a\":1,\"\\ud800\\udc00\":2}",
+    "expected": "{\"\ud800\udc00\":2,\"\uff3a\":1}"
+  },
+  {
+    "name": "keys-astral-vs-bmp",
+    "input": "{\"\\ud83d\\ude80\":1,\"z\":2,\"\\uffff\":3}",
+    "expected": "{\"z\":2,\"\ud83d\ude80\":1,\"\uffff\":3}"
+  },
+  {
+    "name": "keys-integer-like",
+    "input": "{\"2\":\"b\",\"1\":\"a\",\"10\":\"c\",\"0\":\"z\"}",
+    "expected": "{\"0\":\"z\",\"1\":\"a\",\"10\":\"c\",\"2\":\"b\"}"
+  },
+  {
+    "name": "nested-mixed",
+    "input": "{\"b\":[1,2.5,null,true],\"a\":{\"z\":1,\"y\":[{\"k\":\"v\"}]}}",
+    "expected": "{\"a\":{\"y\":[{\"k\":\"v\"}],\"z\":1},\"b\":[1,2.5,null,true]}"
+  },
+  {
+    "name": "array-of-objects",
+    "input": "[{\"b\":1,\"a\":2},{\"a\":3}]",
+    "expected": "[{\"a\":2,\"b\":1},{\"a\":3}]"
+  },
+  {
+    "name": "deep-nesting",
+    "input": "{\"a\":{\"a\":{\"a\":{\"a\":{\"a\":[1,[2,[3,[4]]]]}}}}}",
+    "expected": "{\"a\":{\"a\":{\"a\":{\"a\":{\"a\":[1,[2,[3,[4]]]]}}}}}"
+  },
+  {
+    "name": "streams-like",
+    "input": "{\"chiptime_schema\":1,\"ok\":true,\"streams\":{\"power\":{\"units\":\"W\",\"values\":[212,0,null,65.5],\"source\":\"native\"}},\"errors\":[]}",
+    "expected": "{\"chiptime_schema\":1,\"errors\":[],\"ok\":true,\"streams\":{\"power\":{\"source\":\"native\",\"units\":\"W\",\"values\":[212,0,null,65.5]}}}"
+  }
+]

@@ -69,6 +69,15 @@ The shaping layer applies the existing rule unchanged: magnitudes beyond 2^53 �
 decimal strings, everything else as JSON numbers. The canonicalizer refuses an out-of-range
 `number` in both languages (bug guard, ADR-0002 §2).
 
+One asymmetry is unavoidable and is accepted rather than papered over. Python's guard is
+*type*-based (`isinstance(obj, int)`), so it accepts a `float` of any magnitude and refuses only
+oversized `int`s. TypeScript has one number type, so its guard is *value*-based — and because every
+finite double at or above 2^53 is integral, TypeScript refuses the entire range
+`[2^53, 1.797e308]` that Python accepts. Refusing is the safe direction: an unrepresentable value
+becomes a loud failure rather than a silent one. The band is unreachable in practice (no corpus
+snapshot holds a number in it) and is pinned by `js/test/vectors/canonical-asymmetry.json`, so a
+future value entering it fails a test rather than a user's pipeline.
+
 ### 5. Timestamps: the integer formatter, never `Date`
 
 `Date.prototype.toISOString()` always emits milliseconds (`…T00:00:00.000Z`); Python's

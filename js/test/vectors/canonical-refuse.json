@@ -1,0 +1,22 @@
+[
+  {
+    "name": "int-above-max-safe",
+    "input": "9007199254740992",
+    "pythonError": "integer 9007199254740992 exceeds 2**53-1; shape layer must serialize it as a string"
+  },
+  {
+    "name": "int-below-min-safe",
+    "input": "-9007199254740992",
+    "pythonError": "integer -9007199254740992 exceeds 2**53-1; shape layer must serialize it as a string"
+  },
+  {
+    "name": "int-far-above-max-safe",
+    "input": "123456789012345678901234567890",
+    "pythonError": "integer 123456789012345678901234567890 exceeds 2**53-1; shape layer must serialize it as a string"
+  },
+  {
+    "name": "int-nested-above-max-safe",
+    "input": "{\"a\":[1,9007199254740992]}",
+    "pythonError": "integer 9007199254740992 exceeds 2**53-1; shape layer must serialize it as a string"
+  }
+]

@@ -8,8 +8,8 @@ Compact form (full dependency sections live in each spec; every edge verified bi
 
 | Feature | Depends on | Depended on by |
 |---|---|---|
-| F1 scaffolding | — | all |
-| F2 corpus+canonical | F1 | F3+ (all corpus-tested) |
+| F1 scaffolding | — | all (incl. F31, which mirrors its repo/CI conventions in `js/`) |
+| F2 corpus+canonical | F1 | F3+ (all corpus-tested), F31 (`canonical.py` is the port's reference) |
 | F3 decode core | F1, F2 | F4–F21 |
 | F4 intake | F3 | F5, F13 |
 | F5 recovery/resync | F3, F4 | F10, F13, F15, F17 |
@@ -36,6 +36,7 @@ Compact form (full dependency sections live in each spec; every edge verified bi
 | F27 trim (crop) | F3, F7/F9 (build_activity, derived totals), F12, F13 (`_summary_message`), F11 | F30 |
 | F28 privacy (reveal/scrub) | F3, F12, F11, ADR-0007 | M3 (TS twin), client-side browser tool |
 | F29 doctor + calibration | F13 repair, F14 validate, F26 edit, F11 CLI | — (composition layer) |
+| F31 js scaffolding/canonical/numeric (M3) | F1, F2 (`canonical.py` is the reference), ADR-0002, ADR-0009 | F32–F41 (every TypeScript module) |
 
 ## Module Dependencies
 
@@ -56,15 +57,33 @@ profile, canonical, errors, model, message ─→ (leaves)
 
 No cycles; `decode` never imports `semantics`; `profile` and `errors` remain leaves.
 
+### TypeScript (`js/src`) — as built at F31
+
+```
+index ─→ canonical
+canonical ─→ (leaf — imports nothing, not even numeric: formatting is String(x), not rounding)
+numeric ─→ (leaf; INTERNAL — absent from the exports map, no Python analogue)
+```
+
+The tree mirrors `python/src/chiptime/` module-for-module (ADR-0009), with `numeric.ts` as the one
+deliberate exception: Python uses the stdlib where TypeScript needs an explicit kernel. No `node:`
+import executes at module load anywhere in `js/src` — enforced by `js/scripts/smoke.sh`.
+
 ## External Dependencies
 
-**Runtime: none.** `python/pyproject.toml` has `dependencies = []` — adding one requires an ADR.
+**Runtime: none, in both languages.** `python/pyproject.toml` has `dependencies = []`;
+`js/package.json` has `"dependencies": {}`. Adding one on either side requires an ADR
+(ADR-0009 §7 is why the JS side ships its own inflate rather than reaching for `node:zlib`).
 
 | Dependency (dev-only) | Group | Used by | Why |
 |---|---|---|---|
 | pytest, hypothesis | dev | tests | Test runner + property tests |
 | mypy, ruff | dev | CI/verify | Types + lint/format |
 | fitparse, fitdecode | baselines | scripts (QA) | Local QA oracles (profile cross-check, internal robustness harness); never imported by chiptime; no published comparisons |
+| typescript | js dev | `js/` build + typecheck | Two plain `tsc` passes (ESM, CJS); no bundler on the publish path |
+| vitest | js dev | `js/test` | Test runner; the conformance runner lands on it at F33 |
+| @biomejs/biome | js dev | CI/verify | Lint + format — the `ruff` analogue |
+| @types/node | js dev | `js/test`, `js/scripts` | Test and tooling only; `js/src` compiles with `lib: ["ES2022"]` and no node types |
 
 ## Update Log
 
@@ -74,3 +93,4 @@ No cycles; `decode` never imports `semantics`; `profile` and `errors` remain lea
 | 2026-08-17 | F1: dev/baselines dependency groups declared; runtime pinned at zero |
 | 2026-08-18 | M1+M2 shipped: module layering recorded; runtime dependencies still ZERO |
 | 2026-08-18 | M2.5 wrap: feature matrix filled (F1–F21); metrics module added (optional import only); pandas as optional extra — runtime core still ZERO |
+| 2026-08-21 | F31 (M3): `js/` package added with its own dependency table. Runtime dependencies ZERO in both languages; JS dev group is typescript/vitest/biome/@types/node. TypeScript module tree recorded; `canonical.ts` and `numeric.ts` are both leaves |

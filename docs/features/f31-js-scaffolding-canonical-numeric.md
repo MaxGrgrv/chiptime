@@ -1,6 +1,6 @@
 # Feature: F31 — JS scaffolding, canonical JSON, number kernel, parity harness
 
-> Status: CRITIQUED
+> Status: DONE
 
 ## Purpose
 
@@ -232,6 +232,25 @@ depth is bounded by shape, not size. A pathological depth would raise in both la
 only in the exception type; the shaping layer bounds depth, so this is noted, not guarded.
 Per-number `String(x)` in the hot loop is the same cost profile as Python's `number()`; F31 sets
 no performance gate, and the perf pass has its own precedent (F20).
+
+### Risk 1 — the integral-float asymmetry (carried forward, corrected in implementation)
+
+Python's oversized-integer guard is *type*-based (`isinstance(obj, int)`), so it accepts a `float`
+of any magnitude and refuses only oversized `int`s. TypeScript has one number type and cannot tell
+them apart, so its guard must be *value*-based (`Number.isInteger(x) && |x| > 2**53 - 1`) — which
+refuses values Python accepts.
+
+The spec originally framed this as an edge case at the 2^53 boundary. **It is a range, not a
+boundary**: every finite double at or above 2^53 is integral, so TypeScript refuses all of
+`[2^53, 1.797e308]`. The differential harness found this on its first run — three vectors written
+as "ok" (`1.7976931348623157e308`, `1.00000000000001e20`, and `9007199254740991.5`, which rounds
+to an integral double) were refused, and now live in `canonical-asymmetry.json` as tested,
+documented facts.
+
+Refusing is the safe direction: it turns an unrepresentable value into a loud failure rather than a
+silent one. Verified unreachable in practice — no corpus snapshot contains a number in the band —
+and pinned by vectors, so a future value entering it fails a test rather than a user's pipeline.
+See ADR-0009 §4 and the implementation doc, Deviation 1.
 
 ### Contract check
 - **Silent loss** — this was the sharpest finding. Gap 2's four mangling paths would each put

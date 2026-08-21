@@ -1,0 +1,68 @@
+{
+  "name": "chiptime",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Recovery-grade FIT file processing: parse anything, lose nothing silently, explain everything.",
+  "license": "MIT",
+  "author": "Maxim Grigoryev",
+  "homepage": "https://maxgrgrv.github.io/chiptime/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaxGrgrv/chiptime.git",
+    "directory": "js"
+  },
+  "bugs": "https://github.com/MaxGrgrv/chiptime/issues",
+  "keywords": [
+    "fit",
+    "garmin",
+    "fitness",
+    "activity",
+    "parser",
+    "recovery",
+    "repair",
+    "cycling",
+    "running"
+  ],
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "parity": {
+    "python": null,
+    "note": "npm 0.N.0 mirrors the feature surface of PyPI 0.N.0 (ADR-0009 \u00a79). null = pre-parity scaffolding."
+  },
+  "//": "Contract: the core has ZERO runtime dependencies. Any addition requires an ADR (ADR-0009 \u00a77).",
+  "dependencies": {},
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "scripts": {
+    "build": "npm run build:esm && npm run build:cjs && node scripts/finish-build.mjs",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "test": "vitest run",
+    "guards": "node scripts/guards.mjs",
+    "smoke": "bash scripts/smoke.sh",
+    "check": "npm run lint && npm run typecheck && npm run guards && npm test",
+    "determinism": "npm run build && node scripts/determinism.mjs"
+  }
+}

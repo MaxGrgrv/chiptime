@@ -41,3 +41,31 @@ Next: **M3 — the TypeScript twin on the shared corpus** ([plan](../m3-typescri
 | `chiptime.result` | output | ParseResult + canonical schema v1 shaping |
 | `chiptime.canonical` | output | RFC 8785 canonical JSON serialization (ADR-0002); the determinism contract |
 | `corpus/tools/*` | corpus tooling (outside package) | Deterministic fixture generation, independent of chiptime by design (ADR-0001) |
+
+## TypeScript twin (`js/src`) — as built
+
+Module-for-module with the table above, so a Python change has an obvious TypeScript address
+([ADR-0009](adrs/0009-cross-language-parity.md), [M3 plan](../m3-typescript-plan.md)).
+
+| Module | Layer | Purpose | Status |
+|---|---|---|---|
+| `canonical.ts` | output | RFC 8785 serializer; the number policy; UTF-8 encoder; the refusal set | F31 ✅ |
+| `numeric.ts` | leaf (internal) | Python rounding semantics: `pyRound`, `pyRoundN`, `floorDiv`, `divmod` | F31 ✅ |
+| `index.ts` | api | Public surface — the parsing verbs arrive at F34/F35 | F31 ✅ |
+| `profile/*` | profile | Generated tables, dual-emitted with the Python profile | F32 |
+| `frames.ts`, `decode.ts`, `message.ts` | decode | Crash-proof frame reader; frames → messages | F33 |
+| `intake.ts`, `inflate.ts`, `api.ts`, `result.ts`, `cli.ts` | intake / api / output / cli | Unwrap, recover, shape, and the first CLI verbs | F34 |
+| `model.ts`, `semantics/*` | semantics | The canonical model — full corpus parity | F35 |
+| `encode.ts`, `repair.ts`, `validate.ts` | encode / repair | Writer, salvage, platform profiles | F36 |
+| `metrics/*` | analytics (optional) | The optional layer; never imported by core | F37 |
+| `edit.ts`, `trim.ts`, `privacy.ts` | write verbs | Metadata surgery, crop, privacy | F38–F40 |
+
+Invariants specific to this tree, enforced rather than documented:
+
+- **Zero runtime dependencies**, same as Python (`js/scripts/smoke.sh` asserts no `node:` import
+  reaches `dist`, so the browser build cannot regress silently).
+- **`Math.round` is banned** outside `numeric.ts` — it is half-up where Python is half-to-even
+  (`js/scripts/guards.mjs`, verified to exit non-zero on a probe).
+- **`Date` never appears on an output path**: `toISOString()` always emits milliseconds, which the
+  Python formatter does not (ADR-0009 §5). `canonical.ts` refuses a `Date` outright.
+
