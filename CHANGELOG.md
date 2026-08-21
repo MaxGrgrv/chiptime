@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.5.0 — 2026-08-21 (M2.8: file surgery begins)
+
+- **New: `chiptime edit`** — change what a file *says about itself* and keep
+  it uploadable. Sport/sub-sport (applied everywhere they are declared, so a
+  file can't contradict itself), recording-device identity (`file_id` + the
+  creator `device_info` entry only), and signed time shifts across every
+  profile-typed timestamp. Every edit lands in `provenance[]`; the output is
+  re-parsed in strict mode before you see it (`output_strict_ok`).
+- **Honest by construction**: `sub_sport` is never inferred from `sport` —
+  changing sport while a specific sub-sport remains emits
+  `SPORT_PAIR_IMPLAUSIBLE` instead of guessing. Time shifts that would leave
+  the representable range, or land on the invalid sentinel, refuse the whole
+  edit and write no bytes.
+- **Everything unnamed round-trips untouched** — unknown messages, unknown
+  enum values, and developer fields survive an unrelated edit, asserted
+  field-by-field in tests.
+- **New corpus case** `protocol/unknown-enum-values` closes a real coverage
+  gap: taxonomy #24 (unknown enums pass through as raw values) had no case.
+- PRD non-goals corrected: the sport rule now separates inference (still
+  forbidden) from user-directed edits; the analytics non-goal superseded by
+  M2.7 was fixed.
+
 ## 0.4.2 — 2026-08-21
 
 - **Fixed**: `repair` raised `EncodeError` on files whose field 253 was

@@ -1499,8 +1499,49 @@ def float_sentinel_vs_nan() -> bytes:
     return b.build()
 
 
+def unknown_enums() -> bytes:
+    """Unknown enum values everywhere they matter (taxonomy #24).
+
+    A future device: manufacturer 64999 and product 9999 are outside the
+    known tables, sport 250 / sub_sport 240 are values this profile has
+    never seen. All must survive as raw values — unknown is not invalid,
+    and forward-compatibility is a contract, not a courtesy.
+    """
+    b = FitBuilder()
+    t0 = fit_ts(T0)
+    b.define(
+        0,
+        FILE_ID,
+        [(0, "enum", 1), (1, "uint16", 1), (2, "uint16", 1), (3, "uint32z", 1), (4, "uint32", 1)],
+    )
+    b.data(0, 4, 64999, 9999, 4242, t0)  # unknown manufacturer + product
+    b.define(
+        1,
+        RECORD,
+        [(253, "uint32", 1), (5, "uint32", 1), (3, "uint8", 1)],
+    )
+    for i in range(4):
+        b.data(1, t0 + i, i * 1000, 120 + i)
+    b.define(
+        2,
+        SESSION,
+        [
+            (253, "uint32", 1),
+            (254, "uint16", 1),
+            (2, "uint32", 1),
+            (5, "enum", 1),
+            (6, "enum", 1),
+            (7, "uint32", 1),
+            (9, "uint32", 1),
+        ],
+    )
+    b.data(2, t0 + 4, 0, t0, 250, 240, 4000, 3000)  # unknown sport + sub_sport
+    return b.build()
+
+
 SEEDS: dict[str, object] = {
     "ride_smooth": ride_smooth,
+    "unknown_enums": unknown_enums,
     "run_basic": run_basic,
     "course_file": course_file,
     "workout_file": workout_file,

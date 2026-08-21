@@ -130,6 +130,7 @@ nav:
   - Guides:
       - Parse anything: guides/parse-anything.md
       - Repair crash files: guides/repair.md
+      - Edit metadata: guides/edit.md
       - Analyze workouts: guides/analyze.md
       - Built for agents: guides/agents.md
       - Storing the output: guides/storage.md

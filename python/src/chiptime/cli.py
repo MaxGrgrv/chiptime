@@ -58,6 +58,20 @@ def main(argv: list[str] | None = None) -> int:
         "--platform", choices=["strict-spec", "garmin-connect", "strava"], default="strict-spec"
     )
 
+    p_edit = sub.add_parser("edit", help="change what a file says about itself (metadata)")
+    p_edit.add_argument("file")
+    p_edit.add_argument("-o", "--output", required=True)
+    p_edit.add_argument("--mode", choices=["strict", "lenient", "forensic"], default="lenient")
+    p_edit.add_argument("--sport", help="new sport, e.g. running (or a raw number)")
+    p_edit.add_argument("--sub-sport", dest="sub_sport", help="new sub-sport; never inferred")
+    p_edit.add_argument("--manufacturer", help="new recording-device manufacturer, name or number")
+    p_edit.add_argument("--product", type=int, help="new product id (numeric)")
+    p_edit.add_argument(
+        "--time-shift",
+        dest="time_shift",
+        help="signed offset applied to every timestamp: seconds, or ±HH:MM",
+    )
+
     p_an = sub.add_parser("analyze", help="per-sport workout report + insights (optional layer)")
     p_an.add_argument("file")
     p_an.add_argument("--mode", choices=["strict", "lenient", "forensic"], default="lenient")
@@ -83,6 +97,8 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_validate(args)
     if args.command == "analyze":
         return _cmd_analyze(args)
+    if args.command == "edit":
+        return _cmd_edit(args)
     return _cmd_codes()
 
 
@@ -108,6 +124,70 @@ def _parse_bounds(raw: str | None, flag: str) -> tuple[float, ...] | None:
         print(f"error: {flag} bounds must ascend", file=sys.stderr)
         raise SystemExit(64)
     return bounds
+
+
+def _parse_time_shift(raw: str | None) -> int | None:
+    """Accept plain seconds or ±HH:MM (the form humans think in for timezones)."""
+    if raw is None:
+        return None
+    text = raw.strip()
+    sign = -1 if text.startswith("-") else 1
+    text = text.lstrip("+-")
+    try:
+        if ":" in text:
+            hours, minutes = text.split(":", 1)
+            return sign * (int(hours) * 3600 + int(minutes) * 60)
+        return sign * int(text)
+    except ValueError:
+        print(f"error: --time-shift expects seconds or ±HH:MM, got {raw!r}", file=sys.stderr)
+        raise SystemExit(64) from None
+
+
+def _cmd_edit(args: argparse.Namespace) -> int:
+    shift = _parse_time_shift(args.time_shift)
+    if not any((args.sport, args.sub_sport, args.manufacturer, args.product is not None, shift)):
+        print("error: edit requires at least one change", file=sys.stderr)
+        print(
+            "suggestion: --sport / --sub-sport / --manufacturer / --product / --time-shift",
+            file=sys.stderr,
+        )
+        return 64
+    try:
+        result = chiptime.edit(
+            args.file,
+            sport=args.sport,
+            sub_sport=args.sub_sport,
+            manufacturer=args.manufacturer,
+            product=args.product,
+            time_shift_s=shift,
+            mode=args.mode,
+        )
+    except chiptime.NotFitError as e:
+        print(f"{e.code}: {e.detail}", file=sys.stderr)
+        return 4
+    except chiptime.FitError as e:
+        print(f"{e.code}: {e.detail}", file=sys.stderr)
+        if e.suggestion:
+            print(f"suggestion: {e.suggestion}", file=sys.stderr)
+        return 3
+    except OSError as e:
+        print(f"cannot read {args.file}: {e}", file=sys.stderr)
+        return 64
+
+    with open(args.output, "wb") as f:
+        f.write(result.data)
+    for entry in result.provenance:
+        print(f"{entry.code}: {entry.detail}")
+    for warn in result.warnings:
+        print(f"{warn.code}: {warn.detail}", file=sys.stderr)
+    print(f"wrote {args.output} ({len(result.data)} bytes)")
+    if not result.output_strict_ok:
+        print(
+            "warning: the edited file does not parse in strict mode; inspect before uploading",
+            file=sys.stderr,
+        )
+        return 2
+    return 0
 
 
 def _cmd_analyze(args: argparse.Namespace) -> int:

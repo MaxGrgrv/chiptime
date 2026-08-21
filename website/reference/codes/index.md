@@ -1,5 +1,5 @@
 ---
-description: Every chiptime machine code — 86 errors, warnings, provenance entries, and insight codes — each with its own page.
+description: Every chiptime machine code — 91 errors, warnings, provenance entries, and insight codes — each with its own page.
 ---
 
 # Codes registry
@@ -12,6 +12,7 @@ its own page; the complete agent-facing contract (schema, exit codes) lives in
 
 | Code | Kind | Meaning |
 |---|---|---|
+| [`TIME_SHIFT_OUT_OF_RANGE`](time-shift-out-of-range.md) | error | A requested time shift would push a timestamp outside the representable FIT range (or onto the invalid sentinel); no bytes were written. |
 | [`FIT_EMPTY`](fit-empty.md) | error | The file contains no bytes. |
 | [`FIT_TOO_SMALL`](fit-too-small.md) | error | The file is smaller than any valid FIT header. |
 | [`FIT_NO_CONTENT`](fit-no-content.md) | error | Structurally valid container, zero messages; data genuinely absent (#16). |
@@ -29,6 +30,7 @@ its own page; the complete agent-facing contract (schema, exit codes) lives in
 | [`FIT_MISSING_TIMESTAMP_ANCHOR`](fit-missing-timestamp-anchor.md) | error | A compressed-timestamp record has no timestamp anchor. |
 | [`FIT_TRAILING_JUNK`](fit-trailing-junk.md) | error | Bytes after the final CRC are not a chained FIT file. |
 | [`REPAIR_NOTHING_TO_SALVAGE`](repair-nothing-to-salvage.md) | error | Nothing usable survives parsing; repair refuses to fabricate data (#16). |
+| [`SPORT_PAIR_IMPLAUSIBLE`](sport-pair-implausible.md) | warning | Sport was edited while a non-generic sub-sport was left in place; verify the pair is what you intended (chiptime never guesses a replacement). |
 | [`FIT_CRC_MISMATCH`](fit-crc-mismatch.md) | warning | File CRC is wrong but content decodes; continued. |
 | [`FIT_HEADER_CRC_MISMATCH`](fit-header-crc-mismatch.md) | warning | Header CRC is wrong; continued. |
 | [`FIT_HEADER_INVALID`](fit-header-invalid.md) | warning | Header is nonstandard; continued on best interpretation. |
@@ -68,6 +70,9 @@ its own page; the complete agent-facing contract (schema, exit codes) lives in
 | [`LAP_COVERAGE_GAP`](lap-coverage-gap.md) | warning | Laps do not cover the session span (#94). |
 | [`TIMESTAMP_DECLARED_AS_BYTES`](timestamp-declared-as-bytes.md) | warning | Field 253 declared as byte[4]; reassembled (Xiaomi-pipeline class). |
 | [`HR_EXPANSION_NO_ANCHOR`](hr-expansion-no-anchor.md) | warning | hr.event_timestamp_12 appeared before any full event_timestamp; samples not expandable. |
+| [`SPORT_EDITED`](sport-edited.md) | provenance | Declared sport/sub-sport rewritten at the user's explicit request. |
+| [`DEVICE_EDITED`](device-edited.md) | provenance | Declared recording-device identity rewritten at the user's explicit request. |
+| [`TIMESTAMPS_SHIFTED`](timestamps-shifted.md) | provenance | Every profile-typed timestamp shifted by a user-supplied offset. |
 | [`TRUNCATED_TAIL_SALVAGED`](truncated-tail-salvaged.md) | provenance | File ends mid-content; complete records before the cut kept. |
 | [`STREAM_STOPPED_AT_DEFECT`](stream-stopped-at-defect.md) | provenance | Decoding stopped at a structural defect; prefix salvaged. |
 | [`PARTIAL_RECORD_DISCARDED`](partial-record-discarded.md) | provenance | Trailing bytes formed an incomplete record; discarded. |

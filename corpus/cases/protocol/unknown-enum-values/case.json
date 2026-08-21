@@ -1,0 +1,23 @@
+{
+  "slug": "unknown-enum-values",
+  "category": "protocol",
+  "taxonomy": [
+    24
+  ],
+  "tier": 1,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "unknown_enums"
+    }
+  ],
+  "source": "synthetic",
+  "notes": "unknown manufacturer/product/sport/sub_sport survive as raw values; unknown is not invalid (contract #6)",
+  "input_sha256": "a08b78aa5afc79731571d5e5666d5c28c040d7b3ba51dc8967f1d05c0963cc10"
+}

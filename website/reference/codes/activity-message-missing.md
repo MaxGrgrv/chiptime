@@ -12,7 +12,7 @@ Warning — chiptime saw something suspicious, handled it, and continued. Appear
 
 ## Proven by corpus cases
 
-This code's behavior is pinned by committed conformance cases: [`gps/spike-bounce`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/gps/spike-bounce) · [`gps/treadmill-final-jump`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/gps/treadmill-final-jump) · [`reconcile/summary-mismatch`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/reconcile/summary-mismatch) · [`reconcile/zero-duration-lap`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/reconcile/zero-duration-lap) · [`reconcile/zero-duration-session`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/reconcile/zero-duration-session) · [`structural/data-size-lies-short`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/structural/data-size-lies-short)
+This code's behavior is pinned by committed conformance cases: [`gps/spike-bounce`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/gps/spike-bounce) · [`gps/treadmill-final-jump`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/gps/treadmill-final-jump) · [`protocol/unknown-enum-values`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/protocol/unknown-enum-values) · [`reconcile/summary-mismatch`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/reconcile/summary-mismatch) · [`reconcile/zero-duration-lap`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/reconcile/zero-duration-lap) · [`reconcile/zero-duration-session`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/reconcile/zero-duration-session)
 
 ## Handling it
 

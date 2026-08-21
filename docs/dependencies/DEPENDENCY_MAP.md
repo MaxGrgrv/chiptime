@@ -32,6 +32,7 @@ Compact form (full dependency sections live in each spec; every edge verified bi
 | F23 sport profiles/pacing | F7 (model), F21 (ADR-0008) | F24 (profiles+signal), F25 (pacing+zones) |
 | F24 interval detection | F23, F7 (model/laps/lengths) | F25 (report embeds structure) |
 | F25 insights/load/analyze | F23, F24, F11 (CLI), F21 (basics) | — |
+| F26 edit (metadata) | F3 (decode), F12 (encoder), F13 (repair pattern), F11 (CLI) | F27/F28/F30 (share the transform+re-encode skeleton), M3 |
 
 ## Module Dependencies
 

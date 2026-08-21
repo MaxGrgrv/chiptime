@@ -1,6 +1,6 @@
 # Feature: F26 — `edit`: metadata surgery with validated round-trip
 
-> Status: CRITIQUED
+> Status: DONE
 
 ## Purpose
 

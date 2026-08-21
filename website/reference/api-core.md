@@ -17,6 +17,7 @@ input → complete result.
 | To stream a huge file in constant memory | `iter_messages` |
 | Wire-level bytes forensics | `iter_frames` |
 | A broken file made uploadable | `repair` |
+| Metadata changed (sport, device, clock) | `edit` |
 | "Will this platform accept it?" | `validate` |
 
 `parse` reads everything into a `ParseResult`; the iterators yield as they go
@@ -36,6 +37,12 @@ and skip the semantic layer entirely. `repair` and `validate` are built *on*
 ## Repair
 
 ::: chiptime.repair
+
+## Edit
+
+::: chiptime.edit
+
+::: chiptime.edit.EditResult
 
 ## Validate
 

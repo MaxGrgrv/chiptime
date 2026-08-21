@@ -503,6 +503,7 @@ Rules:
 | **M2.5** ✅ | 0.3.0 tagged 2026-08-18 | From the 66-file soak (0 contract violations): F17 soak fixes (FIT_NO_CONTENT for empty shells #16, sport-aware DISTANCE_FROZEN, repair drops implausible local_timestamp), F18 full profile generation (maintainer SDK local), F19 real-file corpus promotion (own files only, PII policy; NEVER SDK samples), F20 perf pass (~1s/MB → target 3-5x), F21 swim/HRV depth (#72) |
 | **M2.6** ✅ | shipped 2026-08-18 | Ecosystem-issue hardening: publicly reported FIT parsing failure modes surveyed → 30 classes → 21 pre-handled, 9 fixed (incl. hr event_timestamp_12 12-bit expansion) |
 | **M2.7** ✅ | 0.4.0 tagged 2026-08-18 | Analytics layer (ADR-0008): F23 sport profiles + pacing (profiles-as-data, inverse-safe pace, Concept2 bridge, splits), F24 interval/structure detection (evidence ladder, honest bands), F25 insights + load + `chiptime analyze` (basis strings, omissions, TRIMP coverage guard, fitness/fatigue/form EWMA) |
+| **M2.8** ◐ | in progress | File surgery — the write verbs users actually ask for: F26 `edit` (metadata) ✅ 0.5.0; F27 trim, F28 privacy scrub, F29 convert, F30 merge queued |
 | **M3** | JS/TS `chiptime` on npm | Twin implementation consuming the same corpus; parity gate in CI; browser + Node |
 | **M4+** | Depth moat | Tier-3 items; device-quirk registry; dev-field vendor registry (Stryd, CORE, Moxy…); per-edge-case docs pages (SEO/agent-search: "FIT local_timestamp 1989 fix"); donation page; `[pandas]` extra |
 

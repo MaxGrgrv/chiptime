@@ -35,6 +35,7 @@
     "cases/protocol/sentinel-values",
     "cases/protocol/string-edges",
     "cases/protocol/uint64-fields",
+    "cases/protocol/unknown-enum-values",
     "cases/reconcile/no-session-rebuild",
     "cases/reconcile/summary-mismatch",
     "cases/reconcile/zero-duration-lap",

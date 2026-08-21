@@ -50,6 +50,7 @@ The local file path is never serialized.
 
 | Code | Meaning |
 |---|---|
+| `TIME_SHIFT_OUT_OF_RANGE` | A requested time shift would push a timestamp outside the representable FIT range (or onto the invalid sentinel); no bytes were written. |
 | `FIT_EMPTY` | The file contains no bytes. |
 | `FIT_TOO_SMALL` | The file is smaller than any valid FIT header. |
 | `FIT_NO_CONTENT` | Structurally valid container, zero messages; data genuinely absent (#16). |
@@ -72,6 +73,7 @@ The local file path is never serialized.
 
 | Code | Meaning |
 |---|---|
+| `SPORT_PAIR_IMPLAUSIBLE` | Sport was edited while a non-generic sub-sport was left in place; verify the pair is what you intended (chiptime never guesses a replacement). |
 | `FIT_CRC_MISMATCH` | File CRC is wrong but content decodes; continued. |
 | `FIT_HEADER_CRC_MISMATCH` | Header CRC is wrong; continued. |
 | `FIT_HEADER_INVALID` | Header is nonstandard; continued on best interpretation. |
@@ -116,6 +118,9 @@ The local file path is never serialized.
 
 | Code | Meaning |
 |---|---|
+| `SPORT_EDITED` | Declared sport/sub-sport rewritten at the user's explicit request. |
+| `DEVICE_EDITED` | Declared recording-device identity rewritten at the user's explicit request. |
+| `TIMESTAMPS_SHIFTED` | Every profile-typed timestamp shifted by a user-supplied offset. |
 | `TRUNCATED_TAIL_SALVAGED` | File ends mid-content; complete records before the cut kept. |
 | `STREAM_STOPPED_AT_DEFECT` | Decoding stopped at a structural defect; prefix salvaged. |
 | `PARTIAL_RECORD_DISCARDED` | Trailing bytes formed an incomplete record; discarded. |

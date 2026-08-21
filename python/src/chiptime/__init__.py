@@ -9,6 +9,7 @@ Parse anything, lose nothing silently, explain everything.
 """
 
 from chiptime._api import iter_frames, iter_messages, parse
+from chiptime.edit import EditError, EditResult, edit
 from chiptime.errors import (
     CrcMismatchError,
     EmptyFileError,
@@ -21,10 +22,12 @@ from chiptime.errors import (
 from chiptime.repair import NotRepairableError, RepairResult, repair
 from chiptime.result import Mode, ParseResult
 
-__version__ = "0.4.2"
+__version__ = "0.5.0"
 
 __all__ = [
     "CrcMismatchError",
+    "EditError",
+    "EditResult",
     "EmptyFileError",
     "FitError",
     "HeaderError",
@@ -36,6 +39,7 @@ __all__ = [
     "RepairResult",
     "TruncatedError",
     "__version__",
+    "edit",
     "iter_frames",
     "iter_messages",
     "parse",
