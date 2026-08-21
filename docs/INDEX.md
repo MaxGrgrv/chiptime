@@ -7,7 +7,7 @@ Master index of all documentation. Updated with every feature change.
 | Doc | Purpose |
 |---|---|
 | [PRD.md](PRD.md) | Product requirements — vision, principles, scope, architecture, roadmap |
-| [m3-typescript-plan.md](m3-typescript-plan.md) | M3 milestone plan — the TypeScript twin on npm (F31–F41), parity gates, hazards |
+| [m3-typescript-plan.md](m3-typescript-plan.md) | M3 milestone plan — the TypeScript twin on npm (F31–F42), parity gates, hazards |
 | [edge-case-taxonomy.md](edge-case-taxonomy.md) | The 104-item FIT edge-case taxonomy — the parser-behavior backlog |
 | [BACKLOG.md](BACKLOG.md) | Items deferred during critique cycles |
 | [for-agents.md](for-agents.md) | Generated agent-facing reference: codes, exit codes, schema (do not hand-edit) |
@@ -73,7 +73,8 @@ Plan: [m3-typescript-plan.md](m3-typescript-plan.md) · contract: [ADR-0009](arc
 | F38 `edit` (npm 0.5.0) | PLANNED | — | — |
 | F39 `trim` (npm 0.6.0) | PLANNED | — | — |
 | F40 `reveal` + `scrub` (npm 0.7.0) | PLANNED | — | — |
-| F41 Browser build, docs tabs, parity CI, parity release | PLANNED | — | — |
+| F41 Catch-up: mirror Python features shipped during the port | PLANNED | — | — |
+| F42 Browser build, docs tabs, parity CI, parity release | PLANNED | — | — |
 
 ## ADRs
 

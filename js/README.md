@@ -23,9 +23,13 @@ npm `0.N.0` mirrors the feature surface of PyPI `0.N.0`. Patch numbers are indep
 | `0.2.0` | PyPI `0.2.0` | encoder, `repair`, `validate` |
 | `0.4.0` | PyPI `0.4.0` | `metrics`, `analyze` |
 | `0.5.0`–`0.7.0` | same | `edit`, `trim`, `reveal`/`scrub` |
+| `0.8.0`+ | same | `doctor`, and whatever else Python ships while this port runs |
 
 There is no npm `0.3.0`: PyPI `0.3.0` was internal work (profile generation, performance, soak
 fixes) that this port inherits from the code it mirrors.
+
+The top of that table moves — Python keeps shipping while the port runs — so the two version lines
+merge when npm catches up to the then-current Python version, not at a fixed number.
 
 ## Design constraints
 

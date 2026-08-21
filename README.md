@@ -103,9 +103,10 @@ interface was designed with it in mind.
 
 ## Status
 
-`0.7.0` — Python implementation live: decode + recovery + repair + validation +
-analytics, plus the file-surgery verbs (`edit`, `trim`, `reveal`/`scrub`). 371
-tests, validated against 66 real device files with zero contract violations.
+`0.8.0` — Python implementation live: decode + recovery + repair + validation +
+analytics, plus the file-surgery verbs (`edit`, `trim`, `reveal`/`scrub`) and
+`doctor`. 385 tests, validated against 66 real device files with zero contract
+violations.
 
 **In progress (M3):** the TypeScript twin on the shared corpus. The canonical
 serializer and number kernel are built and differentially tested against CPython;

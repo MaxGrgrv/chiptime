@@ -123,8 +123,17 @@ canonical digest and requires equality — CI fails if they drift.
 
 npm `0.N.0` denotes the feature surface of PyPI `0.N.0`. Patch releases are independent.
 Python `0.3.0` (M2.5) and the M2.6 hardening were internal — the port inherits those behaviors,
-so npm skips `0.3.0`. On reaching npm `0.7.0` the version lines merge: from then on a single
-version number covers both packages and every feature bumps both together.
+so npm skips `0.3.0`.
+
+The two lines merge when npm **catches up to the then-current Python version** — not at a fixed
+number. The original wording named `0.7.0`, which assumed Python would stand still during the
+port; it did not (`doctor` shipped as 0.8.0 four commits later). Catching a moving target is what
+the plan's F41 exists for. After the merge, one version number covers both packages and every
+feature bumps both together.
+
+**Corollary, and the reason this ordering is not negotiable:** a feature ships in Python *first*,
+with its corpus case, and reaches TypeScript afterwards. The case is what makes the second
+implementation cheap — reversing the order would mean writing the contract twice.
 
 ## Alternatives considered
 

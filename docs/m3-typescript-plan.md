@@ -1,7 +1,7 @@
 # M3 — the TypeScript twin on npm
 
 > Status: **PLANNED** · created 2026-08-21 · governed by [ADR-0009](architecture/adrs/0009-cross-language-parity.md)
-> Prerequisite: M2.8 in progress (F26–F28 shipped; F29 `convert`, F30 `merge` queued). M3 features are numbered **F31–F41**.
+> Prerequisite: M2.8 in progress (F26–F29 shipped, Python at 0.8.0; F30 `merge` and `convert` queued). M3 features are numbered **F31–F42**.
 
 ## Goal
 
@@ -58,11 +58,19 @@ Each feature runs the full lifecycle (`/plan-feature` → `/critique` → `/impl
 | **F38** | `edit` — metadata surgery | F26 | edited bytes identical to Python's; validated round-trip | **`0.5.0`** |
 | **F39** | `trim` — crop + rebuild | F27 | trimmed bytes identical; rebuilt totals identical | **`0.6.0`** |
 | **F40** | `reveal` + `scrub` — privacy | F28 | report + scrubbed bytes identical | **`0.7.0`** |
-| **F41** | Browser build, docs-site JS tabs, parity CI hardening, parity release | F11, F16 | full harness green on every case × every verb | parity tag |
+| **F41** | Catch-up: mirror whatever Python shipped *during* the port, in version order | F29 `doctor` today; more if Python ships more | same gates as the feature being mirrored | `0.8.0`+ |
+| **F42** | Browser build, docs-site JS tabs, parity CI hardening, parity release | F11, F16 | full harness green on every case × every verb | parity tag |
 
 npm skips `0.3.0`: Python `0.3.0` (M2.5) and the M2.6 hardening were internal — soak fixes, full
 profile generation, the perf pass, real-file corpus promotion. The port inherits those behaviors
 from the code it mirrors, so there is no distinct surface to stage. See ADR-0009 §9.
+
+**The top of the ladder moves.** Python does not stop while the port runs — `doctor` shipped as
+F29 (0.8.0) after this plan was written, and `merge`/`convert` are still queued. Rather than
+renumber the ladder each time, **F41 is a catch-up feature**: mirror every Python version that
+shipped during the port, in order, until npm reaches the then-current Python version. Only then do
+the two lines merge into one (ADR-0009 §9). F31–F40 stay fixed because they mirror surface that
+already existed when the plan was written.
 
 ## Why this order
 
@@ -96,8 +104,9 @@ they are independent of each other and could be reordered without cost.
   `chiptime` (ADR-0001 §3) and TypeScript gains nothing by duplicating a fixture writer; the port
   consumes committed inputs.
 - `[pandas]`-equivalent dataframe integration.
-- Any feature not yet shipped in Python. F29 `convert` and F30 `merge` land in Python first and
-  reach npm afterwards, per ADR-0009 §1.
+- Any feature not yet shipped in Python. `merge`, `convert`, and anything after them land in
+  Python first — with their corpus cases — and reach npm through F41, per ADR-0009 §1. The
+  ordering is not negotiable: the corpus case is what makes the second implementation cheap.
 
 ## Related
 
