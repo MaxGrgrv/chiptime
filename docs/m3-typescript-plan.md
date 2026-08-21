@@ -1,7 +1,7 @@
 # M3 — the TypeScript twin on npm
 
 > Status: **PLANNED** · created 2026-08-21 · governed by [ADR-0009](architecture/adrs/0009-cross-language-parity.md)
-> Prerequisite: M2.8 in progress (F26–F29 shipped, Python at 0.8.0; F30 `merge` and `convert` queued). M3 features are numbered **F31–F42**.
+> Prerequisite: M2.8 in progress (F26–F29 shipped, Python at 0.8.0; F30 `merge` and `convert` queued). M3 features are numbered **F31–F43**.
 
 ## Goal
 
@@ -50,16 +50,17 @@ Each feature runs the full lifecycle (`/plan-feature` → `/critique` → `/impl
 |---|---|---|---|---|
 | **F31** | JS scaffolding, canonical JSON, number kernel, parity harness | F1, F2 | `canonical.ts` == `canonical.py` over generated vectors; `numeric.ts` differential-tested against CPython | — |
 | **F32** | Profile tables: dual emitter + base types + vendor registry | F18, F6 | `check_profile_parity.py` digest equality | — |
-| **F33** | Frames + decode core (base types, endianness, compressed timestamps, components, subfields, accumulators, dev fields) | F3, F6, F22 | message-level parity on `clean/`, `protocol/`, `devfields/` | — |
-| **F34** | Intake + inflate + recovery + modes + `ParseResult` shaping + `parse`/`inspect`/`codes` CLI | F4, F5, F11, F15 | `container/`, `structural/` cases; NOT_FIT routing; exit codes | `0.0.x` preview |
-| **F35** | Semantics: model, build, timers, gaps, reconcile, plausibility | F7–F10, F17, F21 | **all 72 public cases byte-identical, all three modes, double-parse determinism** | **`0.1.0`** |
-| **F36** | Encoder + `repair` + platform `validate` profiles | F12–F14 | round-trip identity; repair output byte-identical to Python's | **`0.2.0`** |
-| **F37** | Analytics layer: metrics + `analyze` | F23–F25 | `analyze` stdout byte-identical per corpus case | **`0.4.0`** |
-| **F38** | `edit` — metadata surgery | F26 | edited bytes identical to Python's; validated round-trip | **`0.5.0`** |
-| **F39** | `trim` — crop + rebuild | F27 | trimmed bytes identical; rebuilt totals identical | **`0.6.0`** |
-| **F40** | `reveal` + `scrub` — privacy | F28 | report + scrubbed bytes identical | **`0.7.0`** |
-| **F41** | Catch-up: mirror whatever Python shipped *during* the port, in version order | F29 `doctor` today; more if Python ships more | same gates as the feature being mirrored | `0.8.0`+ |
-| **F42** | Browser build, docs-site JS tabs, parity CI hardening, parity release | F11, F16 | full harness green on every case × every verb | parity tag |
+| **F33** | Errors + code registries + message shapes + the crash-proof frame reader (`iterFrames`) | F3 (frame half) | **frame parity on all 72 cases**, incl. `SkippedBytes` accounting on the 5 resync cases; truncation sweep | — |
+| **F34** | Decoder: base types, endianness, compressed timestamps, components, subfields, accumulators, dev fields (`iterMessages`) | F3, F6, F22 | **message parity on all 72 cases** (3,213 messages) | — |
+| **F35** | Intake + inflate + recovery + modes + `ParseResult` shaping + `parse`/`inspect`/`codes` CLI | F4, F5, F11, F15 | `container/`, `structural/` cases; NOT_FIT routing; exit codes | `0.0.x` preview |
+| **F36** | Semantics: model, build, timers, gaps, reconcile, plausibility | F7–F10, F17, F21 | **all 72 public cases byte-identical, all three modes, double-parse determinism** | **`0.1.0`** |
+| **F37** | Encoder + `repair` + platform `validate` profiles | F12–F14 | round-trip identity; repair output byte-identical to Python's | **`0.2.0`** |
+| **F38** | Analytics layer: metrics + `analyze` | F23–F25 | `analyze` stdout byte-identical per corpus case | **`0.4.0`** |
+| **F39** | `edit` — metadata surgery | F26 | edited bytes identical to Python's; validated round-trip | **`0.5.0`** |
+| **F40** | `trim` — crop + rebuild | F27 | trimmed bytes identical; rebuilt totals identical | **`0.6.0`** |
+| **F41** | `reveal` + `scrub` — privacy | F28 | report + scrubbed bytes identical | **`0.7.0`** |
+| **F42** | Catch-up: mirror whatever Python shipped *during* the port, in version order | F29 `doctor` today; more if Python ships more | same gates as the feature being mirrored | `0.8.0`+ |
+| **F43** | Browser build, docs-site JS tabs, parity CI hardening, parity release | F11, F16 | full harness green on every case × every verb | parity tag |
 
 npm skips `0.3.0`: Python `0.3.0` (M2.5) and the M2.6 hardening were internal — soak fixes, full
 profile generation, the perf pass, real-file corpus promotion. The port inherits those behaviors
@@ -67,18 +68,20 @@ from the code it mirrors, so there is no distinct surface to stage. See ADR-0009
 
 **The top of the ladder moves.** Python does not stop while the port runs — `doctor` shipped as
 F29 (0.8.0) after this plan was written, and `merge`/`convert` are still queued. Rather than
-renumber the ladder each time, **F41 is a catch-up feature**: mirror every Python version that
+renumber the ladder each time, **F42 is a catch-up feature**: mirror every Python version that
 shipped during the port, in order, until npm reaches the then-current Python version. Only then do
-the two lines merge into one (ADR-0009 §9). F31–F40 stay fixed because they mirror surface that
+the two lines merge into one (ADR-0009 §9). F31–F41 stay fixed because they mirror surface that
 already existed when the plan was written.
 
 ## Why this order
 
-Dependency-forced, not preference. `canonical.ts` and `numeric.ts` (F31) sit under everything and
+Dependency-forced, not preference. (F33 was split from a single frames-and-decode feature during
+its critique: ~1,600 lines of Python under one review pass is where per-feature critique stops
+working, and `iterFrames` is a public entry point with a complete 72-case gate of its own.) `canonical.ts` and `numeric.ts` (F31) sit under everything and
 are the two modules where a silent divergence would be discovered last and cost most — so they
 ship first, with differential tests, before any FIT byte is read. The profile (F32) is pure data
-under decode. Decode (F33) cannot be corpus-gated end-to-end until intake and result shaping
-exist (F34), which is why F34 carries the first runnable CLI. F35 is the milestone that matters:
+under decode. The decoder (F34) cannot be reached through `parse()` until intake and result shaping exist
+(F35), which is why F35 carries the first runnable CLI. F36 is the milestone that matters:
 the moment the corpus goes green, "parity" stops being a plan.
 
 The write verbs (F38–F40) come after analytics (F37) only to keep the version mirror legible;
@@ -123,7 +126,7 @@ for this repo and `release-js.yml` (no token in the repo), an `npm` environment 
   consumes committed inputs.
 - `[pandas]`-equivalent dataframe integration.
 - Any feature not yet shipped in Python. `merge`, `convert`, and anything after them land in
-  Python first — with their corpus cases — and reach npm through F41, per ADR-0009 §1. The
+  Python first — with their corpus cases — and reach npm through F42, per ADR-0009 §1. The
   ordering is not negotiable: the corpus case is what makes the second implementation cheap.
 
 ## Related
