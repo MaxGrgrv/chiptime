@@ -38,6 +38,7 @@ Compact form (full dependency sections live in each spec; every edge verified bi
 | F29 doctor + calibration | F13 repair, F14 validate, F26 edit, F11 CLI | — (composition layer) |
 | F31 js scaffolding/canonical/numeric (M3) | F1, F2 (`canonical.py` is the reference), ADR-0002, ADR-0009 | F32–F42 (every TypeScript module) |
 | F32 js profile tables (M3) | F31, F18 (the merged Python tables it transcodes), F6 (vendor registry), ADR-0004, ADR-0009 | F33+ (decode reads every table) |
+| F33 js errors/message/frames (M3) | F31, F32, F3 (frame half, as reference), ADR-0003, ADR-0009 | F34+ (the decoder and everything above it) |
 
 ## Module Dependencies
 
@@ -64,6 +65,10 @@ No cycles; `decode` never imports `semantics`; `profile` and `errors` remain lea
 index ─→ canonical
 canonical ─→ (leaf — imports nothing, not even numeric: formatting is String(x), not rounding)
 numeric ─→ (leaf; INTERNAL — absent from the exports map, no Python analogue)
+api ─→ frames, errors
+frames ─→ errors, profile/base-types
+errors ─→ codes (generated)
+message ─→ frames (types only)
 profile/index ─→ profile/{base-types, core, generated, registry}
 profile/generated ─→ profile/core (types only)
 profile/{base-types, core, registry} ─→ (leaves)
@@ -102,5 +107,6 @@ import executes at module load anywhere in `js/src` — enforced by `js/scripts/
 | 2026-08-17 | F1: dev/baselines dependency groups declared; runtime pinned at zero |
 | 2026-08-18 | M1+M2 shipped: module layering recorded; runtime dependencies still ZERO |
 | 2026-08-18 | M2.5 wrap: feature matrix filled (F1–F21); metrics module added (optional import only); pandas as optional extra — runtime core still ZERO |
+| 2026-08-21 | F33 (M3): `errors`/`codes`/`message`/`frames`/`api` added; `errors` is a leaf over the generated `codes.ts`; `frames` imports only `errors` and `profile/base-types`, matching Python. Runtime dependencies still ZERO |
 | 2026-08-21 | F32 (M3): `js/src/profile` added as a leaf; new build-time edge js-profile ← python-profile (committed artifact, two CI gates). Runtime dependencies still ZERO in both languages |
 | 2026-08-21 | F31 (M3): `js/` package added with its own dependency table. Runtime dependencies ZERO in both languages; JS dev group is typescript/vitest/biome/@types/node. TypeScript module tree recorded; `canonical.ts` and `numeric.ts` are both leaves |

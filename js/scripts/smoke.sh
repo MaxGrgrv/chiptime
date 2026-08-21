@@ -19,20 +19,25 @@ npm init -y >/dev/null 2>&1
 npm install --silent --no-audit --no-fund "./$tarball" >/dev/null
 
 cat > esm.mjs <<'JS'
-import { CanonicalizationError, dumps } from "chiptime";
+import { iterFrames } from "chiptime";
+import { CanonicalizationError, dumps } from "chiptime/canonical";
 const bytes = dumps({ b: 1, a: [0, null, 2.5] });
 if (!(bytes instanceof Uint8Array)) throw new Error("dumps did not return bytes");
 const text = new TextDecoder().decode(bytes);
 if (text !== '{"a":[0,null,2.5],"b":1}') throw new Error("ESM: canonical output wrong");
 if (typeof CanonicalizationError !== "function") throw new Error("ESM: missing export");
+if (typeof iterFrames !== "function") throw new Error("ESM: missing iterFrames");
+if ([...iterFrames(new Uint8Array(0))].length !== 0) throw new Error("ESM: empty input should yield nothing");
 console.log("esm ok");
 JS
 
 cat > cjs.cjs <<'JS'
-const { dumps, CanonicalizationError } = require("chiptime");
+const { iterFrames } = require("chiptime");
+const { dumps, CanonicalizationError } = require("chiptime/canonical");
 const text = new TextDecoder().decode(dumps({ b: 1, a: [0, null, 2.5] }));
 if (text !== '{"a":[0,null,2.5],"b":1}') throw new Error("CJS: canonical output wrong");
 if (typeof CanonicalizationError !== "function") throw new Error("CJS: missing export");
+if (typeof iterFrames !== "function") throw new Error("CJS: missing iterFrames");
 console.log("cjs ok");
 JS
 

@@ -3,13 +3,25 @@
  *
  * Parse anything, lose nothing silently, explain everything.
  *
- * The parsing surface arrives at F34/F35 (see docs/m3-typescript-plan.md). What is
- * exported today is the determinism contract itself: the canonical serializer that
- * defines "byte-identical output" for this implementation.
+ * This module mirrors `chiptime/__init__.py`'s `__all__` and nothing more. Names
+ * Python reaches through a submodule — `chiptime.canonical.dumps`,
+ * `chiptime.errors.ERROR_CODES`, `chiptime.frames.crc16` — are reached here through
+ * the matching subpath export (`chiptime/canonical`, `chiptime/errors`,
+ * `chiptime/frames`, `chiptime/profile`), so the two packages have the same names at
+ * the same addresses (ADR-0009 section 2).
+ *
+ * The surface grows one verb at a time as the port climbs: `iterFrames` at F33,
+ * `iterMessages` at F34, `parse` at F35.
  */
 
-// Every name here has a `chiptime.canonical` counterpart in Python (ADR-0009 §2:
-// one name per concept, and no concept the twin does not have). `dumpsText` is
-// deliberately absent — it is a test and diagnostic convenience with no Python
-// analogue, and stays importable from the module rather than from the package.
-export { CanonicalizationError, MAX_SAFE_INT, dumps, formatNumber } from "./canonical.js";
+export type { Mode } from "./api.js";
+export { iterFrames } from "./api.js";
+export {
+  CrcMismatchError,
+  EmptyFileError,
+  FitError,
+  HeaderError,
+  NotFitError,
+  ProtocolError,
+  TruncatedError,
+} from "./errors.js";

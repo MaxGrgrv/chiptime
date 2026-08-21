@@ -1,6 +1,6 @@
 # Feature: F33 — Errors, messages, and the frame reader for TypeScript
 
-> Status: CRITIQUED
+> Status: DONE
 >
 > **Scope reduced during critique.** This spec originally covered frames *and* decode (~1,600 lines
 > of Python). It was split: F33 is the frame layer, F34 is the decoder. See the assessment below.
@@ -85,8 +85,12 @@ second implementation consuming the same corpus should need no new fixtures (ADR
 ### 4. Public surface
 13. `iterFrames(src)` exported from `index.ts`, mirroring `iter_frames`. Input is `Uint8Array`
     only; path and stream inputs arrive with intake at F35.
-14. Mode is **not** a parameter here. `read_stream` in Python takes no mode: it always reports what
-    it finds, and policy is applied above it. Adding a mode parameter now would invent a difference.
+14. **`readStream` takes no mode; `iterFrames` does.** *(Corrected during implementation — the
+    original requirement conflated the two.)* `read_stream` in Python has no mode: it reports what
+    it finds. But the public `iter_frames` wrapper is not a pass-through — it owns the chained-file
+    loop (taxonomy #12), raises the first defect in `strict` with a code-specific suggestion, and
+    yields **nothing at all** for a zero-length input because its `while` never runs. Both
+    behaviors are observable and both were caught by the corpus gate on its first run.
 
 ### 5. The corpus gate
 15. `scripts/check_frame_parity.py` runs `iter_frames` and `iterFrames` over **every**

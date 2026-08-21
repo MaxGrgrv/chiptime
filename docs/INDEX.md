@@ -65,7 +65,7 @@ Plan: [m3-typescript-plan.md](m3-typescript-plan.md) · contract: [ADR-0009](arc
 |---|---|---|---|
 | F31 JS scaffolding, canonical JSON, number kernel | DONE | [spec](features/f31-js-scaffolding-canonical-numeric.md) | [impl](implementation/f31-js-scaffolding-canonical-numeric.md) |
 | F32 Profile tables for TypeScript | DONE | [spec](features/f32-js-profile-tables.md) | [impl](implementation/f32-js-profile-tables.md) |
-| F33 Errors, messages, frame reader (TS) | CRITIQUED | [spec](features/f33-js-frames-decode.md) | — |
+| F33 Errors, messages, frame reader (TS) | DONE | [spec](features/f33-js-frames-decode.md) | [impl](implementation/f33-js-frames-decode.md) |
 | F34 Decoder — frames to messages (TS) | PLANNED | — | — |
 | F35 Intake, inflate, recovery, result, CLI (TS) | PLANNED | — | — |
 | F36 Semantics — full corpus parity (npm 0.1.0) | PLANNED | — | — |

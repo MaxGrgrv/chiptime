@@ -274,6 +274,24 @@ def base_type_vectors() -> None:
     _write("base-types.json", rows)
 
 
+def crc_vectors() -> None:
+    """crc16 over adversarial byte patterns (F33).
+
+    The CRC is a byte-wise table composed from the FIT nibble algorithm; a table
+    built wrong is wrong only for some inputs, so the probes sweep single bytes,
+    every-byte-value runs, and lengths around the table boundaries.
+    """
+    from chiptime.frames import crc16
+
+    probes: list[bytes] = [b"", b"\x00", b"\xff", b".FIT", bytes(range(256))]
+    probes += [bytes([v]) * n for v in (0x00, 0x01, 0x7F, 0x80, 0xFF) for n in (1, 2, 15, 16, 17)]
+    probes += [bytes(range(n)) for n in (12, 14, 255)]
+    rows = [{"hex": p.hex(), "crc": crc16(p)} for p in probes]
+    # Seeded continuation: crc16(b, crc) must chain like the Python default argument.
+    rows.append({"hex": b"abc".hex(), "seed": crc16(b"xyz"), "crc": crc16(b"abc", crc16(b"xyz"))})
+    _write("crc16.json", rows)
+
+
 def _write(name: str, payload: object) -> None:
     path = OUT / name
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
@@ -285,6 +303,7 @@ def main() -> None:
     canonical_vectors()
     numeric_vectors()
     base_type_vectors()
+    crc_vectors()
 
 
 if __name__ == "__main__":

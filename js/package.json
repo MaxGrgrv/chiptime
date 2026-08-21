@@ -33,6 +33,31 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },
+    "./canonical": {
+      "types": "./dist/esm/canonical.d.ts",
+      "import": "./dist/esm/canonical.js",
+      "require": "./dist/cjs/canonical.js"
+    },
+    "./errors": {
+      "types": "./dist/esm/errors.d.ts",
+      "import": "./dist/esm/errors.js",
+      "require": "./dist/cjs/errors.js"
+    },
+    "./frames": {
+      "types": "./dist/esm/frames.d.ts",
+      "import": "./dist/esm/frames.js",
+      "require": "./dist/cjs/frames.js"
+    },
+    "./message": {
+      "types": "./dist/esm/message.d.ts",
+      "import": "./dist/esm/message.js",
+      "require": "./dist/cjs/message.js"
+    },
+    "./profile": {
+      "types": "./dist/esm/profile/index.d.ts",
+      "import": "./dist/esm/profile/index.js",
+      "require": "./dist/cjs/profile/index.js"
+    },
     "./package.json": "./package.json"
   },
   "files": ["dist", "README.md", "LICENSE"],

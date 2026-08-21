@@ -53,7 +53,10 @@ Module-for-module with the table above, so a Python change has an obvious TypeSc
 | `numeric.ts` | leaf (internal) | Python rounding semantics: `pyRound`, `pyRoundN`, `floorDiv`, `divmod` | F31 ✅ |
 | `index.ts` | api | Public surface — the parsing verbs arrive at F34/F35 | F31 ✅ |
 | `profile/*` | profile | Base types, merged message/enum tables (transcoded from Python), vendor registry | F32 ✅ |
-| `frames.ts`, `decode.ts`, `message.ts` | decode | Crash-proof frame reader; frames → messages | F33 |
+| `errors.ts`, `codes.ts` | errors (leaf) | `FitError` hierarchy, `Defect`/`Diagnostic`/`ProvenanceEntry`, 103 transcoded codes | F33 ✅ |
+| `frames.ts`, `message.ts` | decode | Crash-proof frame reader, CRC, resync scanner; message shapes | F33 ✅ |
+| `api.ts` | api | `iterFrames` (chained-file loop, mode policy); grows a verb per feature | F33 ✅ |
+| `decode.ts` | decode | Frames → messages: base types, scale/offset, dev fields, components | F34 |
 | `intake.ts`, `inflate.ts`, `api.ts`, `result.ts`, `cli.ts` | intake / api / output / cli | Unwrap, recover, shape, and the first CLI verbs | F34 |
 | `model.ts`, `semantics/*` | semantics | The canonical model — full corpus parity | F35 |
 | `encode.ts`, `repair.ts`, `validate.ts` | encode / repair | Writer, salvage, platform profiles | F36 |

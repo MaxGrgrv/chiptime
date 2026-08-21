@@ -26,6 +26,11 @@ if [ -d js/node_modules ]; then
   uv run --project python python scripts/gen_profile_ts.py > /dev/null
   git diff --exit-code -- js/src/profile/generated.ts
   uv run --project python python scripts/check_profile_parity.py
+  echo "pre-push gate: code registries (regenerate + diff)"
+  uv run --project python python scripts/gen_codes_ts.py > /dev/null
+  git diff --exit-code -- js/src/codes.ts
+  echo "pre-push gate: frame parity across the corpus"
+  uv run --project python python scripts/check_frame_parity.py
   echo "pre-push gate: js lint + types + guards + tests"
   (cd js && npm run check)
   echo "pre-push gate: js determinism (cross-process, cross-language)"

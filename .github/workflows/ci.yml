@@ -111,6 +111,12 @@ jobs:
         run: git diff --exit-code -- js/src/profile/generated.ts
       - name: Profile value parity (transcoding gate — catches what the diff cannot)
         run: uv run --project python python scripts/check_profile_parity.py
+      - name: Regenerate the TypeScript code registries
+        run: uv run --project python python scripts/gen_codes_ts.py
+      - name: Code registries must be unchanged
+        run: git diff --exit-code -- js/src/codes.ts
+      - name: Frame parity across every corpus case
+        run: uv run --project python python scripts/check_frame_parity.py
   cross-os-determinism:
     needs: test
     runs-on: ubuntu-latest

@@ -30,6 +30,11 @@ export interface BaseTypeVector {
   value: string;
   expected: boolean;
 }
+export interface CrcVector {
+  hex: string;
+  seed?: number;
+  crc: number;
+}
 export interface NumericVectors {
   pyRound: [number, number][];
   pyRoundN: [number, number, number][];
@@ -42,3 +47,10 @@ export const canonicalRefuse = load<RefuseVector[]>("canonical-refuse.json");
 export const canonicalAsymmetry = load<AsymmetryVector[]>("canonical-asymmetry.json");
 export const numericVectors = load<NumericVectors>("numeric.json");
 export const baseTypeVectors = load<BaseTypeVector[]>("base-types.json");
+export const crcVectors = load<CrcVector[]>("crc16.json");
+
+export function fromHex(hex: string): Uint8Array {
+  const out = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = Number.parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+  return out;
+}
