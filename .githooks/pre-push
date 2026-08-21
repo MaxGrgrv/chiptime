@@ -15,4 +15,28 @@ echo "pre-push gate: docs build (strict)"
 uv run --project python --group docs mkdocs build --quiet
 echo "pre-push gate: pytest"
 (cd python && uv run pytest -q)
+
+# The repo is bilingual from F31. Skipped when js/node_modules is absent, so a
+# Python-only clone can still push — CI runs these unconditionally either way.
+if [ -d js/node_modules ]; then
+  echo "pre-push gate: parity vectors (regenerate + diff)"
+  uv run --project python python scripts/gen_parity_vectors.py > /dev/null
+  git diff --exit-code -- js/test/vectors
+  echo "pre-push gate: js lint + types + guards + tests"
+  (cd js && npm run check)
+  echo "pre-push gate: js determinism (cross-process, cross-language)"
+  # Build once, then run the checker twice: comparing `npm run determinism` output
+  # would compare build chatter, not hashes.
+  (cd js && npm run build > /dev/null)
+  (cd js && node scripts/determinism.mjs > /tmp/chiptime-det1)
+  (cd js && node scripts/determinism.mjs > /tmp/chiptime-det2)
+  diff /tmp/chiptime-det1 /tmp/chiptime-det2 > /dev/null || {
+    echo "pre-push gate: canonical output differs between processes" >&2
+    exit 1
+  }
+  cat /tmp/chiptime-det1
+else
+  echo "pre-push gate: js/ skipped (no node_modules — run 'npm install' in js/)"
+fi
+
 echo "pre-push gate: all green"

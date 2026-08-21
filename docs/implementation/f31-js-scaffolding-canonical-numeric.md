@@ -33,6 +33,7 @@ language, proven rather than asserted.
 | `js/scripts/smoke.sh` | Added | Pack, install into a clean dir, import from ESM and CJS, assert no `node:` imports |
 | `js/README.md`, `js/LICENSE` | Added | Parity table and the pre-release status; MIT copied from root |
 | `scripts/gen_parity_vectors.py` | Added | Emits the vectors from CPython; deterministic; CI regenerates and diffs |
+| `.githooks/pre-push` | Modified | Extended with the JS gates so the local last line still matches CI; skips cleanly when `js/node_modules` is absent |
 | `.github/workflows/ci.yml` | Modified | Three jobs: `js` (2 OS × Node 20/22), `js-package-smoke`, `parity-vectors` |
 
 ## Corpus Cases Added
@@ -149,6 +150,12 @@ regenerated in CI so they cannot silently drift. Corpus consumption begins at F3
 - **A twin makes API drift a thing you can check, so check it.** Listing both export surfaces side
   by side took one command and caught `dumpsText`. That check now lives in `/verify` and gets more
   valuable with every feature, since the surfaces only grow.
+
+- **A bilingual repo needs its local gate updated the day the second language lands.** The
+  pre-push hook was Python-only and would have let a red JS build through — the one place the
+  "last line of defense" comment promises it will not. Extending it immediately caught a bug *in
+  the extension*: `npm run determinism` prints build chatter before the hashes, so capturing it
+  twice compared chatter, not output. Build once, run the checker twice.
 
 - **Release-facing docs go stale where no gate looks.** The root README still claimed `0.4.0`,
   `273 tests`, and `71 corpus cases` — three M2.8 features shipped past it. Corrected here from
