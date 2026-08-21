@@ -27,6 +27,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "python" / 
 from chiptime.canonical import CanonicalizationError, dumps  # isort:skip
 
 OUT = pathlib.Path(__file__).resolve().parents[1] / "js" / "test" / "vectors"
+NAN = float("nan")
 
 # ── canonical: inputs as JSON text ──────────────────────────────────────────────
 # Every entry is (name, json_text). Grouped by what it is meant to catch.
@@ -239,6 +240,40 @@ def numeric_vectors() -> None:
     _write("numeric.json", data)
 
 
+def base_type_vectors() -> None:
+    """is_invalid() for every base type against its sentinel and its neighbours (F32).
+
+    Values travel as decimal strings: uint64's sentinel is 0xFFFFFFFFFFFFFFFF, which
+    no JSON number can carry (ADR-0009 s4). TypeScript rebuilds a bigint for the
+    64-bit rows and a number for the rest.
+    """
+    from chiptime.profile.base_types import BASE_TYPES, is_invalid
+
+    rows = []
+    for byte in sorted(BASE_TYPES):
+        bt = BASE_TYPES[byte]
+        probes: list[float | int] = [0, 1, -1]
+        if bt.invalid is not None:
+            probes += [bt.invalid, bt.invalid - 1, bt.invalid + 1]
+            signed = {"sint8": 0x7F, "sint16": 0x7FFF, "sint32": 0x7FFFFFFF}
+            if bt.name in signed:
+                probes.append(signed[bt.name])
+        for value in probes:
+            rows.append(
+                {
+                    "type": bt.name,
+                    "byte": bt.byte,
+                    "value": str(value),
+                    "expected": is_invalid(bt, value),
+                }
+            )
+        # NaN is the sentinel's real form for the float types; every type gets asked.
+        rows.append(
+            {"type": bt.name, "byte": bt.byte, "value": "nan", "expected": is_invalid(bt, NAN)}
+        )
+    _write("base-types.json", rows)
+
+
 def _write(name: str, payload: object) -> None:
     path = OUT / name
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
@@ -249,6 +284,7 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     canonical_vectors()
     numeric_vectors()
+    base_type_vectors()
 
 
 if __name__ == "__main__":

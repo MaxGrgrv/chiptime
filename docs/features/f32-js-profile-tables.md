@@ -1,6 +1,6 @@
 # Feature: F32 — Profile tables for TypeScript
 
-> Status: CRITIQUED
+> Status: DONE
 
 ## Purpose
 

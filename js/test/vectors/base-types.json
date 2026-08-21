@@ -1,0 +1,698 @@
+[
+  {
+    "type": "enum",
+    "byte": 0,
+    "value": "0",
+    "expected": false
+  },
+  {
+    "type": "enum",
+    "byte": 0,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "enum",
+    "byte": 0,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "enum",
+    "byte": 0,
+    "value": "255",
+    "expected": true
+  },
+  {
+    "type": "enum",
+    "byte": 0,
+    "value": "254",
+    "expected": false
+  },
+  {
+    "type": "enum",
+    "byte": 0,
+    "value": "256",
+    "expected": false
+  },
+  {
+    "type": "enum",
+    "byte": 0,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "sint8",
+    "byte": 1,
+    "value": "0",
+    "expected": false
+  },
+  {
+    "type": "sint8",
+    "byte": 1,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "sint8",
+    "byte": 1,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "sint8",
+    "byte": 1,
+    "value": "127",
+    "expected": true
+  },
+  {
+    "type": "sint8",
+    "byte": 1,
+    "value": "126",
+    "expected": false
+  },
+  {
+    "type": "sint8",
+    "byte": 1,
+    "value": "128",
+    "expected": false
+  },
+  {
+    "type": "sint8",
+    "byte": 1,
+    "value": "127",
+    "expected": true
+  },
+  {
+    "type": "sint8",
+    "byte": 1,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "uint8",
+    "byte": 2,
+    "value": "0",
+    "expected": false
+  },
+  {
+    "type": "uint8",
+    "byte": 2,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "uint8",
+    "byte": 2,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "uint8",
+    "byte": 2,
+    "value": "255",
+    "expected": true
+  },
+  {
+    "type": "uint8",
+    "byte": 2,
+    "value": "254",
+    "expected": false
+  },
+  {
+    "type": "uint8",
+    "byte": 2,
+    "value": "256",
+    "expected": false
+  },
+  {
+    "type": "uint8",
+    "byte": 2,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "string",
+    "byte": 7,
+    "value": "0",
+    "expected": false
+  },
+  {
+    "type": "string",
+    "byte": 7,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "string",
+    "byte": 7,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "string",
+    "byte": 7,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "uint8z",
+    "byte": 10,
+    "value": "0",
+    "expected": true
+  },
+  {
+    "type": "uint8z",
+    "byte": 10,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "uint8z",
+    "byte": 10,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "uint8z",
+    "byte": 10,
+    "value": "0",
+    "expected": true
+  },
+  {
+    "type": "uint8z",
+    "byte": 10,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "uint8z",
+    "byte": 10,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "uint8z",
+    "byte": 10,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "byte",
+    "byte": 13,
+    "value": "0",
+    "expected": false
+  },
+  {
+    "type": "byte",
+    "byte": 13,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "byte",
+    "byte": 13,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "byte",
+    "byte": 13,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "sint16",
+    "byte": 131,
+    "value": "0",
+    "expected": false
+  },
+  {
+    "type": "sint16",
+    "byte": 131,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "sint16",
+    "byte": 131,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "sint16",
+    "byte": 131,
+    "value": "32767",
+    "expected": true
+  },
+  {
+    "type": "sint16",
+    "byte": 131,
+    "value": "32766",
+    "expected": false
+  },
+  {
+    "type": "sint16",
+    "byte": 131,
+    "value": "32768",
+    "expected": false
+  },
+  {
+    "type": "sint16",
+    "byte": 131,
+    "value": "32767",
+    "expected": true
+  },
+  {
+    "type": "sint16",
+    "byte": 131,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "uint16",
+    "byte": 132,
+    "value": "0",
+    "expected": false
+  },
+  {
+    "type": "uint16",
+    "byte": 132,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "uint16",
+    "byte": 132,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "uint16",
+    "byte": 132,
+    "value": "65535",
+    "expected": true
+  },
+  {
+    "type": "uint16",
+    "byte": 132,
+    "value": "65534",
+    "expected": false
+  },
+  {
+    "type": "uint16",
+    "byte": 132,
+    "value": "65536",
+    "expected": false
+  },
+  {
+    "type": "uint16",
+    "byte": 132,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "sint32",
+    "byte": 133,
+    "value": "0",
+    "expected": false
+  },
+  {
+    "type": "sint32",
+    "byte": 133,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "sint32",
+    "byte": 133,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "sint32",
+    "byte": 133,
+    "value": "2147483647",
+    "expected": true
+  },
+  {
+    "type": "sint32",
+    "byte": 133,
+    "value": "2147483646",
+    "expected": false
+  },
+  {
+    "type": "sint32",
+    "byte": 133,
+    "value": "2147483648",
+    "expected": false
+  },
+  {
+    "type": "sint32",
+    "byte": 133,
+    "value": "2147483647",
+    "expected": true
+  },
+  {
+    "type": "sint32",
+    "byte": 133,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "uint32",
+    "byte": 134,
+    "value": "0",
+    "expected": false
+  },
+  {
+    "type": "uint32",
+    "byte": 134,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "uint32",
+    "byte": 134,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "uint32",
+    "byte": 134,
+    "value": "4294967295",
+    "expected": true
+  },
+  {
+    "type": "uint32",
+    "byte": 134,
+    "value": "4294967294",
+    "expected": false
+  },
+  {
+    "type": "uint32",
+    "byte": 134,
+    "value": "4294967296",
+    "expected": false
+  },
+  {
+    "type": "uint32",
+    "byte": 134,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "float32",
+    "byte": 136,
+    "value": "0",
+    "expected": false
+  },
+  {
+    "type": "float32",
+    "byte": 136,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "float32",
+    "byte": 136,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "float32",
+    "byte": 136,
+    "value": "4294967295",
+    "expected": false
+  },
+  {
+    "type": "float32",
+    "byte": 136,
+    "value": "4294967294",
+    "expected": false
+  },
+  {
+    "type": "float32",
+    "byte": 136,
+    "value": "4294967296",
+    "expected": false
+  },
+  {
+    "type": "float32",
+    "byte": 136,
+    "value": "nan",
+    "expected": true
+  },
+  {
+    "type": "float64",
+    "byte": 137,
+    "value": "0",
+    "expected": false
+  },
+  {
+    "type": "float64",
+    "byte": 137,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "float64",
+    "byte": 137,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "float64",
+    "byte": 137,
+    "value": "18446744073709551615",
+    "expected": false
+  },
+  {
+    "type": "float64",
+    "byte": 137,
+    "value": "18446744073709551614",
+    "expected": false
+  },
+  {
+    "type": "float64",
+    "byte": 137,
+    "value": "18446744073709551616",
+    "expected": false
+  },
+  {
+    "type": "float64",
+    "byte": 137,
+    "value": "nan",
+    "expected": true
+  },
+  {
+    "type": "uint16z",
+    "byte": 139,
+    "value": "0",
+    "expected": true
+  },
+  {
+    "type": "uint16z",
+    "byte": 139,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "uint16z",
+    "byte": 139,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "uint16z",
+    "byte": 139,
+    "value": "0",
+    "expected": true
+  },
+  {
+    "type": "uint16z",
+    "byte": 139,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "uint16z",
+    "byte": 139,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "uint16z",
+    "byte": 139,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "uint32z",
+    "byte": 140,
+    "value": "0",
+    "expected": true
+  },
+  {
+    "type": "uint32z",
+    "byte": 140,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "uint32z",
+    "byte": 140,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "uint32z",
+    "byte": 140,
+    "value": "0",
+    "expected": true
+  },
+  {
+    "type": "uint32z",
+    "byte": 140,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "uint32z",
+    "byte": 140,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "uint32z",
+    "byte": 140,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "sint64",
+    "byte": 142,
+    "value": "0",
+    "expected": false
+  },
+  {
+    "type": "sint64",
+    "byte": 142,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "sint64",
+    "byte": 142,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "sint64",
+    "byte": 142,
+    "value": "9223372036854775807",
+    "expected": true
+  },
+  {
+    "type": "sint64",
+    "byte": 142,
+    "value": "9223372036854775806",
+    "expected": false
+  },
+  {
+    "type": "sint64",
+    "byte": 142,
+    "value": "9223372036854775808",
+    "expected": false
+  },
+  {
+    "type": "sint64",
+    "byte": 142,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "uint64",
+    "byte": 143,
+    "value": "0",
+    "expected": false
+  },
+  {
+    "type": "uint64",
+    "byte": 143,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "uint64",
+    "byte": 143,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "uint64",
+    "byte": 143,
+    "value": "18446744073709551615",
+    "expected": true
+  },
+  {
+    "type": "uint64",
+    "byte": 143,
+    "value": "18446744073709551614",
+    "expected": false
+  },
+  {
+    "type": "uint64",
+    "byte": 143,
+    "value": "18446744073709551616",
+    "expected": false
+  },
+  {
+    "type": "uint64",
+    "byte": 143,
+    "value": "nan",
+    "expected": false
+  },
+  {
+    "type": "uint64z",
+    "byte": 144,
+    "value": "0",
+    "expected": true
+  },
+  {
+    "type": "uint64z",
+    "byte": 144,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "uint64z",
+    "byte": 144,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "uint64z",
+    "byte": 144,
+    "value": "0",
+    "expected": true
+  },
+  {
+    "type": "uint64z",
+    "byte": 144,
+    "value": "-1",
+    "expected": false
+  },
+  {
+    "type": "uint64z",
+    "byte": 144,
+    "value": "1",
+    "expected": false
+  },
+  {
+    "type": "uint64z",
+    "byte": 144,
+    "value": "nan",
+    "expected": false
+  }
+]

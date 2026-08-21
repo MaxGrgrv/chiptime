@@ -111,13 +111,53 @@ it keeps `parse()` **synchronous and identical** in Node, browsers, Deno and Bun
 runtime branching and no async infection of an API that is synchronous in Python. Dev
 dependencies (TypeScript, vitest, Biome) are unconstrained.
 
-### 8. Profile tables have one source and two emitters
+### 8. Profile tables are transcoded from the committed Python tables
 
-`scripts/generate_profile.py` gains a TypeScript emitter and writes both
-`python/src/chiptime/profile/generated.py` and `js/src/profile/generated.ts` from the same
-locally-downloaded SDK profile, in the same run. Neither file is hand-edited; the SDK material is
-still never committed (ADR-0004). `scripts/check_profile_parity.py` normalizes both tables to a
-canonical digest and requires equality — CI fails if they drift.
+*(Rewritten at F32. The original text specified `generate_profile.py` emitting both
+`generated.py` and `js/src/profile/generated.ts` from the SDK in one run. Implementing it showed
+that `generated.py` is importable pure data, which makes a better arrangement available.)*
+
+`scripts/gen_profile_ts.py` imports `chiptime.profile` and emits `js/src/profile/generated.ts`
+from the **merged** `MESSAGES` and `ENUMS`. The SDK step stays exactly where F18 put it: a
+maintainer-only action against a locally downloaded profile that is never committed (ADR-0004).
+Everyone else, and CI, regenerates the TypeScript tables from a clean checkout.
+
+Two properties follow, and both are why this beats a dual emitter:
+
+- **Drift becomes impossible to commit, not merely discouraged.** A dual emitter keeps the two
+  tables in step only if both are always rerun together. Transcoding plus a CI regenerate-and-diff
+  means a maintainer who upgrades the SDK and forgets the TypeScript step fails CI instead of
+  shipping two profiles.
+- **The merge policy stays in one language.** Python merges generated SDK breadth with the
+  hand-authored, fitdecode-verified core, the core winning per field and per enum value. Porting
+  that policy would be a second implementation of a rule that has no test of its own, whose
+  divergence would surface at F35 as an unexplained field-name difference.
+
+Two gates, catching different things. `scripts/check_profile_parity.py` loads the TypeScript values
+through `node` and compares them to the Python values — it catches *transcoding* faults (a
+truncated `bigint`, a float that lost a digit, a mis-escaped label). CI's regenerate-and-diff
+catches *staleness*. Neither substitutes for the other: a transcoder that has always been wrong the
+same way passes the diff forever.
+
+**The shared-bug surface, stated plainly.** If `generate_profile.py` mis-reads a scale, the Python
+table is wrong, the transcoded TypeScript table is identically wrong, and `expected.json` was
+generated *from* the wrong Python — so every corpus case passes while both implementations are
+wrong together. The corpus cannot see this class of bug. Derivation does not introduce it (a dual
+emitter shares it, since both would parse the same SDK with the same code); the only design that
+escapes it is generating each language's tables independently from `Profile.xlsx`, which costs a
+zero-dependency xlsx reader in TypeScript and puts the SDK back in every contributor's path.
+
+What stands between us and a two-language shared bug is therefore **not the corpus** but
+`scripts/check_profile_against_fitdecode.py` — an independent oracle checking our tables against a
+separately authored MIT implementation (ADR-0004 §2). Under transcoding, that one oracle
+transitively covers both languages. It is part of the release path, not an F18 artifact, and
+retiring it would re-open a hole the rest of this ADR cannot close. The independent-generation
+alternative is held in BACKLOG against exactly that trigger.
+
+Emitted output carries a provenance header stating **SDK-version-plus-core** — the merged table is
+not the SDK profile, and under ADR-0004 the licensing position rests on an accurate provenance
+trail. The header also records that nothing may depend on the iteration order of these tables,
+since they are emitted as plain lookup objects rather than `Map`s.
 
 ### 9. Versioning: mirrored minors, independent patches, lockstep after parity
 

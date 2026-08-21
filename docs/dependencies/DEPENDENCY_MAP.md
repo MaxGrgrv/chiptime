@@ -36,7 +36,8 @@ Compact form (full dependency sections live in each spec; every edge verified bi
 | F27 trim (crop) | F3, F7/F9 (build_activity, derived totals), F12, F13 (`_summary_message`), F11 | F30 |
 | F28 privacy (reveal/scrub) | F3, F12, F11, ADR-0007 | M3 (TS twin), client-side browser tool |
 | F29 doctor + calibration | F13 repair, F14 validate, F26 edit, F11 CLI | — (composition layer) |
-| F31 js scaffolding/canonical/numeric (M3) | F1, F2 (`canonical.py` is the reference), ADR-0002, ADR-0009 | F32–F41 (every TypeScript module) |
+| F31 js scaffolding/canonical/numeric (M3) | F1, F2 (`canonical.py` is the reference), ADR-0002, ADR-0009 | F32–F42 (every TypeScript module) |
+| F32 js profile tables (M3) | F31, F18 (the merged Python tables it transcodes), F6 (vendor registry), ADR-0004, ADR-0009 | F33+ (decode reads every table) |
 
 ## Module Dependencies
 
@@ -63,7 +64,15 @@ No cycles; `decode` never imports `semantics`; `profile` and `errors` remain lea
 index ─→ canonical
 canonical ─→ (leaf — imports nothing, not even numeric: formatting is String(x), not rounding)
 numeric ─→ (leaf; INTERNAL — absent from the exports map, no Python analogue)
+profile/index ─→ profile/{base-types, core, generated, registry}
+profile/generated ─→ profile/core (types only)
+profile/{base-types, core, registry} ─→ (leaves)
 ```
+
+`js/src/profile` imports nothing from the rest of `js/src`, matching Python where `profile` and
+`errors` are the two leaves. `profile/generated.ts` is transcoded from the Python package by
+`scripts/gen_profile_ts.py` — a **build-time** edge only (the artifact is committed), gated in CI
+by regenerate-and-diff plus `scripts/check_profile_parity.py`.
 
 The tree mirrors `python/src/chiptime/` module-for-module (ADR-0009), with `numeric.ts` as the one
 deliberate exception: Python uses the stdlib where TypeScript needs an explicit kernel. No `node:`
@@ -93,4 +102,5 @@ import executes at module load anywhere in `js/src` — enforced by `js/scripts/
 | 2026-08-17 | F1: dev/baselines dependency groups declared; runtime pinned at zero |
 | 2026-08-18 | M1+M2 shipped: module layering recorded; runtime dependencies still ZERO |
 | 2026-08-18 | M2.5 wrap: feature matrix filled (F1–F21); metrics module added (optional import only); pandas as optional extra — runtime core still ZERO |
+| 2026-08-21 | F32 (M3): `js/src/profile` added as a leaf; new build-time edge js-profile ← python-profile (committed artifact, two CI gates). Runtime dependencies still ZERO in both languages |
 | 2026-08-21 | F31 (M3): `js/` package added with its own dependency table. Runtime dependencies ZERO in both languages; JS dev group is typescript/vitest/biome/@types/node. TypeScript module tree recorded; `canonical.ts` and `numeric.ts` are both leaves |

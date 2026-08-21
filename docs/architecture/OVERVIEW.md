@@ -52,7 +52,7 @@ Module-for-module with the table above, so a Python change has an obvious TypeSc
 | `canonical.ts` | output | RFC 8785 serializer; the number policy; UTF-8 encoder; the refusal set | F31 ✅ |
 | `numeric.ts` | leaf (internal) | Python rounding semantics: `pyRound`, `pyRoundN`, `floorDiv`, `divmod` | F31 ✅ |
 | `index.ts` | api | Public surface — the parsing verbs arrive at F34/F35 | F31 ✅ |
-| `profile/*` | profile | Generated tables, dual-emitted with the Python profile | F32 |
+| `profile/*` | profile | Base types, merged message/enum tables (transcoded from Python), vendor registry | F32 ✅ |
 | `frames.ts`, `decode.ts`, `message.ts` | decode | Crash-proof frame reader; frames → messages | F33 |
 | `intake.ts`, `inflate.ts`, `api.ts`, `result.ts`, `cli.ts` | intake / api / output / cli | Unwrap, recover, shape, and the first CLI verbs | F34 |
 | `model.ts`, `semantics/*` | semantics | The canonical model — full corpus parity | F35 |
@@ -68,4 +68,8 @@ Invariants specific to this tree, enforced rather than documented:
   (`js/scripts/guards.mjs`, verified to exit non-zero on a probe).
 - **`Date` never appears on an output path**: `toISOString()` always emits milliseconds, which the
   Python formatter does not (ADR-0009 §5). `canonical.ts` refuses a `Date` outright.
+- **The profile is transcoded, not re-derived** (ADR-0009 §8). Two CI gates: regenerate-and-diff
+  for staleness, `check_profile_parity.py` for transcoding faults. Note what this means for the
+  corpus — it proves the two implementations agree, not that either matches reality; the outward
+  check is `check_profile_against_fitdecode.py`.
 
