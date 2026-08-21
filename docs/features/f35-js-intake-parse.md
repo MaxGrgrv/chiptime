@@ -1,6 +1,6 @@
 # Feature: F35 — Intake, inflate, recovery and `parse()` for TypeScript
 
-> Status: CRITIQUED
+> Status: DONE
 
 ## Purpose
 

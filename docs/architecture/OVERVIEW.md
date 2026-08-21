@@ -57,7 +57,9 @@ Module-for-module with the table above, so a Python change has an obvious TypeSc
 | `frames.ts`, `message.ts` | decode | Crash-proof frame reader, CRC, resync scanner; message shapes | F33 ✅ |
 | `api.ts` | api | `iterFrames` (chained-file loop, mode policy); grows a verb per feature | F33 ✅ |
 | `decode.ts` | decode | Frames → messages: base types, scale/offset, sentinels, strings, timestamps, dev fields, components | F34 ✅ |
-| `intake.ts`, `inflate.ts`, `api.ts`, `result.ts`, `cli.ts` | intake / api / output / cli | Unwrap, recover, shape, and the first CLI verbs | F34 |
+| `intake.ts`, `inflate.ts`, `sha256.ts`, `result.ts` | intake / output | Unwrap, sniff, hash, shape `chiptime_schema: 1` | F35 ✅ |
+| `api.ts` `parse()` | api | Modes, chained parts, PII, recovery report | F35 ✅ |
+| `cli.ts` | cli | `parse`/`inspect`/`codes`, exit codes | F37 |
 | `model.ts`, `semantics/*` | semantics | The canonical model — full corpus parity | F35 |
 | `encode.ts`, `repair.ts`, `validate.ts` | encode / repair | Writer, salvage, platform profiles | F36 |
 | `metrics/*` | analytics (optional) | The optional layer; never imported by core | F37 |
@@ -75,6 +77,10 @@ Invariants specific to this tree, enforced rather than documented:
 - **Bitwise masking is banned in timestamp math.** JavaScript's `&`/`|`/`~` are 32-bit signed and
   FIT `date_time` is a `uint32` exceeding 2^31, so `decode.ts` uses modulo arithmetic. No test we
   have would catch the difference — every corpus timestamp is below the threshold.
+- **`inflate.ts` and `sha256.ts` have no Python twin** — CPython has them in its stdlib. Three
+  constraints force hand-rolling: zero runtime dependencies, a synchronous `parse()`, and browser
+  support. They carry vector coverage instead of a reference implementation, and `inflate`'s output
+  bound is a *deliberate divergence* (Python is unbounded there).
 - **The profile is transcoded, not re-derived** (ADR-0009 §8). Two CI gates: regenerate-and-diff
   for staleness, `check_profile_parity.py` for transcoding faults. Note what this means for the
   corpus — it proves the two implementations agree, not that either matches reality; the outward

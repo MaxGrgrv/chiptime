@@ -40,6 +40,7 @@ Compact form (full dependency sections live in each spec; every edge verified bi
 | F32 js profile tables (M3) | F31, F18 (the merged Python tables it transcodes), F6 (vendor registry), ADR-0004, ADR-0009 | F33+ (decode reads every table) |
 | F33 js errors/message/frames (M3) | F31, F32, F3 (frame half, as reference), ADR-0003, ADR-0009 | F34+ (the decoder and everything above it) |
 | F34 js decoder (M3) | F31 (numeric), F32 (profile), F33 (frames/errors/message), F3/F6/F22 as reference | F35+ (parse, semantics, everything above) |
+| F35 js intake/inflate/parse/result (M3) | F31–F34, F4/F5/F11/F15 as reference, ADR-0002 | F36+ (semantics fills the activity block) |
 
 ## Module Dependencies
 
@@ -66,7 +67,10 @@ No cycles; `decode` never imports `semantics`; `profile` and `errors` remain lea
 index ─→ canonical
 canonical ─→ (leaf — imports nothing, not even numeric: formatting is String(x), not rounding)
 numeric ─→ (leaf; INTERNAL — absent from the exports map, no Python analogue)
-api ─→ frames, decode, errors
+api ─→ intake, frames, decode, result, errors, numeric, sha256
+intake ─→ inflate, errors
+result ─→ canonical, errors, message
+inflate, sha256 ─→ (leaves; no Python twin)
 decode ─→ frames, message, profile, errors, numeric  (never semantics)
 frames ─→ errors, profile/base-types
 errors ─→ codes (generated)
@@ -109,6 +113,7 @@ import executes at module load anywhere in `js/src` — enforced by `js/scripts/
 | 2026-08-17 | F1: dev/baselines dependency groups declared; runtime pinned at zero |
 | 2026-08-18 | M1+M2 shipped: module layering recorded; runtime dependencies still ZERO |
 | 2026-08-18 | M2.5 wrap: feature matrix filled (F1–F21); metrics module added (optional import only); pandas as optional extra — runtime core still ZERO |
+| 2026-08-21 | F35 (M3): `intake`/`inflate`/`sha256`/`result` added; `api` gains `parse()`. `inflate` and `sha256` are the only modules with no Python counterpart — forced by zero-deps + sync + browser. Runtime dependencies still ZERO |
 | 2026-08-21 | F34 (M3): `decode.ts` added above frames/profile/errors/numeric; `api` gains `iterMessages`. Runtime dependencies still ZERO |
 | 2026-08-21 | F33 (M3): `errors`/`codes`/`message`/`frames`/`api` added; `errors` is a leaf over the generated `codes.ts`; `frames` imports only `errors` and `profile/base-types`, matching Python. Runtime dependencies still ZERO |
 | 2026-08-21 | F32 (M3): `js/src/profile` added as a leaf; new build-time edge js-profile ← python-profile (committed artifact, two CI gates). Runtime dependencies still ZERO in both languages |
