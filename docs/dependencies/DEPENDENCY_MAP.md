@@ -33,6 +33,7 @@ Compact form (full dependency sections live in each spec; every edge verified bi
 | F24 interval detection | F23, F7 (model/laps/lengths) | F25 (report embeds structure) |
 | F25 insights/load/analyze | F23, F24, F11 (CLI), F21 (basics) | — |
 | F26 edit (metadata) | F3 (decode), F12 (encoder), F13 (repair pattern), F11 (CLI) | F27/F28/F30 (share the transform+re-encode skeleton), M3 |
+| F27 trim (crop) | F3, F7/F9 (build_activity, derived totals), F12, F13 (`_summary_message`), F11 | F28 (window logic), F30 |
 
 ## Module Dependencies
 

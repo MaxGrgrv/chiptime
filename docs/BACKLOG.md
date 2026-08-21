@@ -20,4 +20,8 @@ Note: the parser-behavior backlog is [edge-case-taxonomy.md](edge-case-taxonomy.
 | Semantic Lap fields for lap_trigger/wkt_step_index | F24 | Would change canonical parse output (corpus-wide regen); analytics reads raw messages instead | When a second consumer needs triggers outside metrics |
 | `chiptime edit --validate PLATFORM` convenience flag | F26 | `chiptime validate` composes fine; one flag less | If users report the two-step flow is friction |
 | Auto-derive `sub_sport` when sport changes | F26 | Inference into metadata = the non-goal the PRD forbids; warn instead | Never, unless the warning proves insufficient in practice |
+| Truncate laps straddling a trim boundary (needs per-lap derived totals) | F27 | Per-lap totals machinery does not exist; dropping is honest and platform-accepted | When users report losing a partial lap matters |
+| Middle-section removal / splice | F27 | Creates a deliberate time gap with its own semantics | When a user asks to cut a middle section, not just ends |
+| `--rebase-distance` after trimming the start | F27 | Derived totals are already correct; rebasing edits measurements | If a platform renders trimmed rides as starting mid-distance |
+| Trim length-only pool-swim files (no record messages) | F27 | Session totals cannot be rebuilt from lengths alone; real watches write records too | When a real length-only file needs trimming |
 

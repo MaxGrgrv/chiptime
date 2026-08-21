@@ -18,6 +18,7 @@ input → complete result.
 | Wire-level bytes forensics | `iter_frames` |
 | A broken file made uploadable | `repair` |
 | Metadata changed (sport, device, clock) | `edit` |
+| An activity cropped, totals rebuilt | `trim` |
 | "Will this platform accept it?" | `validate` |
 
 `parse` reads everything into a `ParseResult`; the iterators yield as they go
@@ -43,6 +44,12 @@ and skip the semantic layer entirely. `repair` and `validate` are built *on*
 ::: chiptime.edit
 
 ::: chiptime.edit.EditResult
+
+## Trim
+
+::: chiptime.trim
+
+::: chiptime.trim.TrimResult
 
 ## Validate
 

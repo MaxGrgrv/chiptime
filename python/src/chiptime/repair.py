@@ -207,7 +207,14 @@ def _bounds(session: Session, msgs: list[Message]) -> tuple[int, int]:
 
 
 def _summary_message(
-    gnum: int, s: Session, first_t: int, last_t: int, *, lap: bool
+    gnum: int,
+    s: Session,
+    first_t: int,
+    last_t: int,
+    *,
+    lap: bool,
+    first_lap_index: int = 0,
+    num_laps: int = 1,
 ) -> EncodableMessage:
     values: dict[str, object] = {
         "timestamp": last_t,
@@ -239,6 +246,6 @@ def _summary_message(
             values["avg_speed"] = der.avg["speed"]
         if "speed" in der.max:
             values["max_speed"] = der.max["speed"]
-        values["first_lap_index"] = 0
-        values["num_laps"] = 1
+        values["first_lap_index"] = first_lap_index
+        values["num_laps"] = num_laps
     return encodable_from_profile(gnum, values)

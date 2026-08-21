@@ -50,6 +50,10 @@ The local file path is never serialized.
 
 | Code | Meaning |
 |---|---|
+| `TRIM_NO_WINDOW` | trim() was called without a window; pass after= and/or before=. |
+| `TRIM_BAD_BOUND` | A trim bound could not be interpreted as a time; use an ISO timestamp or a relative offset like '+5m' / '-10m'. |
+| `TRIM_NO_RECORDS` | The file has no record messages, so trimmed totals could not be recomputed; nothing was written. |
+| `TRIM_EMPTY_RESULT` | The requested trim window keeps no data; nothing was written. |
 | `TIME_SHIFT_OUT_OF_RANGE` | A requested time shift would push a timestamp outside the representable FIT range (or onto the invalid sentinel); no bytes were written. |
 | `FIT_EMPTY` | The file contains no bytes. |
 | `FIT_TOO_SMALL` | The file is smaller than any valid FIT header. |
@@ -118,6 +122,9 @@ The local file path is never serialized.
 
 | Code | Meaning |
 |---|---|
+| `TRIM_RECORDS_DROPPED` | Records (and pool lengths) outside the requested trim window were removed at the user's explicit request. |
+| `TRIM_LAP_DROPPED` | A lap not wholly inside the trim window was removed; its in-window records were kept. |
+| `TRIM_SUMMARIES_REBUILT` | Session and activity totals were recomputed from the records that survived a trim, so the file cannot carry stale summaries. |
 | `SPORT_EDITED` | Declared sport/sub-sport rewritten at the user's explicit request. |
 | `DEVICE_EDITED` | Declared recording-device identity rewritten at the user's explicit request. |
 | `TIMESTAMPS_SHIFTED` | Every profile-typed timestamp shifted by a user-supplied offset. |

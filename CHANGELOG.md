@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.6.0 — 2026-08-21
+
+- **New: `chiptime trim`** — crop an activity by time window (`--after +5m`,
+  `--before -10m`, or absolute timestamps) and have **every derived number
+  rebuilt** from the records that survive. A trimmed file's declared totals
+  always equal what its own data proves; stale summaries are never carried
+  forward.
+- Structure is preserved where it remains true: laps wholly inside the window
+  survive untouched, straddling laps are dropped and reported by index, and
+  in-window timer events are kept so auto-pause structure (and therefore
+  moving time) survives a trim elsewhere in the ride.
+- Refuses rather than guesses: empty windows, uninterpretable bounds, and
+  length-only pool files (whose totals cannot be rebuilt from lengths alone)
+  all fail with a coded reason and write no bytes.
+- Measurements are never rewritten — cumulative distance keeps its recorded
+  values, and session totals stay correct because they derive as last − first.
+
 ## 0.5.0 — 2026-08-21 (M2.8: file surgery begins)
 
 - **New: `chiptime edit`** — change what a file *says about itself* and keep

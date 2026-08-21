@@ -72,6 +72,17 @@ def main(argv: list[str] | None = None) -> int:
         help="signed offset applied to every timestamp: seconds, or ±HH:MM",
     )
 
+    p_trim = sub.add_parser("trim", help="crop an activity and rebuild its totals")
+    p_trim.add_argument("file")
+    p_trim.add_argument("-o", "--output", required=True)
+    p_trim.add_argument("--mode", choices=["strict", "lenient", "forensic"], default="lenient")
+    p_trim.add_argument(
+        "--after", help="keep records at/after this: ISO time, or '+5m' from the start"
+    )
+    p_trim.add_argument(
+        "--before", help="keep records at/before this: ISO time, or '-10m' from the end"
+    )
+
     p_an = sub.add_parser("analyze", help="per-sport workout report + insights (optional layer)")
     p_an.add_argument("file")
     p_an.add_argument("--mode", choices=["strict", "lenient", "forensic"], default="lenient")
@@ -99,6 +110,8 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_analyze(args)
     if args.command == "edit":
         return _cmd_edit(args)
+    if args.command == "trim":
+        return _cmd_trim(args)
     return _cmd_codes()
 
 
@@ -186,6 +199,39 @@ def _cmd_edit(args: argparse.Namespace) -> int:
             "warning: the edited file does not parse in strict mode; inspect before uploading",
             file=sys.stderr,
         )
+        return 2
+    return 0
+
+
+def _cmd_trim(args: argparse.Namespace) -> int:
+    if not args.after and not args.before:
+        print("error: trim requires --after and/or --before", file=sys.stderr)
+        print("suggestion: --after '+5m' cuts the first five minutes", file=sys.stderr)
+        return 64
+    try:
+        result = chiptime.trim(args.file, after=args.after, before=args.before, mode=args.mode)
+    except chiptime.NotFitError as e:
+        print(f"{e.code}: {e.detail}", file=sys.stderr)
+        return 4
+    except chiptime.FitError as e:
+        print(f"{e.code}: {e.detail}", file=sys.stderr)
+        if e.suggestion:
+            print(f"suggestion: {e.suggestion}", file=sys.stderr)
+        return 3
+    except OSError as e:
+        print(f"cannot read {args.file}: {e}", file=sys.stderr)
+        return 64
+
+    with open(args.output, "wb") as f:
+        f.write(result.data)
+    for entry in result.provenance:
+        print(f"{entry.code}: {entry.detail}")
+    print(
+        f"wrote {args.output} ({len(result.data)} bytes; "
+        f"{result.records_kept} records kept, {result.records_dropped} dropped)"
+    )
+    if not result.output_strict_ok:
+        print("warning: output does not parse strictly; inspect before uploading", file=sys.stderr)
         return 2
     return 0
 

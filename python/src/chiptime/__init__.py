@@ -21,8 +21,9 @@ from chiptime.errors import (
 )
 from chiptime.repair import NotRepairableError, RepairResult, repair
 from chiptime.result import Mode, ParseResult
+from chiptime.trim import TrimError, TrimResult, trim
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 __all__ = [
     "CrcMismatchError",
@@ -37,6 +38,8 @@ __all__ = [
     "ParseResult",
     "ProtocolError",
     "RepairResult",
+    "TrimError",
+    "TrimResult",
     "TruncatedError",
     "__version__",
     "edit",
@@ -44,4 +47,5 @@ __all__ = [
     "iter_messages",
     "parse",
     "repair",
+    "trim",
 ]

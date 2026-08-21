@@ -1,5 +1,5 @@
 ---
-description: Every chiptime machine code — 91 errors, warnings, provenance entries, and insight codes — each with its own page.
+description: Every chiptime machine code — 98 errors, warnings, provenance entries, and insight codes — each with its own page.
 ---
 
 # Codes registry
@@ -12,6 +12,10 @@ its own page; the complete agent-facing contract (schema, exit codes) lives in
 
 | Code | Kind | Meaning |
 |---|---|---|
+| [`TRIM_NO_WINDOW`](trim-no-window.md) | error | trim() was called without a window; pass after= and/or before=. |
+| [`TRIM_BAD_BOUND`](trim-bad-bound.md) | error | A trim bound could not be interpreted as a time; use an ISO timestamp or a relative offset like '+5m' / '-10m'. |
+| [`TRIM_NO_RECORDS`](trim-no-records.md) | error | The file has no record messages, so trimmed totals could not be recomputed; nothing was written. |
+| [`TRIM_EMPTY_RESULT`](trim-empty-result.md) | error | The requested trim window keeps no data; nothing was written. |
 | [`TIME_SHIFT_OUT_OF_RANGE`](time-shift-out-of-range.md) | error | A requested time shift would push a timestamp outside the representable FIT range (or onto the invalid sentinel); no bytes were written. |
 | [`FIT_EMPTY`](fit-empty.md) | error | The file contains no bytes. |
 | [`FIT_TOO_SMALL`](fit-too-small.md) | error | The file is smaller than any valid FIT header. |
@@ -70,6 +74,9 @@ its own page; the complete agent-facing contract (schema, exit codes) lives in
 | [`LAP_COVERAGE_GAP`](lap-coverage-gap.md) | warning | Laps do not cover the session span (#94). |
 | [`TIMESTAMP_DECLARED_AS_BYTES`](timestamp-declared-as-bytes.md) | warning | Field 253 declared as byte[4]; reassembled (Xiaomi-pipeline class). |
 | [`HR_EXPANSION_NO_ANCHOR`](hr-expansion-no-anchor.md) | warning | hr.event_timestamp_12 appeared before any full event_timestamp; samples not expandable. |
+| [`TRIM_RECORDS_DROPPED`](trim-records-dropped.md) | provenance | Records (and pool lengths) outside the requested trim window were removed at the user's explicit request. |
+| [`TRIM_LAP_DROPPED`](trim-lap-dropped.md) | provenance | A lap not wholly inside the trim window was removed; its in-window records were kept. |
+| [`TRIM_SUMMARIES_REBUILT`](trim-summaries-rebuilt.md) | provenance | Session and activity totals were recomputed from the records that survived a trim, so the file cannot carry stale summaries. |
 | [`SPORT_EDITED`](sport-edited.md) | provenance | Declared sport/sub-sport rewritten at the user's explicit request. |
 | [`DEVICE_EDITED`](device-edited.md) | provenance | Declared recording-device identity rewritten at the user's explicit request. |
 | [`TIMESTAMPS_SHIFTED`](timestamps-shifted.md) | provenance | Every profile-typed timestamp shifted by a user-supplied offset. |

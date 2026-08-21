@@ -52,6 +52,7 @@ Master index of all documentation. Updated with every feature change.
 | F24 Interval & structure detection (M2.7) | DONE | [spec](features/f24-interval-structure.md) | [impl](implementation/f24-interval-structure.md) |
 | F25 Insights, load, analyze CLI (M2.7) | DONE | [spec](features/f25-insights-load-analyze.md) | [impl](implementation/f25-insights-load-analyze.md) |
 | F26 `edit` metadata surgery (M2.8) | DONE | [spec](features/f26-edit-metadata.md) | [impl](implementation/f26-edit-metadata.md) |
+| F27 `trim` crop + rebuild (M2.8) | DONE | [spec](features/f27-trim.md) | [impl](implementation/f27-trim.md) |
 
 ## ADRs
 
