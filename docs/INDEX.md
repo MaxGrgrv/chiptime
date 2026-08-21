@@ -7,7 +7,7 @@ Master index of all documentation. Updated with every feature change.
 | Doc | Purpose |
 |---|---|
 | [PRD.md](PRD.md) | Product requirements — vision, principles, scope, architecture, roadmap |
-| [m3-typescript-plan.md](m3-typescript-plan.md) | M3 milestone plan — the TypeScript twin on npm (F31–F43), parity gates, hazards |
+| [m3-typescript-plan.md](m3-typescript-plan.md) | M3 milestone plan — the TypeScript twin on npm (F31–F44), parity gates, hazards |
 | [edge-case-taxonomy.md](edge-case-taxonomy.md) | The 104-item FIT edge-case taxonomy — the parser-behavior backlog |
 | [BACKLOG.md](BACKLOG.md) | Items deferred during critique cycles |
 | [for-agents.md](for-agents.md) | Generated agent-facing reference: codes, exit codes, schema (do not hand-edit) |
@@ -67,15 +67,16 @@ Plan: [m3-typescript-plan.md](m3-typescript-plan.md) · contract: [ADR-0009](arc
 | F32 Profile tables for TypeScript | DONE | [spec](features/f32-js-profile-tables.md) | [impl](implementation/f32-js-profile-tables.md) |
 | F33 Errors, messages, frame reader (TS) | DONE | [spec](features/f33-js-frames-decode.md) | [impl](implementation/f33-js-frames-decode.md) |
 | F34 Decoder — frames to messages (TS) | DONE | [spec](features/f34-js-decoder.md) | [impl](implementation/f34-js-decoder.md) |
-| F35 Intake, inflate, recovery, result, CLI (TS) | PLANNED | — | — |
-| F36 Semantics — full corpus parity (npm 0.1.0) | PLANNED | — | — |
-| F37 Encoder, repair, validate (npm 0.2.0) | PLANNED | — | — |
-| F38 Analytics layer + analyze (npm 0.4.0) | PLANNED | — | — |
-| F39 `edit` (npm 0.5.0) | PLANNED | — | — |
-| F40 `trim` (npm 0.6.0) | PLANNED | — | — |
-| F41 `reveal` + `scrub` (npm 0.7.0) | PLANNED | — | — |
-| F42 Catch-up: mirror Python features shipped during the port | PLANNED | — | — |
-| F43 Browser build, docs tabs, parity CI, parity release | PLANNED | — | — |
+| F35 Intake, inflate, recovery, `parse()`, result (TS) | CRITIQUED | [spec](features/f35-js-intake-parse.md) | — |
+| F36 Semantics — full corpus parity | PLANNED | — | — |
+| F37 CLI + exit codes (npm 0.1.0) | PLANNED | — | — |
+| F38 Encoder, repair, validate (npm 0.2.0) | PLANNED | — | — |
+| F39 Analytics layer + analyze (npm 0.4.0) | PLANNED | — | — |
+| F40 `edit` (npm 0.5.0) | PLANNED | — | — |
+| F41 `trim` (npm 0.6.0) | PLANNED | — | — |
+| F42 `reveal` + `scrub` (npm 0.7.0) | PLANNED | — | — |
+| F43 Catch-up: mirror Python features shipped during the port | PLANNED | — | — |
+| F44 Browser build, docs tabs, parity CI, parity release | PLANNED | — | — |
 
 ## ADRs
 
