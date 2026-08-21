@@ -2,7 +2,8 @@
 
 > Living document. Updated by /implement and /post-impl-review as the system is built. Until code exists, the proposed architecture lives in [../PRD.md](../PRD.md); this file records the as-built state.
 
-Status: **M2.5 shipped (0.3.0).** Next: M3 (TypeScript twin on the shared corpus).
+Status: **M2.8 in progress (0.7.0)** — F26 `edit`, F27 `trim`, F28 `reveal`/`scrub` shipped; F29 `convert`, F30 `merge` queued.
+Next: **M3 — the TypeScript twin on the shared corpus** ([plan](../m3-typescript-plan.md) · [ADR-0009](adrs/0009-cross-language-parity.md)); the `js/` tree mirrors `python/src/chiptime/` module-for-module, so every row in the table below gains a TypeScript twin at the same address.
 
 ## Layers (planned, from PRD — subject to shape agreement)
 

@@ -504,7 +504,7 @@ Rules:
 | **M2.6** ✅ | shipped 2026-08-18 | Ecosystem-issue hardening: publicly reported FIT parsing failure modes surveyed → 30 classes → 21 pre-handled, 9 fixed (incl. hr event_timestamp_12 12-bit expansion) |
 | **M2.7** ✅ | 0.4.0 tagged 2026-08-18 | Analytics layer (ADR-0008): F23 sport profiles + pacing (profiles-as-data, inverse-safe pace, Concept2 bridge, splits), F24 interval/structure detection (evidence ladder, honest bands), F25 insights + load + `chiptime analyze` (basis strings, omissions, TRIMP coverage guard, fitness/fatigue/form EWMA) |
 | **M2.8** ◐ | in progress | File surgery — the write verbs users actually ask for: F26 `edit` (metadata) ✅ 0.5.0; F27 `trim` (crop + rebuild) ✅ 0.6.0; F28 `reveal`/`scrub` (privacy) ✅ 0.7.0; F29 `doctor` + calibration ✅ 0.8.0 (reprioritised from forum research); F30 merge, convert queued |
-| **M3** | JS/TS `chiptime` on npm | Twin implementation consuming the same corpus; parity gate in CI; browser + Node |
+| **M3** ◐ | JS/TS `chiptime` on npm | **Planned 2026-08-21** — F31–F41, see [m3-typescript-plan.md](m3-typescript-plan.md) and [ADR-0009](architecture/adrs/0009-cross-language-parity.md). Twin implementation consuming the same corpus; three parity gates in CI; browser + Node + Deno + Bun, zero runtime deps; mirrored version line (npm 0.N.0 = the surface PyPI 0.N.0 shipped), merging into a single lockstep line once npm catches up to the then-current Python version |
 | **M4+** | Depth moat | Tier-3 items; device-quirk registry; dev-field vendor registry (Stryd, CORE, Moxy…); per-edge-case docs pages (SEO/agent-search: "FIT local_timestamp 1989 fix"); donation page; `[pandas]` extra |
 
 ## 12. Shape decisions — resolved 2026-08-17
@@ -514,3 +514,12 @@ Rules:
 3. **Encoder timing**: **M2 fast-follow** — 0.1 ships decode + recovery + canonical JSON; 0.2 adds encoder + `repair` + platform validation profiles.
 4. **Python floor**: **3.11**.
 5. **Name**: `chiptime` everywhere (PyPI, npm, import name); both registry names free as of 2026-08-17 — register at M1.
+
+## 13. M3 shape decisions — resolved 2026-08-21
+
+Recorded in [ADR-0009](architecture/adrs/0009-cross-language-parity.md); plan in [m3-typescript-plan.md](m3-typescript-plan.md).
+
+6. **TypeScript API naming**: **idiomatic camelCase** (`parse(src, { stripPii })`, `toCanonicalJson()`). Canonical JSON keys, codes, CLI flags and exit codes stay byte-identical across languages — the wire format is the contract, the call surface is ergonomics. No snake_case aliases.
+7. **Runtime targets**: **Node ≥ 20 + browser + Deno + Bun**, one build, `parse()` **synchronous everywhere**. Container unwrapping ships as an internal zero-dep `inflate.ts` rather than `node:zlib` (Node-only) or `DecompressionStream` (async) — the zero-runtime-dependency contract holds in both languages.
+8. **Release sequencing**: **staged, mirrored** — npm `0.N.0` denotes the feature surface of PyPI `0.N.0`; patch numbers independent; npm skips `0.3.0` (M2.5/M2.6 were internal, inherited by the port); the two version lines merge and move in lockstep from `0.7.0` onward.
+9. **Parity enforcement**: three CI gates — TS conformance runner over the shared corpus, generated-profile digest equality, and a cross-implementation harness diffing canonical bytes and CLI stdout. `expected.json` is never regenerated to make TypeScript pass (ADR-0009 §1).

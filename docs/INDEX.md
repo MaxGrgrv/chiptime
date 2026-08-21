@@ -7,6 +7,7 @@ Master index of all documentation. Updated with every feature change.
 | Doc | Purpose |
 |---|---|
 | [PRD.md](PRD.md) | Product requirements — vision, principles, scope, architecture, roadmap |
+| [m3-typescript-plan.md](m3-typescript-plan.md) | M3 milestone plan — the TypeScript twin on npm (F31–F41), parity gates, hazards |
 | [edge-case-taxonomy.md](edge-case-taxonomy.md) | The 104-item FIT edge-case taxonomy — the parser-behavior backlog |
 | [BACKLOG.md](BACKLOG.md) | Items deferred during critique cycles |
 | [for-agents.md](for-agents.md) | Generated agent-facing reference: codes, exit codes, schema (do not hand-edit) |
@@ -56,6 +57,24 @@ Master index of all documentation. Updated with every feature change.
 | F28 `reveal` + `scrub` privacy (M2.8) | DONE | [spec](features/f28-privacy-scrub.md) | [impl](implementation/f28-privacy-scrub.md) |
 | F29 `doctor` + distance calibration (M2.8) | DONE | [spec](features/f29-make-it-upload.md) | [impl](implementation/f29-make-it-upload.md) |
 
+### M3 — TypeScript twin on npm
+
+Plan: [m3-typescript-plan.md](m3-typescript-plan.md) · contract: [ADR-0009](architecture/adrs/0009-cross-language-parity.md)
+
+| Feature | Status | Spec | Implementation |
+|---|---|---|---|
+| F31 JS scaffolding, canonical JSON, number kernel | PLANNED | — | — |
+| F32 Profile dual emitter (Python + TS) | PLANNED | — | — |
+| F33 Frames + decode core (TS) | PLANNED | — | — |
+| F34 Intake, inflate, recovery, result, CLI (TS) | PLANNED | — | — |
+| F35 Semantics — full corpus parity (npm 0.1.0) | PLANNED | — | — |
+| F36 Encoder, repair, validate (npm 0.2.0) | PLANNED | — | — |
+| F37 Analytics layer + analyze (npm 0.4.0) | PLANNED | — | — |
+| F38 `edit` (npm 0.5.0) | PLANNED | — | — |
+| F39 `trim` (npm 0.6.0) | PLANNED | — | — |
+| F40 `reveal` + `scrub` (npm 0.7.0) | PLANNED | — | — |
+| F41 Browser build, docs tabs, parity CI, parity release | PLANNED | — | — |
+
 ## ADRs
 
 | ADR | Decision |
@@ -68,3 +87,4 @@ Master index of all documentation. Updated with every feature change.
 | [0006](architecture/adrs/0006-encoder-policy.md) | Encoder: canonical wire form, two producers, slot management |
 | [0007](architecture/adrs/0007-real-file-pii-policy.md) | Real-file corpus: private tier, PII rules, SDK-sample ban |
 | [0008](architecture/adrs/0008-analytics-layer.md) | Analytics layer: sport profiles as data, honest estimators, neutral names |
+| [0009](architecture/adrs/0009-cross-language-parity.md) | Cross-language parity: corpus as gate, camelCase API, number kernel, mirrored versions |
