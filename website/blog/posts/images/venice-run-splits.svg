@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 330" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" width="900" height="330">
+<rect width="900" height="330" rx="12" fill="#fcfcfb" stroke="rgba(11,11,11,0.10)"/>
+<defs><pattern id="hatchBlue" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#e6effb"/><line x1="0" y1="0" x2="0" y2="7" stroke="#2a78d6" stroke-width="1.6"/></pattern><pattern id="hatchOrange" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fdeee7"/><line x1="0" y1="0" x2="0" y2="7" stroke="#eb6834" stroke-width="1.6"/></pattern><pattern id="hatchRed" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fbe9e9"/><line x1="0" y1="0" x2="0" y2="7" stroke="#d03b3b" stroke-width="1.6"/></pattern><pattern id="hatchAqua" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#e4f5ee"/><line x1="0" y1="0" x2="0" y2="7" stroke="#1baf7a" stroke-width="1.6"/></pattern></defs>
+<text x="20" y="30" font-size="16" fill="#0b0b0b" text-anchor="start" font-weight="600" >Half-marathon splits, km by km</text>
+<text x="20" y="50" font-size="12.5" fill="#898781" text-anchor="start" font-weight="normal" >auto-laps from the file · time per km, so dips are faster kilometres · average 4:47/km</text>
+<line x1="50" y1="218.8" x2="826" y2="218.8" stroke="#e1e0d9" stroke-width="1"/>
+<text x="42" y="222.75" font-size="11" fill="#898781" text-anchor="end" font-weight="normal" >4:30</text>
+<line x1="50" y1="171.9" x2="826" y2="171.9" stroke="#e1e0d9" stroke-width="1"/>
+<text x="42" y="175.875" font-size="11" fill="#898781" text-anchor="end" font-weight="normal" >4:45</text>
+<line x1="50" y1="125.0" x2="826" y2="125.0" stroke="#e1e0d9" stroke-width="1"/>
+<text x="42" y="129.0" font-size="11" fill="#898781" text-anchor="end" font-weight="normal" >5:00</text>
+<line x1="50" y1="165.0" x2="826" y2="165.0" stroke="#52514e" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="834" y="169.00000000000003" font-size="11" fill="#52514e" text-anchor="start" font-weight="normal" >avg</text>
+<path d="M60.0,206.2 L102.0,182.8 L144.0,196.9 L186.0,200.0 L228.0,164.7 L270.0,176.6 L312.0,213.1 L354.0,179.1 L396.0,135.3 L438.0,154.1 L480.0,147.5 L522.0,126.2 L564.0,147.8 L606.0,163.1 L648.0,170.9 L690.0,134.1 L732.0,157.8 L774.0,141.9 L816.0,159.4 " fill="none" stroke="#1baf7a" stroke-width="2"/>
+<circle cx="60.0" cy="206.2" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<text x="60" y="274" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >1</text>
+<text x="60" y="196.25" font-size="11.5" fill="#0b0b0b" text-anchor="middle" font-weight="600" >4:34</text>
+<circle cx="102.0" cy="182.8" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<circle cx="144.0" cy="196.9" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<text x="144" y="274" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >3</text>
+<circle cx="186.0" cy="200.0" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<circle cx="228.0" cy="164.7" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<text x="228" y="274" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >5</text>
+<circle cx="270.0" cy="176.6" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<circle cx="312.0" cy="213.1" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<text x="312" y="274" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >7</text>
+<text x="312" y="233.12499999999997" font-size="11.5" fill="#0b0b0b" text-anchor="middle" font-weight="600" >4:32</text>
+<circle cx="354.0" cy="179.1" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<circle cx="396.0" cy="135.3" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<text x="396" y="274" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >9</text>
+<circle cx="438.0" cy="154.1" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<circle cx="480.0" cy="147.5" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<text x="480" y="274" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >11</text>
+<circle cx="522.0" cy="126.2" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<text x="522" y="116.24999999999993" font-size="11.5" fill="#0b0b0b" text-anchor="middle" font-weight="600" >5:00</text>
+<circle cx="564.0" cy="147.8" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<text x="564" y="274" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >13</text>
+<circle cx="606.0" cy="163.1" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<circle cx="648.0" cy="170.9" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<text x="648" y="274" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >15</text>
+<circle cx="690.0" cy="134.1" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<circle cx="732.0" cy="157.8" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<text x="732" y="274" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >17</text>
+<circle cx="774.0" cy="141.9" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<circle cx="816.0" cy="159.4" r="4" fill="#1baf7a" stroke="#fcfcfb" stroke-width="1.5"/>
+<text x="816" y="274" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >19</text>
+<text x="816" y="149.375" font-size="11.5" fill="#0b0b0b" text-anchor="middle" font-weight="600" >4:49</text>
+<text x="438.0" y="294" font-size="11.5" fill="#898781" text-anchor="middle" font-weight="normal" >kilometre</text>
+<text x="20" y="316" font-size="11" fill="#898781" text-anchor="start" font-weight="normal" >parsed with chiptime · declared lap times from the Suunto Race 2 · final 463 m (5:23/km) not shown</text>
+</svg>

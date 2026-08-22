@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 402" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" width="780" height="402">
+<rect width="780" height="402" rx="12" fill="#fcfcfb" stroke="rgba(11,11,11,0.10)"/>
+<defs><pattern id="hatchBlue" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#e6effb"/><line x1="0" y1="0" x2="0" y2="7" stroke="#2a78d6" stroke-width="1.6"/></pattern><pattern id="hatchOrange" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fdeee7"/><line x1="0" y1="0" x2="0" y2="7" stroke="#eb6834" stroke-width="1.6"/></pattern><pattern id="hatchRed" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fbe9e9"/><line x1="0" y1="0" x2="0" y2="7" stroke="#d03b3b" stroke-width="1.6"/></pattern><pattern id="hatchAqua" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#e4f5ee"/><line x1="0" y1="0" x2="0" y2="7" stroke="#1baf7a" stroke-width="1.6"/></pattern></defs>
+<text x="20" y="30" font-size="16" fill="#0b0b0b" text-anchor="start" font-weight="600" >Five hours, sorted by watts</text>
+<text x="20" y="50" font-size="12.5" fill="#898781" text-anchor="start" font-weight="normal" >time in power zones · zone bounds read from the file itself (basis: file:power_zone, FTP-260 layout)</text>
+<text x="138" y="109.5" font-size="12.5" fill="#0b0b0b" text-anchor="end" font-weight="600" >Z1 · ≤144 W</text>
+<path d="M150.0,88.0 h370.4 q3.5,0 3.5,3.5 v27.0 q0,3.5 -3.5,3.5 h-370.4 z" fill="#86b6ef"/>
+<text x="533.933734939759" y="109.5" font-size="12.5" fill="#52514e" text-anchor="start" font-weight="normal" >1:34:03</text>
+<text x="138" y="155.5" font-size="12.5" fill="#0b0b0b" text-anchor="end" font-weight="600" >Z2 · 145–196 W</text>
+<path d="M150.0,134.0 h436.5 q3.5,0 3.5,3.5 v27.0 q0,3.5 -3.5,3.5 h-436.5 z" fill="#5598e7"/>
+<text x="600.0" y="155.5" font-size="12.5" fill="#52514e" text-anchor="start" font-weight="normal" >1:50:40</text>
+<text x="138" y="201.5" font-size="12.5" fill="#0b0b0b" text-anchor="end" font-weight="600" >Z3 · 197–234 W</text>
+<path d="M150.0,180.0 h219.8 q3.5,0 3.5,3.5 v27.0 q0,3.5 -3.5,3.5 h-219.8 z" fill="#2a78d6"/>
+<text x="383.3132530120482" y="201.5" font-size="12.5" fill="#52514e" text-anchor="start" font-weight="normal" >56:10</text>
+<text x="138" y="247.5" font-size="12.5" fill="#0b0b0b" text-anchor="end" font-weight="600" >Z4 · 235–273 W</text>
+<path d="M150.0,226.0 h105.7 q3.5,0 3.5,3.5 v27.0 q0,3.5 -3.5,3.5 h-105.7 z" fill="#1c5cab"/>
+<text x="269.2048192771084" y="247.5" font-size="12.5" fill="#52514e" text-anchor="start" font-weight="normal" >27:28</text>
+<text x="138" y="293.5" font-size="12.5" fill="#0b0b0b" text-anchor="end" font-weight="600" >Z5 · 274–312 W</text>
+<path d="M150.0,272.0 h49.6 q3.5,0 3.5,3.5 v27.0 q0,3.5 -3.5,3.5 h-49.6 z" fill="#104281"/>
+<text x="213.14457831325302" y="293.5" font-size="12.5" fill="#52514e" text-anchor="start" font-weight="normal" >13:22</text>
+<text x="138" y="339.5" font-size="12.5" fill="#0b0b0b" text-anchor="end" font-weight="600" >Z6 · >312 W</text>
+<path d="M150.0,318.0 h44.6 q3.5,0 3.5,3.5 v27.0 q0,3.5 -3.5,3.5 h-44.6 z" fill="#0d366b"/>
+<text x="208.10843373493975" y="339.5" font-size="12.5" fill="#52514e" text-anchor="start" font-weight="normal" >12:06</text>
+<text x="20" y="388" font-size="11" fill="#898781" text-anchor="start" font-weight="normal" >parsed with chiptime · avg 174 W · weighted 191 W · VI 1.10 · 3,282 kJ of work · 12 min above 312 W mid-Ironman</text>
+</svg>

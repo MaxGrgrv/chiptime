@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 340" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" width="900" height="340">
+<rect width="900" height="340" rx="12" fill="#fcfcfb" stroke="rgba(11,11,11,0.10)"/>
+<defs><pattern id="hatchBlue" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#e6effb"/><line x1="0" y1="0" x2="0" y2="7" stroke="#2a78d6" stroke-width="1.6"/></pattern><pattern id="hatchOrange" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fdeee7"/><line x1="0" y1="0" x2="0" y2="7" stroke="#eb6834" stroke-width="1.6"/></pattern><pattern id="hatchRed" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fbe9e9"/><line x1="0" y1="0" x2="0" y2="7" stroke="#d03b3b" stroke-width="1.6"/></pattern><pattern id="hatchAqua" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#e4f5ee"/><line x1="0" y1="0" x2="0" y2="7" stroke="#1baf7a" stroke-width="1.6"/></pattern></defs>
+<text x="20" y="30" font-size="16" fill="#0b0b0b" text-anchor="start" font-weight="600" >Anatomy of a false alarm</text>
+<text x="20" y="50" font-size="12.5" fill="#898781" text-anchor="start" font-weight="normal" >the file’s six shutdown events, and the phantom interval a naive pairing creates</text>
+<text x="60" y="88" font-size="12" fill="#0b0b0b" text-anchor="start" font-weight="600" >what the timer events actually mean</text>
+<rect x="60" y="100" width="670.8" height="26" rx="3" fill="#2a78d6"/>
+<text x="395.4" y="117.5" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="600" >timer running 5:13:43</text>
+<rect x="733.8" y="100" width="30" height="26" rx="3" fill="#d6d5cf"/>
+<rect x="766.8" y="100" width="73.2" height="26" rx="3" fill="#2a78d6"/>
+<text x="844" y="117.5" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal" >+5 s</text>
+<line x1="60" y1="126" x2="60" y2="140" stroke="#52514e"/>
+<text x="60" y="154" font-size="11" fill="#898781" text-anchor="start" font-weight="normal" >start 08:41:30</text>
+<line x1="730.8" y1="126" x2="730.8" y2="140.0" stroke="#c3c2b7"/>
+<text x="724.8" y="144" font-size="11" fill="#898781" text-anchor="end" font-weight="normal" >stop 13:55:13 (auto-pause)</text>
+<line x1="766.8" y1="126" x2="766.8" y2="164.0" stroke="#c3c2b7"/>
+<text x="760.8" y="168" font-size="11" fill="#898781" text-anchor="end" font-weight="normal" >start 13:55:15</text>
+<line x1="840.0" y1="126" x2="840.0" y2="188.0" stroke="#c3c2b7"/>
+<text x="834" y="192" font-size="11" fill="#898781" text-anchor="end" font-weight="normal" >stop, then stop_all 13:55:20</text>
+<text x="60" y="238" font-size="12" fill="#0b0b0b" text-anchor="start" font-weight="600" >what a stop_all with no open interval looks like to a crash-recovery heuristic</text>
+<rect x="60" y="250" width="780.0" height="26" rx="3" fill="url(#hatchRed)" stroke="#d03b3b" stroke-width="1"/>
+<text x="450.0" y="267.5" font-size="12" fill="#d03b3b" text-anchor="middle" font-weight="600" stroke="#fcfcfb" stroke-width="4" paint-order="stroke">phantom interval: first record → stop_all = +5:13:50 counted twice</text>
+<text x="20" y="326" font-size="11" fill="#898781" text-anchor="start" font-weight="normal" >the redundant stop_all is standard device shutdown — this exact file is now a chiptime corpus candidate (taxonomy #45)</text>
+</svg>

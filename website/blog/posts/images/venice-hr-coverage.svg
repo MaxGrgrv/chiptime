@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 400" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" width="860" height="400">
+<rect width="860" height="400" rx="12" fill="#fcfcfb" stroke="rgba(11,11,11,0.10)"/>
+<defs><pattern id="hatchBlue" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#e6effb"/><line x1="0" y1="0" x2="0" y2="7" stroke="#2a78d6" stroke-width="1.6"/></pattern><pattern id="hatchOrange" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fdeee7"/><line x1="0" y1="0" x2="0" y2="7" stroke="#eb6834" stroke-width="1.6"/></pattern><pattern id="hatchRed" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fbe9e9"/><line x1="0" y1="0" x2="0" y2="7" stroke="#d03b3b" stroke-width="1.6"/></pattern><pattern id="hatchAqua" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#e4f5ee"/><line x1="0" y1="0" x2="0" y2="7" stroke="#1baf7a" stroke-width="1.6"/></pattern></defs>
+<text x="20" y="30" font-size="16" fill="#0b0b0b" text-anchor="start" font-weight="600" >Where the heart-rate data actually is</text>
+<text x="20" y="50" font-size="12.5" fill="#898781" text-anchor="start" font-weight="normal" >valid HR samples as a share of records per leg — null is a dropout, not a zero</text>
+<text x="78" y="105.5" font-size="13" fill="#0b0b0b" text-anchor="end" font-weight="600" >Swim</text>
+<rect x="90" y="84" width="560" height="34" rx="3" fill="#f1f0ec"/>
+<path d="M90.0,84.0 h39.6 q3.5,0 3.5,3.5 v27.0 q0,3.5 -3.5,3.5 h-39.6 z" fill="#2a78d6"/>
+<text x="662" y="105.5" font-size="12.5" fill="#52514e" text-anchor="start" font-weight="normal" >7.7% · 40/522</text>
+<text x="78" y="153.5" font-size="13" fill="#0b0b0b" text-anchor="end" font-weight="600" >T1</text>
+<rect x="90" y="132" width="560" height="34" rx="3" fill="#f1f0ec"/>
+<path d="M90.0,132.0 h414.3 q3.5,0 3.5,3.5 v27.0 q0,3.5 -3.5,3.5 h-414.3 z" fill="#d6d5cf"/>
+<text x="662" y="153.5" font-size="12.5" fill="#52514e" text-anchor="start" font-weight="normal" >74.6% · 352/472</text>
+<text x="78" y="201.5" font-size="13" fill="#0b0b0b" text-anchor="end" font-weight="600" >Bike</text>
+<rect x="90" y="180" width="560" height="34" rx="3" fill="#f1f0ec"/>
+<path d="M90.0,180.0 h130.3 q3.5,0 3.5,3.5 v27.0 q0,3.5 -3.5,3.5 h-130.3 z" fill="#eb6834"/>
+<text x="662" y="201.5" font-size="12.5" fill="#52514e" text-anchor="start" font-weight="normal" >23.9% · 2,119/8,872</text>
+<text x="78" y="249.5" font-size="13" fill="#0b0b0b" text-anchor="end" font-weight="600" >T2</text>
+<rect x="90" y="228" width="560" height="34" rx="3" fill="#f1f0ec"/>
+<path d="M90.0,228.0 h4.3 q3.5,0 3.5,3.5 v27.0 q0,3.5 -3.5,3.5 h-4.3 z" fill="#d6d5cf"/>
+<text x="662" y="249.5" font-size="12.5" fill="#52514e" text-anchor="start" font-weight="normal" >1.4% · 1/71</text>
+<text x="78" y="297.5" font-size="13" fill="#0b0b0b" text-anchor="end" font-weight="600" >Run</text>
+<rect x="90" y="276" width="560" height="34" rx="3" fill="#f1f0ec"/>
+<path d="M90.0,276.0 h6.0 q3.5,0 3.5,3.5 v27.0 q0,3.5 -3.5,3.5 h-6.0 z" fill="#1baf7a"/>
+<text x="662" y="297.5" font-size="12.5" fill="#52514e" text-anchor="start" font-weight="normal" >1.7% · 98/5,870</text>
+<text x="90" y="338" font-size="12" fill="#52514e" text-anchor="start" font-weight="normal" font-style="italic">→ and all 98 of the run’s valid samples read exactly 157 bpm — a flatline, not a heart</text>
+<text x="20" y="386" font-size="11" fill="#898781" text-anchor="start" font-weight="normal" >parsed with chiptime · coverage = non-null samples / records; sentinels decode to null, never to values</text>
+</svg>

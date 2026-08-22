@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 290" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" width="960" height="290">
+<rect width="960" height="290" rx="12" fill="#fcfcfb" stroke="rgba(11,11,11,0.10)"/>
+<defs><pattern id="hatchBlue" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#e6effb"/><line x1="0" y1="0" x2="0" y2="7" stroke="#2a78d6" stroke-width="1.6"/></pattern><pattern id="hatchOrange" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fdeee7"/><line x1="0" y1="0" x2="0" y2="7" stroke="#eb6834" stroke-width="1.6"/></pattern><pattern id="hatchRed" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#fbe9e9"/><line x1="0" y1="0" x2="0" y2="7" stroke="#d03b3b" stroke-width="1.6"/></pattern><pattern id="hatchAqua" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="7" height="7" fill="#e4f5ee"/><line x1="0" y1="0" x2="0" y2="7" stroke="#1baf7a" stroke-width="1.6"/></pattern></defs>
+<text x="20" y="30" font-size="16" fill="#0b0b0b" text-anchor="start" font-weight="600" >One race, five sessions, two button mistakes</text>
+<text x="20" y="50" font-size="12.5" fill="#898781" text-anchor="start" font-weight="normal" >IRONMAN 70.3 Venice-Jesolo · 3 May 2026 · Suunto Race 2 · times are local (UTC+2)</text>
+<rect x="30.0" y="118" width="25.1" height="44" rx="3" fill="#2a78d6"/>
+<rect x="56.6" y="118" width="84.4" height="44" rx="3" fill="url(#hatchBlue)"/>
+<rect x="142.7" y="118" width="19.3" height="44" rx="3" fill="#d6d5cf"/>
+<rect x="163.5" y="118" width="2.0" height="44" rx="3" fill="url(#hatchOrange)"/>
+<rect x="167.0" y="118" width="455.5" height="44" rx="3" fill="#eb6834"/>
+<rect x="624.0" y="118" width="2.1" height="44" rx="3" fill="#d6d5cf"/>
+<rect x="627.7" y="118" width="300.8" height="44" rx="3" fill="#1baf7a"/>
+<text x="30" y="85" font-size="12.5" fill="#0b0b0b" text-anchor="start" font-weight="600" >watch paused — still swimming</text>
+<text x="30" y="100" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal" >27:47 lost to one button press</text>
+<text x="395.47046703296706" y="85" font-size="12.5" fill="#0b0b0b" text-anchor="middle" font-weight="600" >bike</text>
+<text x="395.47046703296706" y="100" font-size="11.5" fill="#52514e" text-anchor="middle" font-weight="normal" >2:27:51 · 88.9 km · 36.2 km/h</text>
+<text x="778.8410027472528" y="85" font-size="12.5" fill="#0b0b0b" text-anchor="middle" font-weight="600" >run</text>
+<text x="778.8410027472528" y="100" font-size="11.5" fill="#52514e" text-anchor="middle" font-weight="normal" >1:37:49 · 20.5 km · 4:47/km</text>
+<line x1="43.3" y1="165" x2="43.3" y2="178" stroke="#c3c2b7" stroke-width="1"/>
+<text x="30" y="192" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal" >swim — 8:37 · 519 m recorded before the pause</text>
+<line x1="154.8" y1="165" x2="154.8" y2="210" stroke="#c3c2b7" stroke-width="1"/>
+<text x="40" y="224" font-size="11.5" fill="#52514e" text-anchor="start" font-weight="normal" >“T1” 7:51 — the last 1:08 of it at 32 km/h: already on the bike, button not yet pressed</text>
+<line x1="625.8" y1="165" x2="625.8" y2="178" stroke="#c3c2b7" stroke-width="1"/>
+<text x="625.8276098901099" y="192" font-size="11.5" fill="#52514e" text-anchor="middle" font-weight="normal" >T2 1:10</text>
+<line x1="210.0" y1="162" x2="210.0" y2="166" stroke="#c3c2b7"/>
+<text x="209.97939560439562" y="254" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >09:00</text>
+<line x1="395.4" y1="162" x2="395.4" y2="166" stroke="#c3c2b7"/>
+<text x="395.41895604395603" y="254" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >10:00</text>
+<line x1="580.9" y1="162" x2="580.9" y2="166" stroke="#c3c2b7"/>
+<text x="580.8585164835165" y="254" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >11:00</text>
+<line x1="766.3" y1="162" x2="766.3" y2="166" stroke="#c3c2b7"/>
+<text x="766.2980769230769" y="254" font-size="11" fill="#898781" text-anchor="middle" font-weight="normal" >12:00</text>
+<text x="20" y="276" font-size="11" fill="#898781" text-anchor="start" font-weight="normal" >parsed with chiptime · gap classified as manual_stop from the event log, not guessed</text>
+</svg>
