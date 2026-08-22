@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { divmod, floorDiv, pyFixed, pyFloatStr, pyRound, pyRoundN, pySum } from "../src/numeric.js";
+import {
+  divmod,
+  floorDiv,
+  pyFixed,
+  pyFloatStr,
+  pyG,
+  pyRound,
+  pyRoundN,
+  pySum,
+} from "../src/numeric.js";
 import { formatVectors, numericVectors } from "./vectors.js";
 
 describe("pyRound — round-half-to-even", () => {
@@ -113,5 +122,20 @@ describe("pyFixed and pyFloatStr — formatting, differential against CPython", 
     expect(pyFixed(0.125, 2)).toBe("0.12");
     expect(String(55)).toBe("55");
     expect(pyFloatStr(55.0)).toBe("55.0");
+  });
+});
+
+describe("pyG — Python's general format, differential against CPython", () => {
+  for (const v of formatVectors.pyG) {
+    it(`f"{${v.x}:g}" === ${JSON.stringify(v.text)}`, () => {
+      expect(pyG(v.x)).toBe(v.text);
+    });
+  }
+
+  it("is not String()", () => {
+    expect(String(1234.5678)).toBe("1234.5678");
+    expect(pyG(1234.5678)).toBe("1234.57");
+    expect(String(1e-5)).toBe("0.00001");
+    expect(pyG(1e-5)).toBe("1e-05");
   });
 });

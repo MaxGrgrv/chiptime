@@ -83,9 +83,14 @@
       "types": "./dist/esm/sha256.d.ts",
       "import": "./dist/esm/sha256.js",
       "require": "./dist/cjs/sha256.js"
+    },
+    "./cli": {
+      "types": "./dist/esm/cli.d.ts",
+      "import": "./dist/esm/cli.js",
+      "require": "./dist/cjs/cli.js"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": ["dist", "bin", "README.md", "LICENSE"],
   "sideEffects": false,
   "engines": {
     "node": ">=20"
@@ -114,5 +119,8 @@
     "smoke": "bash scripts/smoke.sh",
     "check": "npm run lint && npm run typecheck && npm run guards && npm test",
     "determinism": "npm run build && node scripts/determinism.mjs"
+  },
+  "bin": {
+    "chiptime": "./bin/chiptime.mjs"
   }
 }

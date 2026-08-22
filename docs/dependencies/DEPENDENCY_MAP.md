@@ -42,6 +42,7 @@ Compact form (full dependency sections live in each spec; every edge verified bi
 | F34 js decoder (M3) | F31 (numeric), F32 (profile), F33 (frames/errors/message), F3/F6/F22 as reference | F35+ (parse, semantics, everything above) |
 | F35 js intake/inflate/parse/result (M3) | F31–F34, F4/F5/F11/F15 as reference, ADR-0002 | F36+ (semantics fills the activity block) |
 | F36 js semantics (M3) | F31–F35, F7–F10/F15/F17/F21 as reference, ADR-0005 | F37 (CLI), F38+ |
+| F37 js CLI (M3, npm 0.1.0) | F31–F36, F11 as reference | F38+ (each verb extends the CLI) |
 
 ## Module Dependencies
 
@@ -71,6 +72,7 @@ numeric ─→ (leaf; INTERNAL — absent from the exports map, no Python analog
 api ─→ intake, frames, decode, semantics/build, result, errors, numeric, sha256
 semantics/build ─→ decode(epoch), model, message, errors, numeric, semantics/{timers,gaps,reconcile,plausibility}
 model ─→ (leaf)
+cli ─→ api, errors, numeric, result, model, node:fs  (the ONLY module importing a Node builtin)
 intake ─→ inflate, errors
 result ─→ canonical, errors, message
 inflate, sha256 ─→ (leaves; no Python twin)

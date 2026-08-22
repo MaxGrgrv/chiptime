@@ -60,8 +60,12 @@ export type ErrorKind =
 
 def table(name: str, mapping: dict[str, str], doc: str) -> str:
     lines = [f"\n/** {doc} */", f"export const {name}: Readonly<Record<string, string>> = {{"]
-    for key in sorted(mapping):
-        lines.append(f"  {json.dumps(key)}: {json.dumps(mapping[key])},")
+    # SOURCE order, not sorted. Python dicts preserve insertion order and
+    # `chiptime codes` prints them in it, so sorting here would make the CLI's
+    # output diverge -- which is exactly how it was caught. Source order is just as
+    # deterministic; it is the declaration order in errors.py.
+    for key, value in mapping.items():
+        lines.append(f"  {json.dumps(key)}: {json.dumps(value)},")
     lines.append("};")
     return "\n".join(lines)
 

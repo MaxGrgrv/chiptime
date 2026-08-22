@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+"""CLI parity: stdout bytes and exit codes, across every corpus case (F37).
+
+Run from repo root:  uv run --project python python scripts/check_cli_parity.py
+
+The CLI is the agent contract — `docs/for-agents.md` publishes the exit codes and
+promises `--json` emits canonical bytes on stdout. So the comparison is the whole
+of stdout, byte for byte, plus the exit code, for every invocation.
+
+Both sides run in-process (Python calls `cli.main`, TypeScript calls the exported
+`main` with injected writers) rather than spawning a process per case: 72 cases x
+several invocations is thousands of spawns, and the thing under test is the output,
+not the shell plumbing.
+
+Exit 0 = every invocation agrees.
+"""
+
+from __future__ import annotations
+
+import contextlib
+import io
+import json
+import pathlib
+import subprocess
+import sys
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "python" / "src"))
+
+from chiptime.cli import main as py_main  # isort:skip
+
+# Invocation shapes, applied to every corpus case.
+INVOCATIONS = [
+    ["parse", "{file}"],
+    ["parse", "{file}", "--json"],
+    ["parse", "{file}", "--mode", "forensic"],
+    ["parse", "{file}", "--strip-pii"],
+    ["parse", "{file}", "--no-unknown"],
+    ["inspect", "{file}"],
+    ["inspect", "{file}", "--limit", "5"],
+]
+# Invocations with no file argument, run once.
+GLOBAL_INVOCATIONS = [["codes"], ["nosuchcommand"], []]
+
+RUNNER_JS = """
+import { main } from "./cli.js";
+
+const cases = JSON.parse(process.argv[2]);
+const out = {};
+for (const [key, argv] of cases) {
+  const lines = [];
+  const code = main(argv, (s) => lines.push(s), () => {});
+  out[key] = { code, stdout: lines.length ? `${lines.join("\\n")}\\n` : "" };
+}
+process.stdout.write(JSON.stringify(out));
+"""
+
+
+def python_side(cases: list[tuple[str, list[str]]]) -> dict[str, dict]:
+    out: dict[str, dict] = {}
+    for key, argv in cases:
+        # A TextIOWrapper over BytesIO, because `parse --json` writes canonical bytes
+        # to sys.stdout.buffer -- a StringIO has no .buffer and the capture would
+        # crash on exactly the invocation that matters most.
+        raw = io.BytesIO()
+        buf = io.TextIOWrapper(raw, encoding="utf-8", newline="")
+        err = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(err):
+                code = py_main(argv)
+        except SystemExit as exc:
+            code = int(exc.code or 0)
+        buf.flush()
+        out[key] = {"code": code, "stdout": raw.getvalue().decode("utf-8")}
+    return out
+
+
+def typescript_side(cases: list[tuple[str, list[str]]]) -> dict[str, dict]:
+    js_dir = ROOT / "js"
+    subprocess.run(["npm", "run", "build"], cwd=js_dir, check=True, capture_output=True)
+    runner = js_dir / "dist" / "esm" / "_clirun.mjs"
+    runner.write_text(RUNNER_JS, encoding="utf-8")
+    payload = json.dumps([[k, a] for k, a in cases])
+    try:
+        res = subprocess.run(
+            ["node", str(runner), payload], cwd=js_dir, capture_output=True, text=True
+        )
+    finally:
+        runner.unlink(missing_ok=True)
+    if res.returncode != 0:
+        raise SystemExit(f"running the TypeScript CLI failed:\n{res.stderr.strip()}")
+    return json.loads(res.stdout)
+
+
+def first_difference(a: str, b: str) -> str:
+    for i, (ca, cb) in enumerate(zip(a, b, strict=False)):
+        if ca != cb:
+            lo = max(0, i - 60)
+            return (
+                f"at char {i}:\n      python:     ...{a[lo : i + 60]!r}"
+                f"\n      typescript: ...{b[lo : i + 60]!r}"
+            )
+    return f"one is a prefix of the other (python {len(a)}, typescript {len(b)})"
+
+
+def main() -> None:
+    corpus = ROOT / "corpus" / "cases"
+    cases: list[tuple[str, list[str]]] = []
+    for path in sorted(corpus.glob("*/*/input.fit")):
+        name = f"{path.parent.parent.name}/{path.parent.name}"
+        for inv in INVOCATIONS:
+            argv = [a.replace("{file}", str(path)) for a in inv]
+            cases.append((f"{name}::{' '.join(inv)}", argv))
+    for inv in GLOBAL_INVOCATIONS:
+        cases.append((f"<global>::{' '.join(inv) or '(no args)'}", list(inv)))
+
+    py = python_side(cases)
+    ts = typescript_side(cases)
+
+    failures: list[tuple[str, str]] = []
+    for key, _ in cases:
+        p_res = py[key]
+        t_res = ts.get(key)
+        if t_res is None:
+            failures.append((key, "missing from the TypeScript run"))
+            continue
+        if p_res["code"] != t_res["code"]:
+            failures.append((key, f"exit code python={p_res['code']} typescript={t_res['code']}"))
+            continue
+        if p_res["stdout"] != t_res["stdout"]:
+            failures.append((key, first_difference(p_res["stdout"], t_res["stdout"])))
+
+    if failures:
+        print(f"cli parity: {len(failures)} of {len(cases)} invocation(s) diverged")
+        for key, where in failures[:6]:
+            print(f"\n  {key}\n    {where}")
+        if len(failures) > 6:
+            print(f"\n  ... and {len(failures) - 6} more")
+        raise SystemExit(1)
+
+    print(f"cli parity: ok -- {len(cases)} invocations, stdout and exit codes identical")
+
+
+if __name__ == "__main__":
+    main()

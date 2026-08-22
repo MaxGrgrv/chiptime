@@ -69,7 +69,7 @@ Plan: [m3-typescript-plan.md](m3-typescript-plan.md) · contract: [ADR-0009](arc
 | F34 Decoder — frames to messages (TS) | DONE | [spec](features/f34-js-decoder.md) | [impl](implementation/f34-js-decoder.md) |
 | F35 Intake, inflate, recovery, `parse()`, result (TS) | DONE | [spec](features/f35-js-intake-parse.md) | [impl](implementation/f35-js-intake-parse.md) |
 | F36 Semantics — full corpus parity | DONE | [spec](features/f36-js-semantics.md) | [impl](implementation/f36-js-semantics.md) |
-| F37 CLI + exit codes (npm 0.1.0) | PLANNED | — | — |
+| F37 CLI + exit codes (npm 0.1.0) | DONE | [spec](features/f37-js-cli.md) | [impl](implementation/f37-js-cli.md) |
 | F38 Encoder, repair, validate (npm 0.2.0) | PLANNED | — | — |
 | F39 Analytics layer + analyze (npm 0.4.0) | PLANNED | — | — |
 | F40 `edit` (npm 0.5.0) | PLANNED | — | — |

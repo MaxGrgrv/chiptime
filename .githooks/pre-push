@@ -35,6 +35,8 @@ if [ -d js/node_modules ]; then
   uv run --project python python scripts/check_message_parity.py
   echo "pre-push gate: parse() parity across the corpus"
   uv run --project python python scripts/check_parse_parity.py
+  echo "pre-push gate: CLI parity (stdout + exit codes)"
+  uv run --project python python scripts/check_cli_parity.py
   echo "pre-push gate: js lint + types + guards + tests"
   (cd js && npm run check)
   echo "pre-push gate: js determinism (cross-process, cross-language)"

@@ -59,7 +59,7 @@ Module-for-module with the table above, so a Python change has an obvious TypeSc
 | `decode.ts` | decode | Frames → messages: base types, scale/offset, sentinels, strings, timestamps, dev fields, components | F34 ✅ |
 | `intake.ts`, `inflate.ts`, `sha256.ts`, `result.ts` | intake / output | Unwrap, sniff, hash, shape `chiptime_schema: 1` | F35 ✅ |
 | `api.ts` `parse()` | api | Modes, chained parts, PII, recovery report | F35 ✅ |
-| `cli.ts` | cli | `parse`/`inspect`/`codes`, exit codes | F37 |
+| `cli.ts` | cli | `parse`/`inspect`/`codes`, exit codes; the only module importing `node:fs` | F37 ✅ |
 | `model.ts`, `semantics/*` | semantics | The canonical model, timers, gaps, reconcile, GPS gate | F36 ✅ |
 | `encode.ts`, `repair.ts`, `validate.ts` | encode / repair | Writer, salvage, platform profiles | F36 |
 | `metrics/*` | analytics (optional) | The optional layer; never imported by core | F37 |

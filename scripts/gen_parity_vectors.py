@@ -475,6 +475,27 @@ def format_vectors() -> None:
                 {"x": v, "n": n, "text": f"{v:.{n}f}"} for v in fixed_vals for n in (0, 1, 2, 3)
             ],
             "pyFloatStr": [{"x": v, "text": str(v)} for v in fixed_vals],
+            "pyG": [
+                {"x": v, "text": f"{v:g}", "signed": f"{v:+g}"}
+                for v in [
+                    *fixed_vals,
+                    1234.5678,
+                    0.000012345,
+                    1e-5,
+                    1e20,
+                    123456789.0,
+                    1000000.0,
+                    999999.0,
+                    0.1,
+                    -0.1,
+                    1e-4,
+                    1.5e-5,
+                    2.0,
+                    -3.75,
+                    1e6,
+                    1e7,
+                ]
+            ],
         },
     )
 

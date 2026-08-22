@@ -44,9 +44,13 @@ JS
 node esm.mjs
 node cjs.cjs
 
-# The package must not reach for an environment it may not have.
-if grep -rn 'require("node:\|from "node:' "$work/node_modules/chiptime/dist"; then
-  echo "smoke: dist reaches for a node: builtin — the browser build would break" >&2
+# The library must not reach for an environment it may not have. The CLI may and
+# does — a command line implies a filesystem — so it is excluded by name. The
+# invariant under test is that importing `chiptime` pulls in no Node builtin, which
+# the ESM/CJS imports above already exercised.
+if grep -rn 'require("node:\|from "node:' "$work/node_modules/chiptime/dist" \
+     --exclude='cli.js' --exclude='cli.d.ts'; then
+  echo "smoke: the library reaches for a node: builtin — the browser build would break" >&2
   exit 1
 fi
-echo "smoke: ok (esm + cjs, no node: imports)"
+echo "smoke: ok (esm + cjs, no node: imports outside the CLI)"

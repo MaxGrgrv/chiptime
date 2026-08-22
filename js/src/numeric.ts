@@ -189,3 +189,43 @@ export function pySum(values: readonly number[]): number {
   }
   return result + c;
 }
+
+/**
+ * `f"{x:g}"` — Python's general format, which JavaScript has no equivalent for.
+ *
+ * Follows C's `%g`: with precision P (6 by default), if `P > X >= -4` where X is
+ * the decimal exponent, format as fixed with `P-1-X` decimals; otherwise as
+ * exponential with `P-1`. Then strip trailing zeros and a trailing point.
+ *
+ * `String(x)` is not close: `String(1234.5678)` is `"1234.5678"` where `f"{x:g}"`
+ * is `"1234.57"`, and `String(1e-5)` is `"0.00001"` where `:g` gives `"1e-05"`.
+ */
+export function pyG(x: number, precision = 6): string {
+  if (Number.isNaN(x)) return "nan";
+  if (!Number.isFinite(x)) return x > 0 ? "inf" : "-inf";
+  const p = precision === 0 ? 1 : precision;
+  if (x === 0) return Object.is(x, -0) ? "-0" : "0";
+
+  // The exponent as %e would render it.
+  const exponent = Number(
+    Math.abs(x)
+      .toExponential(p - 1)
+      .split("e")[1],
+  );
+  let body: string;
+  if (exponent >= -4 && exponent < p) {
+    body = Math.abs(x).toFixed(Math.max(0, p - 1 - exponent));
+    if (body.includes(".")) body = body.replace(/0+$/, "").replace(/\.$/, "");
+  } else {
+    const [mantissa, exp] = Math.abs(x)
+      .toExponential(p - 1)
+      .split("e") as [string, string];
+    let m = mantissa;
+    if (m.includes(".")) m = m.replace(/0+$/, "").replace(/\.$/, "");
+    // Python pads the exponent to at least two digits: 1e-05, not 1e-5.
+    const sign = exp.startsWith("-") ? "-" : "+";
+    const digits = exp.replace(/^[+-]/, "").padStart(2, "0");
+    body = `${m}e${sign}${digits}`;
+  }
+  return (x < 0 ? "-" : "") + body;
+}

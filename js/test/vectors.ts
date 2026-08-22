@@ -66,6 +66,7 @@ export interface FormatVectors {
   pySum: { values: number[]; sum: number }[];
   pyFixed: { x: number; n: number; text: string }[];
   pyFloatStr: { x: number; text: string }[];
+  pyG: { x: number; text: string; signed: string }[];
 }
 export interface NumericVectors {
   pyRound: [number, number][];
