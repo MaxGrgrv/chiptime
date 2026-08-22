@@ -32,12 +32,13 @@ import {
 } from "./metrics/index.js";
 import type { Session } from "./model.js";
 import { pyFixed, pyFloatStr, pyG } from "./numeric.js";
+import { type PrivacyReport, reveal, scrub } from "./privacy.js";
 import { NotRepairableError, repair } from "./repair.js";
 import type { ParseResult } from "./result.js";
 import { trim } from "./trim.js";
 import { type Platform, validate } from "./validate.js";
 
-const USAGE = `usage: chiptime [-h] {parse,inspect,repair,validate,edit,trim,analyze,codes} ...
+const USAGE = `usage: chiptime [-h] {parse,inspect,repair,validate,edit,trim,reveal,scrub,analyze,codes} ...
 
 Recovery-grade FIT file processing.
 
@@ -50,6 +51,8 @@ positional arguments:
     analyze             per-sport workout report + insights (optional layer)
     edit                change what a file says about itself (metadata)
     trim                crop an activity and rebuild its totals
+    reveal              what does this file disclose about you?
+    scrub               remove personal data and write a clean file
     codes               print the error/warning/provenance code registry
 `;
 
@@ -948,6 +951,188 @@ function cmdTrim(rawArgv: string[], out: (s: string) => void, err: (s: string) =
   return 0;
 }
 
+/** `json.dumps(report.to_dict(), sort_keys=True, separators=(",",":"))` — the
+ * coarse coordinates are Python floats, so they need `pyFloatStr` ("52.0"). */
+function revealJson(report: PrivacyReport): string {
+  const coarse = (p: [number, number] | null): string =>
+    p === null ? "null" : `[${pyFloatStr(p[0])},${pyFloatStr(p[1])}]`;
+  const findings = report.findings
+    .map(
+      (f) =>
+        `{"category":${JSON.stringify(f.category)},"count":${f.count},` +
+        `"detail":${JSON.stringify(f.detail)},"field":${f.field === null ? "null" : JSON.stringify(f.field)},` +
+        `"message":${JSON.stringify(f.message)}}`,
+    )
+    .join(",");
+  return (
+    `{"clean_categories":[${report.cleanCategories.map((c) => JSON.stringify(c)).join(",")}],` +
+    `"end_coarse":${coarse(report.endCoarse)},"findings":[${findings}],` +
+    `"positions_present":${report.positionsPresent},"start_coarse":${coarse(report.startCoarse)}}`
+  );
+}
+
+function cmdReveal(argv: string[], out: (s: string) => void, err: (s: string) => void): number {
+  let json = false;
+  const positional: string[] = [];
+  for (const a of argv) {
+    if (a === "--json") json = true;
+    else if (a.startsWith("-")) {
+      err(USAGE.trimEnd());
+      err(`error: unrecognized arguments: ${a}`);
+      return 64;
+    } else positional.push(a);
+  }
+  if (positional.length !== 1) {
+    err(USAGE.trimEnd());
+    err("error: the following arguments are required: file");
+    return 64;
+  }
+
+  let data: Uint8Array;
+  try {
+    data = readFileBytes(positional[0] as string);
+  } catch (e) {
+    err(`cannot read ${positional[0]}: ${(e as Error).message}`);
+    return 64;
+  }
+  let report: PrivacyReport;
+  try {
+    report = reveal(data);
+  } catch (e) {
+    if (e instanceof FitError) {
+      err(`${e.code}: ${e.detail}`);
+      return e.code === "NOT_FIT_FORMAT" || e.code === "FIT_TOO_SMALL" ? 4 : 3;
+    }
+    throw e;
+  }
+
+  if (json) {
+    out(revealJson(report));
+    return 0;
+  }
+
+  if (report.findings.length === 0) {
+    out("this file discloses nothing chiptime recognises as personal");
+    return 0;
+  }
+  out("this file discloses:");
+  for (const finding of report.findings) out(`  [${finding.category}] ${finding.detail}`);
+  const start = report.startCoarse;
+  const end = report.endCoarse;
+  if (start !== null && end !== null) {
+    out(
+      `  route start ≈ ${pyFloatStr(start[0])}, ${pyFloatStr(start[1])} · end ≈ ${pyFloatStr(end[0])}, ${pyFloatStr(end[1])}   (rounded to ~1 km so this report is safe to share)`,
+    );
+  }
+  if (report.cleanCategories.length > 0) out(`  clean: ${report.cleanCategories.join(", ")}`);
+  out("");
+  out("remove it with: chiptime scrub FILE -o clean.fit --gps-radius 500");
+  return 0;
+}
+
+function cmdScrub(argv: string[], out: (s: string) => void, err: (s: string) => void): number {
+  let mode: Mode = "lenient";
+  let output: string | null = null;
+  let gpsRadius: number | null = null;
+  let dropAllGps = false;
+  let keepIdentity = false;
+  let keepSerials = false;
+  let keepBodyMetrics = false;
+  const positional: string[] = [];
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i] as string;
+    if (a === "--mode") {
+      const v = argv[++i];
+      if (v !== "strict" && v !== "lenient" && v !== "forensic") {
+        err(USAGE.trimEnd());
+        err(
+          `error: argument --mode: invalid choice: '${v ?? ""}' (choose from 'strict', 'lenient', 'forensic')`,
+        );
+        return 64;
+      }
+      mode = v;
+    } else if (a === "-o" || a === "--output") {
+      const v = argv[++i];
+      if (v === undefined) {
+        err(USAGE.trimEnd());
+        err(`error: argument ${a}: expected one argument`);
+        return 64;
+      }
+      output = v;
+    } else if (a === "--gps-radius") {
+      const v = argv[++i];
+      const n = Number(v);
+      if (v === undefined || v.trim() === "" || Number.isNaN(n)) {
+        err(USAGE.trimEnd());
+        err(`error: argument --gps-radius: invalid float value: '${v ?? ""}'`);
+        return 64;
+      }
+      gpsRadius = n;
+    } else if (a === "--drop-all-gps") {
+      dropAllGps = true;
+    } else if (a === "--keep-identity") {
+      keepIdentity = true;
+    } else if (a === "--keep-serials") {
+      keepSerials = true;
+    } else if (a === "--keep-body-metrics") {
+      keepBodyMetrics = true;
+    } else if (a.startsWith("-")) {
+      err(USAGE.trimEnd());
+      err(`error: unrecognized arguments: ${a}`);
+      return 64;
+    } else {
+      positional.push(a);
+    }
+  }
+  if (positional.length !== 1 || output === null) {
+    err(USAGE.trimEnd());
+    err(
+      `error: the following arguments are required: ${positional.length !== 1 ? "file" : "-o/--output"}`,
+    );
+    return 64;
+  }
+
+  let data: Uint8Array;
+  try {
+    data = readFileBytes(positional[0] as string);
+  } catch (e) {
+    err(`cannot read ${positional[0]}: ${(e as Error).message}`);
+    return 64;
+  }
+  let result: ReturnType<typeof scrub>;
+  try {
+    result = scrub(data, {
+      identity: !keepIdentity,
+      serials: !keepSerials,
+      bodyMetrics: !keepBodyMetrics,
+      gpsRadiusM: gpsRadius,
+      dropAllGps,
+      mode,
+    });
+  } catch (e) {
+    if (e instanceof FitError) {
+      err(`${e.code}: ${e.detail}`);
+      if (e.suggestion) err(`suggestion: ${e.suggestion}`);
+      return e.code === "NOT_FIT_FORMAT" || e.code === "FIT_TOO_SMALL" ? 4 : 3;
+    }
+    throw e;
+  }
+
+  writeFileBytes(output, result.data);
+  if (result.provenance.length > 0) {
+    for (const entry of result.provenance) out(`${entry.code}: ${entry.detail}`);
+  } else {
+    out("nothing personal found to remove; the file was re-encoded unchanged");
+  }
+  for (const warn of result.warnings) err(`${warn.code}: ${warn.detail}`);
+  out(`wrote ${output} (${result.data.length} bytes)`);
+  if (!result.outputStrictOk) {
+    err("warning: output does not parse strictly; inspect it");
+    return 2;
+  }
+  return 0;
+}
+
 /**
  * Run the CLI. `out` and `err` are injected so the parity harness can capture
  * output without spawning a process per case.
@@ -974,11 +1159,13 @@ export function main(
   if (command === "validate") return cmdValidate(rest, out, err);
   if (command === "edit") return cmdEdit(rest, out, err);
   if (command === "trim") return cmdTrim(rest, out, err);
+  if (command === "reveal") return cmdReveal(rest, out, err);
+  if (command === "scrub") return cmdScrub(rest, out, err);
   if (command === "analyze") return cmdAnalyze(rest, out, err);
   if (command === "codes") return cmdCodes(out);
   err(USAGE.trimEnd());
   err(
-    `error: argument command: invalid choice: '${command}' (choose from 'parse', 'inspect', 'repair', 'validate', 'edit', 'trim', 'analyze', 'codes')`,
+    `error: argument command: invalid choice: '${command}' (choose from 'parse', 'inspect', 'repair', 'validate', 'edit', 'trim', 'reveal', 'scrub', 'analyze', 'codes')`,
   );
   return 64;
 }
