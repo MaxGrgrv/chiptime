@@ -34,9 +34,10 @@ import type { Session } from "./model.js";
 import { pyFixed, pyFloatStr, pyG } from "./numeric.js";
 import { NotRepairableError, repair } from "./repair.js";
 import type { ParseResult } from "./result.js";
+import { trim } from "./trim.js";
 import { type Platform, validate } from "./validate.js";
 
-const USAGE = `usage: chiptime [-h] {parse,inspect,repair,validate,edit,analyze,codes} ...
+const USAGE = `usage: chiptime [-h] {parse,inspect,repair,validate,edit,trim,analyze,codes} ...
 
 Recovery-grade FIT file processing.
 
@@ -48,6 +49,7 @@ positional arguments:
     validate            check platform acceptance (heuristic)
     analyze             per-sport workout report + insights (optional layer)
     edit                change what a file says about itself (metadata)
+    trim                crop an activity and rebuild its totals
     codes               print the error/warning/provenance code registry
 `;
 
@@ -825,6 +827,127 @@ function cmdEdit(argv: string[], out: (s: string) => void, err: (s: string) => v
   return 0;
 }
 
+// argparse's negative-number heuristic: `-10` may be an option value, `-10m` may not.
+const NEGATIVE_NUMBER = /^-\d+$|^-\d*\.\d+$/;
+
+function cmdTrim(rawArgv: string[], out: (s: string) => void, err: (s: string) => void): number {
+  let mode: Mode = "lenient";
+  let output: string | null = null;
+  let after: string | null = null;
+  let before: string | null = null;
+  const positional: string[] = [];
+  // argparse splits `--opt=value` and, in that form only, exempts the value from
+  // the option-looking-token refusal: a relative bound like `-10m` needs `=`.
+  const argv: string[] = [];
+  const inlineValue = new Set<number>();
+  for (const a of rawArgv) {
+    if (a.startsWith("--") && a.includes("=")) {
+      const at = a.indexOf("=");
+      argv.push(a.slice(0, at));
+      inlineValue.add(argv.length);
+      argv.push(a.slice(at + 1));
+    } else {
+      argv.push(a);
+    }
+  }
+  const takeBound = (flag: string, v: string | undefined, at: number): string | false => {
+    // argparse refuses an option-looking token as a value ("--before -10m" fails;
+    // "--before=-10m" or a plain negative number works).
+    if (
+      v === undefined ||
+      (!inlineValue.has(at) && v.startsWith("-") && !NEGATIVE_NUMBER.test(v))
+    ) {
+      err(USAGE.trimEnd());
+      err(`error: argument ${flag}: expected one argument`);
+      return false;
+    }
+    return v;
+  };
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i] as string;
+    if (a === "--mode") {
+      const v = argv[++i];
+      if (v !== "strict" && v !== "lenient" && v !== "forensic") {
+        err(USAGE.trimEnd());
+        err(
+          `error: argument --mode: invalid choice: '${v ?? ""}' (choose from 'strict', 'lenient', 'forensic')`,
+        );
+        return 64;
+      }
+      mode = v;
+    } else if (a === "-o" || a === "--output") {
+      const v = argv[++i];
+      if (v === undefined) {
+        err(USAGE.trimEnd());
+        err(`error: argument ${a}: expected one argument`);
+        return 64;
+      }
+      output = v;
+    } else if (a === "--after") {
+      const v = takeBound(a, argv[++i], i);
+      if (v === false) return 64;
+      after = v;
+    } else if (a === "--before") {
+      const v = takeBound(a, argv[++i], i);
+      if (v === false) return 64;
+      before = v;
+    } else if (a.startsWith("-") && !NEGATIVE_NUMBER.test(a)) {
+      err(USAGE.trimEnd());
+      err(`error: unrecognized arguments: ${a}`);
+      return 64;
+    } else {
+      positional.push(a);
+    }
+  }
+  if (positional.length !== 1 || output === null) {
+    err(USAGE.trimEnd());
+    err(
+      `error: the following arguments are required: ${positional.length !== 1 ? "file" : "-o/--output"}`,
+    );
+    return 64;
+  }
+  if (!after && !before) {
+    err("error: trim requires --after and/or --before");
+    err("suggestion: --after '+5m' cuts the first five minutes");
+    return 64;
+  }
+
+  let data: Uint8Array;
+  try {
+    data = readFileBytes(positional[0] as string);
+  } catch (e) {
+    err(`cannot read ${positional[0]}: ${(e as Error).message}`);
+    return 64;
+  }
+  let result: ReturnType<typeof trim>;
+  try {
+    result = trim(data, { after, before, mode });
+  } catch (e) {
+    if (e instanceof NotFitError) {
+      err(`${e.code}: ${e.detail}`);
+      return 4;
+    }
+    if (e instanceof FitError) {
+      err(`${e.code}: ${e.detail}`);
+      if (e.suggestion) err(`suggestion: ${e.suggestion}`);
+      return 3;
+    }
+    throw e;
+  }
+
+  writeFileBytes(output, result.data);
+  for (const entry of result.provenance) out(`${entry.code}: ${entry.detail}`);
+  out(
+    `wrote ${output} (${result.data.length} bytes; ` +
+      `${result.recordsKept} records kept, ${result.recordsDropped} dropped)`,
+  );
+  if (!result.outputStrictOk) {
+    err("warning: output does not parse strictly; inspect before uploading");
+    return 2;
+  }
+  return 0;
+}
+
 /**
  * Run the CLI. `out` and `err` are injected so the parity harness can capture
  * output without spawning a process per case.
@@ -850,11 +973,12 @@ export function main(
   if (command === "repair") return cmdRepair(rest, out, err);
   if (command === "validate") return cmdValidate(rest, out, err);
   if (command === "edit") return cmdEdit(rest, out, err);
+  if (command === "trim") return cmdTrim(rest, out, err);
   if (command === "analyze") return cmdAnalyze(rest, out, err);
   if (command === "codes") return cmdCodes(out);
   err(USAGE.trimEnd());
   err(
-    `error: argument command: invalid choice: '${command}' (choose from 'parse', 'inspect', 'repair', 'validate', 'edit', 'analyze', 'codes')`,
+    `error: argument command: invalid choice: '${command}' (choose from 'parse', 'inspect', 'repair', 'validate', 'edit', 'trim', 'analyze', 'codes')`,
   );
   return 64;
 }

@@ -33,3 +33,5 @@ export {
 } from "./errors.js";
 export type { EditOptions, EditResult } from "./edit.js";
 export { EditError, edit } from "./edit.js";
+export type { TrimOptions, TrimResult } from "./trim.js";
+export { TrimError, trim } from "./trim.js";

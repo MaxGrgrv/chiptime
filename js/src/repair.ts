@@ -192,12 +192,15 @@ function bounds(session: Session, msgs: Message[]): [number, number] {
   );
 }
 
-function summaryMessage(
+/** Shared with `trim.ts` (Python: `from chiptime.repair import _summary_message`). */
+export function summaryMessage(
   gnum: number,
   s: Session,
   firstT: number,
   lastT: number,
   lap: boolean,
+  firstLapIndex = 0,
+  numLaps = 1,
 ): EncodableMessage {
   const values: Record<string, unknown> = {
     timestamp: lastT,
@@ -229,8 +232,8 @@ function summaryMessage(
     if (avgSpeed !== undefined) values.avg_speed = avgSpeed;
     const maxSpeed = der.max.get("speed");
     if (maxSpeed !== undefined) values.max_speed = maxSpeed;
-    values.first_lap_index = 0;
-    values.num_laps = 1;
+    values.first_lap_index = firstLapIndex;
+    values.num_laps = numLaps;
   }
   return encodableFromProfile(gnum, values);
 }
