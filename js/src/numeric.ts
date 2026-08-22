@@ -118,3 +118,19 @@ function decimalString(scaled: bigint, n: number): string {
   const digits = scaled.toString().padStart(n + 1, "0");
   return `${digits.slice(0, -n)}.${digits.slice(-n)}`;
 }
+
+/**
+ * `str(x)` for a Python **float**.
+ *
+ * Python prints an integral float with its fractional part — `str(55.0)` is
+ * `"55.0"` — while JavaScript's `String(55)` gives `"55"`, because it has no
+ * float/int distinction. The difference is invisible in canonical JSON (ES6 number
+ * formatting drops the `.0` on both sides) but very visible in the provenance and
+ * diagnostic *strings* that interpolate these values.
+ *
+ * Only for values Python holds as floats. Integers must not go through this.
+ */
+export function pyFloatStr(x: number): string {
+  if (!Number.isFinite(x)) return x > 0 ? "inf" : Number.isNaN(x) ? "nan" : "-inf";
+  return Number.isInteger(x) ? `${x}.0` : String(x);
+}
