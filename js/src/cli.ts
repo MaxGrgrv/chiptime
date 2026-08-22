@@ -22,13 +22,20 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { iterFrames, parse } from "./api.js";
 import { ERROR_CODES, FitError, NotFitError, PROVENANCE_CODES, WARNING_CODES } from "./errors.js";
+import {
+  type AthleteSettings,
+  type WorkoutReport,
+  analyze,
+  dumpsReportJson,
+  reportToPlain,
+} from "./metrics/index.js";
 import type { Session } from "./model.js";
 import { pyFixed, pyFloatStr, pyG } from "./numeric.js";
 import { NotRepairableError, repair } from "./repair.js";
 import type { ParseResult } from "./result.js";
 import { type Platform, validate } from "./validate.js";
 
-const USAGE = `usage: chiptime [-h] {parse,inspect,repair,validate,codes} ...
+const USAGE = `usage: chiptime [-h] {parse,inspect,repair,validate,analyze,codes} ...
 
 Recovery-grade FIT file processing.
 
@@ -38,6 +45,7 @@ positional arguments:
     inspect             wire-level frame table (forensics)
     repair              salvage + synthesize + write a valid .fit
     validate            check platform acceptance (heuristic)
+    analyze             per-sport workout report + insights (optional layer)
     codes               print the error/warning/provenance code registry
 `;
 
@@ -438,6 +446,196 @@ function cmdValidate(argv: string[], out: (s: string) => void, err: (s: string) 
   return 0;
 }
 
+function parseBounds(
+  raw: string | null,
+  flag: string,
+  err: (s: string) => void,
+): number[] | null | false {
+  if (raw === null) return null;
+  const parts = raw.split(",").map((x) => Number(x));
+  if (parts.some((x) => Number.isNaN(x))) {
+    err(`error: ${flag} expects comma-separated numbers`);
+    return false;
+  }
+  for (let i = 1; i < parts.length; i++) {
+    if ((parts[i] as number) < (parts[i - 1] as number)) {
+      err(`error: ${flag} bounds must ascend`);
+      return false;
+    }
+  }
+  return parts;
+}
+
+function cmdAnalyze(argv: string[], out: (s: string) => void, err: (s: string) => void): number {
+  let mode: "strict" | "lenient" | "forensic" = "lenient";
+  let json = false;
+  let output: string | null = null;
+  let ftp: number | null = null;
+  let maxHr: number | null = null;
+  let restingHr: number | null = null;
+  let sex: string | null = null;
+  let hrZones: string | null = null;
+  let powerZones: string | null = null;
+  const positional: string[] = [];
+  const takeFloat = (flag: string, v: string | undefined): number | false => {
+    const n = Number(v);
+    if (v === undefined || Number.isNaN(n)) {
+      err(USAGE.trimEnd());
+      err(`error: argument ${flag}: invalid float value: '${v ?? ""}'`);
+      return false;
+    }
+    return n;
+  };
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i] as string;
+    if (a === "--mode") {
+      const v = argv[++i];
+      if (v !== "strict" && v !== "lenient" && v !== "forensic") {
+        err(USAGE.trimEnd());
+        err(
+          `error: argument --mode: invalid choice: '${v ?? ""}' (choose from 'strict', 'lenient', 'forensic')`,
+        );
+        return 64;
+      }
+      mode = v;
+    } else if (a === "--json") {
+      json = true;
+    } else if (a === "-o" || a === "--output") {
+      const v = argv[++i];
+      if (v === undefined) {
+        err(USAGE.trimEnd());
+        err(`error: argument ${a}: expected one argument`);
+        return 64;
+      }
+      output = v;
+    } else if (a === "--ftp") {
+      const n = takeFloat(a, argv[++i]);
+      if (n === false) return 64;
+      ftp = n;
+    } else if (a === "--max-hr") {
+      const n = takeFloat(a, argv[++i]);
+      if (n === false) return 64;
+      maxHr = n;
+    } else if (a === "--resting-hr") {
+      const n = takeFloat(a, argv[++i]);
+      if (n === false) return 64;
+      restingHr = n;
+    } else if (a === "--sex") {
+      const v = argv[++i];
+      if (v !== "male" && v !== "female") {
+        err(USAGE.trimEnd());
+        err(`error: argument --sex: invalid choice: '${v ?? ""}' (choose from 'male', 'female')`);
+        return 64;
+      }
+      sex = v;
+    } else if (a === "--hr-zones") {
+      hrZones = argv[++i] ?? null;
+    } else if (a === "--power-zones") {
+      powerZones = argv[++i] ?? null;
+    } else if (a.startsWith("-")) {
+      err(USAGE.trimEnd());
+      err(`error: unrecognized arguments: ${a}`);
+      return 64;
+    } else {
+      positional.push(a);
+    }
+  }
+  if (positional.length !== 1) {
+    err(USAGE.trimEnd());
+    err("error: the following arguments are required: file");
+    return 64;
+  }
+  let data: Uint8Array;
+  try {
+    data = readFileBytes(positional[0] as string);
+  } catch (e) {
+    err(`cannot read ${positional[0]}: ${(e as Error).message}`);
+    return 64;
+  }
+  let result: ParseResult;
+  try {
+    result = parse(data, { mode });
+  } catch (e) {
+    const fe = e as FitError;
+    if (fe instanceof NotFitError) {
+      err(`${fe.code}: ${fe.detail}`);
+      return 4;
+    }
+    if (fe instanceof FitError) {
+      err(`${fe.code}: ${fe.detail}`);
+      return 3;
+    }
+    throw e;
+  }
+  const hb = parseBounds(hrZones, "--hr-zones", err);
+  if (hb === false) return 64;
+  const pb = parseBounds(powerZones, "--power-zones", err);
+  if (pb === false) return 64;
+  const settings: AthleteSettings = {
+    ftpW: ftp,
+    maxHr,
+    restingHr,
+    sex,
+    hrZoneBounds: hb,
+    powerZoneBounds: pb,
+  };
+  const report = analyze(result, settings);
+  if (json || output !== null) {
+    const payload = dumpsReportJson(reportToPlain(report));
+    if (output !== null) writeFileBytes(output, new TextEncoder().encode(payload));
+    else out(payload);
+  } else {
+    printReport(report.sessions, out);
+  }
+  return exitCode(result);
+}
+
+function printReport(sessions: WorkoutReport[], out: (s: string) => void): void {
+  if (sessions.length === 0) {
+    out("no activity sessions in this file (nothing to analyze)");
+    return;
+  }
+  sessions.forEach((s, idx) => {
+    const head = `session ${idx + 1}: ${s.sport}${s.subSport ? `/${s.subSport}` : ""}`;
+    out(head);
+    // Python `or`: a zero timer duration falls through to elapsed.
+    const dur = s.durationS.get("timer") || s.durationS.get("elapsed");
+    const bits: string[] = [];
+    if (dur) {
+      const total = Math.trunc(dur + 0.5);
+      const m0 = Math.floor(total / 60);
+      const sec = total - m0 * 60;
+      const h = Math.floor(m0 / 60);
+      const m = m0 - h * 60;
+      bits.push(
+        h
+          ? `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`
+          : `${m}:${String(sec).padStart(2, "0")}`,
+      );
+    }
+    if (s.distanceM) bits.push(`${pyFixed(s.distanceM / 1000, 2)} km`);
+    if (s.pace) {
+      bits.push(`${String(s.pace.formatted)} (${String(s.pace.basis)})`);
+    } else if (s.avgSpeedKmh) {
+      const basis = s.avgSpeedBasis !== "timer" ? ` (${s.avgSpeedBasis})` : "";
+      bits.push(`${pyFixed(s.avgSpeedKmh, 1)} km/h${basis}`);
+    }
+    if (s.avgPrimary !== null && s.primarySignal === "power") {
+      bits.push(`avg ${pyFixed(s.avgPrimary, 0)} W`);
+      if (s.weightedAvgPower) bits.push(`weighted ${pyFixed(s.weightedAvgPower, 0)} W`);
+    }
+    if (s.avgHr !== null) bits.push(`avg HR ${pyFixed(s.avgHr, 0)}`);
+    if (bits.length > 0) out(`  ${bits.join(" · ")}`);
+    if (s.structure !== null && s.structure.basis !== "none") {
+      const labels = s.structure.repeats.map((g) => g.label).join("; ") || "intervals";
+      out(`  structure [${s.structure.basis}]: ${labels}`);
+    }
+    if (s.load !== null) out(`  load ${pyFixed(s.load.value, 0)} [${s.load.basis}]`);
+    for (const ins of s.insights) out(`  ${ins.code}: ${ins.message}`);
+    for (const o of s.omissions) out(`  (omitted) ${o}`);
+  });
+}
+
 function cmdCodes(out: (s: string) => void): number {
   const tables: [string, Readonly<Record<string, string>>][] = [
     ["errors", ERROR_CODES],
@@ -475,10 +673,11 @@ export function main(
   if (command === "inspect") return cmdInspect(rest, out, err);
   if (command === "repair") return cmdRepair(rest, out, err);
   if (command === "validate") return cmdValidate(rest, out, err);
+  if (command === "analyze") return cmdAnalyze(rest, out, err);
   if (command === "codes") return cmdCodes(out);
   err(USAGE.trimEnd());
   err(
-    `error: argument command: invalid choice: '${command}' (choose from 'parse', 'inspect', 'repair', 'validate', 'codes')`,
+    `error: argument command: invalid choice: '${command}' (choose from 'parse', 'inspect', 'repair', 'validate', 'analyze', 'codes')`,
   );
   return 64;
 }

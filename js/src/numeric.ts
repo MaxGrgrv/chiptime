@@ -229,3 +229,31 @@ export function pyG(x: number, precision = 6): string {
   }
   return (x < 0 ? "-" : "") + body;
 }
+
+/**
+ * `statistics.median(values)` — sorted middle, or the mean of the two middles.
+ * No arithmetic beyond one `(a+b)/2`, so it is exactly portable.
+ */
+export function pyMedian(values: readonly number[]): number {
+  if (values.length === 0) throw new RangeError("median of empty data");
+  const s = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  if (s.length % 2 === 1) return s[mid] as number;
+  return ((s[mid - 1] as number) + (s[mid] as number)) / 2;
+}
+
+/**
+ * `statistics.pstdev(values)` — population standard deviation.
+ *
+ * CPython computes this over exact rationals; this uses compensated sums instead,
+ * which can differ in the last ULP. Its only callers land the result in a
+ * threshold comparison and a whole-percent string, where one ULP is invisible —
+ * the corpus gate is the arbiter, and an exact-rational port is the fallback if
+ * it ever disagrees (F31 BACKLOG, discharged at F39).
+ */
+export function pyPstdev(values: readonly number[]): number {
+  if (values.length === 0) throw new RangeError("pstdev of empty data");
+  const mean = pySum(values) / values.length;
+  const sq = values.map((v) => (v - mean) * (v - mean));
+  return Math.sqrt(pySum(sq) / values.length);
+}

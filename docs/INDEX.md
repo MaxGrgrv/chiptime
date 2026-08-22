@@ -71,7 +71,7 @@ Plan: [m3-typescript-plan.md](m3-typescript-plan.md) · contract: [ADR-0009](arc
 | F36 Semantics — full corpus parity | DONE | [spec](features/f36-js-semantics.md) | [impl](implementation/f36-js-semantics.md) |
 | F37 CLI + exit codes (npm 0.1.0) | DONE | [spec](features/f37-js-cli.md) | [impl](implementation/f37-js-cli.md) |
 | F38 Encoder, repair, validate (npm 0.2.0) | DONE | [spec+impl](features/f38-js-encode-repair-validate.md) | — |
-| F39 Analytics layer + analyze (npm 0.4.0) | PLANNED | — | — |
+| F39 Analytics: metrics + analyze (npm 0.4.0) | DONE | [spec+impl](features/f39-js-analytics.md) | — |
 | F40 `edit` (npm 0.5.0) | PLANNED | — | — |
 | F41 `trim` (npm 0.6.0) | PLANNED | — | — |
 | F42 `reveal` + `scrub` (npm 0.7.0) | PLANNED | — | — |

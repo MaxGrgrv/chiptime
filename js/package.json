@@ -1,6 +1,6 @@
 {
   "name": "chiptime",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "description": "Recovery-grade FIT file processing: parse anything, lose nothing silently, explain everything.",
   "license": "MIT",
   "author": "Maxim Grigoryev",
@@ -102,19 +102,28 @@
       "types": "./dist/esm/validate.d.ts",
       "import": "./dist/esm/validate.js",
       "require": "./dist/cjs/validate.js"
+    },
+    "./metrics": {
+      "types": "./dist/esm/metrics/index.d.ts",
+      "import": "./dist/esm/metrics/index.js",
+      "require": "./dist/cjs/metrics/index.js"
     }
   },
-  "files": ["dist", "bin", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
   "sideEffects": false,
   "engines": {
     "node": ">=20"
   },
   "parity": {
-    "python": "0.2.0",
-    "note": "npm 0.N.0 mirrors the feature surface of PyPI 0.N.0 (ADR-0009 \u00a79)."
+    "python": "0.4.0",
+    "note": "npm 0.N.0 mirrors the feature surface of PyPI 0.N.0 (ADR-0009 §9)."
   },
-  "//": "Contract: the core has ZERO runtime dependencies. Any addition requires an ADR (ADR-0009 \u00a77).",
-  "dependencies": {},
+  "//": "Contract: the core has ZERO runtime dependencies. Any addition requires an ADR (ADR-0009 §7).",
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^22.10.2",

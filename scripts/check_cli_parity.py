@@ -36,6 +36,23 @@ INVOCATIONS = [
     ["validate", "{file}"],
     ["validate", "{file}", "--platform", "garmin-connect"],
     ["validate", "{file}", "--platform", "strava"],
+    ["analyze", "{file}"],
+    ["analyze", "{file}", "--json"],
+    ["analyze", "{file}", "--json", "--ftp", "250", "--max-hr", "190", "--resting-hr", "45"],
+    [
+        "analyze",
+        "{file}",
+        "--json",
+        "--hr-zones",
+        "115,135,155,172,188",
+        "--sex",
+        "female",
+        "--max-hr",
+        "190",
+        "--resting-hr",
+        "45",
+    ],
+    ["analyze", "{file}", "--power-zones", "150,200,250,300,350", "--ftp", "250"],
     ["parse", "{file}", "--json"],
     ["parse", "{file}", "--mode", "forensic"],
     ["parse", "{file}", "--strip-pii"],
@@ -97,6 +114,27 @@ def typescript_side(cases: list[tuple[str, list[str]]]) -> dict[str, dict]:
     return json.loads(res.stdout)
 
 
+def _tolerant_equal(a: object, b: object) -> bool:
+    """Tree equality with last-ULP tolerance on floats.
+
+    Used ONLY for `analyze --json`: the report's full-precision load fields pass
+    through exp/pow, and CPython takes those from the *platform's* libm — its own
+    output differs across OSes in the last ULP, so demanding that V8 byte-match one
+    platform's libm is a phantom target (ADR-0009 §6 extension, F39). Canonical
+    parse output contains no such field and stays byte-exact.
+    """
+    if isinstance(a, float) and isinstance(b, (int, float)):
+        if a == b:
+            return True
+        scale = max(abs(a), abs(float(b)))
+        return scale > 0 and abs(a - float(b)) / scale < 1e-12
+    if isinstance(a, dict) and isinstance(b, dict):
+        return a.keys() == b.keys() and all(_tolerant_equal(a[k], b[k]) for k in a)
+    if isinstance(a, list) and isinstance(b, list):
+        return len(a) == len(b) and all(_tolerant_equal(x, y) for x, y in zip(a, b, strict=True))
+    return a == b
+
+
 def first_difference(a: str, b: str) -> str:
     for i, (ca, cb) in enumerate(zip(a, b, strict=False)):
         if ca != cb:
@@ -146,6 +184,12 @@ def main() -> None:
             a = p_res["stdout"].replace(".py.fit", ".fit")
             b = t_res["stdout"].replace(".ts.fit", ".fit")
             if a != b:
+                if "analyze" in key and "--json" in key:
+                    try:
+                        if _tolerant_equal(json.loads(a), json.loads(b)):
+                            continue
+                    except ValueError:
+                        pass
                 failures.append((key, first_difference(a, b)))
                 continue
         if "repair" in key and p_res["code"] in (0, 2):
