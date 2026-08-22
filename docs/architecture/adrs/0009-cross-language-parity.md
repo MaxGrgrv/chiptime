@@ -96,7 +96,15 @@ principle and the corpus passes anyway) because every value derived from them is
 rounded to 1–4 decimal places before it reaches output.
 
 The decision is to **keep the same formulation and let the corpus gate it**, not to build a
-fixed-point trig kernel for a hazard that rounding already absorbs. Concretely:
+fixed-point trig kernel for a hazard that rounding already absorbs.
+
+**Measured at F36**, over the 54 real position pairs the `gps/*` corpus cases contain, run through
+the identical haversine in both runtimes: **53 of 54 results are bit-identical**; the largest
+absolute difference is **5.7 × 10⁻¹⁴ m** and the largest relative difference is **1.67 × 10⁻¹⁶**,
+one ULP. That value is thresholded against speeds and then rounded to one decimal place, so
+changing an outcome would require a velocity within ~10⁻¹⁵ of a gate threshold. The hedge below is
+therefore upheld by evidence rather than by argument, and the check is cheap to repeat if the
+corpus gains GPS cases. Concretely:
 
 - No new transcendental call may be introduced on a canonical-output path in either language.
 - Values derived from one are rounded (`pyRoundN`) before entering output — already true today.
