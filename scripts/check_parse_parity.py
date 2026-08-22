@@ -1,29 +1,16 @@
 #!/usr/bin/env python3
-"""parse() parity across every corpus case (F35).
+"""parse() parity across every corpus case (F35, closed out at F36).
 
 Run from repo root:  uv run --project python python scripts/check_parse_parity.py
 
-Two tiers, because the semantic model does not exist in TypeScript until F36
-(F35 critique, amendment D1):
+Every one of the 72 cases is compared against its COMMITTED expected.json, byte for
+byte, in lenient mode -- TypeScript producing the corpus snapshot. Strict and
+forensic are compared implementation to implementation, and every case is parsed
+twice to prove determinism.
 
-  TIER 1  the 11 cases whose output has no `activity` block -- non-activity file
-          types, rejects and empties. Compared against the COMMITTED expected.json,
-          byte for byte, provenance and warnings included, because at these cases
-          every entry originates in intake or decode. This is TypeScript producing
-          the corpus snapshot.
-
-  TIER 2  the 61 activity cases, compared on a whitelist of the top-level keys F35
-          owns. NOT "everything except activity": 52 of the 61 carry provenance or
-          warnings from the semantic layer (SESSION_REBUILT x28,
-          ACTIVITY_MESSAGE_MISSING x9, ...), so eliding one key would fail them for
-          reasons outside this feature.
-
-          `parts[].messages` is also excluded from tier 2: Python drops record
-          messages from the message list when an activity model is present (they
-          live in streams instead), and TypeScript has no model yet, so the lists
-          legitimately differ until F36.
-
-All three modes are compared, not just lenient.
+The two-tier scheme this script carried at F35 is gone. It existed only because the
+semantic model did not, and a scaffold that outlives its reason becomes a place
+where coverage can quietly narrow again -- while still passing.
 
 Exit 0 = every case agrees.
 """
@@ -42,10 +29,6 @@ import chiptime  # isort:skip
 from chiptime.canonical import dumps  # isort:skip
 
 MODES = ("lenient", "strict", "forensic")
-
-# What F35 owns, for cases whose remaining content is F36's.
-TIER2_TOP_KEYS = ("chiptime_schema", "ok", "mode", "source", "recovery", "errors")
-TIER2_PART_KEYS = ("file_type", "file_id")
 
 RUNNER_JS = """
 import { readFileSync } from "node:fs";
@@ -66,12 +49,6 @@ for (const [name, path, mode] of cases) {
 }
 process.stdout.write(JSON.stringify(out));
 """
-
-
-def tier2_view(tree: dict) -> dict:
-    view = {k: tree[k] for k in TIER2_TOP_KEYS if k in tree}
-    view["parts"] = [{k: p.get(k) for k in TIER2_PART_KEYS} for p in tree.get("parts", [])]
-    return view
 
 
 def python_side(cases: list[tuple[str, pathlib.Path]]) -> dict[str, dict]:
@@ -129,18 +106,10 @@ def main() -> None:
     py = python_side(cases)
     ts = typescript_side(cases)
 
-    tier1: list[str] = []
     failures: list[tuple[str, str]] = []
     snapshot_failures: list[tuple[str, str]] = []
 
     for name, path in cases:
-        lenient = py[f"{name}::lenient"]
-        has_activity = lenient["ok"] and any(
-            p.get("activity") is not None for p in json.loads(lenient["json"]).get("parts", [])
-        )
-        if not has_activity:
-            tier1.append(name)
-
         for mode in MODES:
             key = f"{name}::{mode}"
             p_res, t_res = py[key], ts.get(key)
@@ -162,20 +131,15 @@ def main() -> None:
                         )
                     )
                 continue
-            if has_activity:
-                a = dumps(tier2_view(json.loads(p_res["json"]))).decode("utf-8")
-                b = dumps(tier2_view(json.loads(t_res["json"]))).decode("utf-8")
-            else:
-                a, b = p_res["json"], t_res["json"]
-            if a != b:
-                failures.append((key, first_difference(a, b)))
+            if p_res["json"] != t_res["json"]:
+                failures.append((key, first_difference(p_res["json"], t_res["json"])))
 
-        # Tier 1 also checks the committed snapshot, which is the real claim.
-        if not has_activity and lenient["ok"]:
+        # The real claim: TypeScript reproduces the committed snapshot.
+        lenient = ts.get(f"{name}::lenient", {})
+        if lenient.get("ok"):
             expected = (path.parent / "expected.json").read_bytes().decode("utf-8")
-            actual = ts.get(f"{name}::lenient", {}).get("json")
-            if actual is not None and actual != expected:
-                snapshot_failures.append((name, first_difference(expected, actual)))
+            if lenient["json"] != expected:
+                snapshot_failures.append((name, first_difference(expected, lenient["json"])))
 
     if failures or snapshot_failures:
         if snapshot_failures:
@@ -191,9 +155,8 @@ def main() -> None:
         raise SystemExit(1)
 
     print(
-        f"parse parity: ok -- {len(tier1)} case(s) byte-identical to their committed "
-        f"expected.json; {len(cases) - len(tier1)} activity case(s) matched on the keys "
-        f"F35 owns; {len(cases) * len(MODES)} case/mode combinations total"
+        f"parse parity: ok -- ALL {len(cases)} cases byte-identical to their committed "
+        f"expected.json; {len(cases) * len(MODES)} case/mode combinations agree"
     )
 
 

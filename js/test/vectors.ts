@@ -62,6 +62,11 @@ export interface Sha256Vector {
   hex: string;
   digest: string;
 }
+export interface FormatVectors {
+  pySum: { values: number[]; sum: number }[];
+  pyFixed: { x: number; n: number; text: string }[];
+  pyFloatStr: { x: number; text: string }[];
+}
 export interface NumericVectors {
   pyRound: [number, number][];
   pyRoundN: [number, number, number][];
@@ -80,6 +85,7 @@ export const timestampVectors = load<TimestampVector[]>("timestamps.json");
 export const inflateVectors = load<InflateVector[]>("inflate.json");
 export const badInflateVectors = load<BadInflateVector[]>("inflate-bad.json");
 export const sha256Vectors = load<Sha256Vector[]>("sha256.json");
+export const formatVectors = load<FormatVectors>("format.json");
 
 export function fromHex(hex: string): Uint8Array {
   const out = new Uint8Array(hex.length / 2);

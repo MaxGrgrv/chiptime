@@ -20,6 +20,7 @@ import { unwrap } from "./intake.js";
 import type { Message } from "./message.js";
 import { pyRound } from "./numeric.js";
 import { type FitPart, type Mode, ParseResult, type SourceInfo } from "./result.js";
+import { buildActivity } from "./semantics/build.js";
 import { sha256Hex } from "./sha256.js";
 
 export type { Mode } from "./result.js";
@@ -347,7 +348,12 @@ export function parse(src: Uint8Array, options: ParseOptions = {}): ParseResult 
       const part = buildPart(messages);
       if (stripPii) stripPiiFrom(part, provenance, scope);
       if (!includeUnknown) dropUnknown(part, provenance, scope);
-      // part.activity stays null until F36 supplies the semantic model.
+      if (part.fileType === "activity") {
+        part.activity = buildActivity(part.messages, warnings, provenance, scope, {
+          skippedRanges: skips.map((sk) => [sk.offset, sk.offset + sk.length]),
+          forensic: mode === "forensic",
+        });
+      }
       parts.push(part);
       totalRecovered += messages.length;
     }

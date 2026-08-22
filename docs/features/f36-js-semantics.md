@@ -1,6 +1,6 @@
 # Feature: F36 — The semantic model for TypeScript
 
-> Status: CRITIQUED
+> Status: DONE
 
 ## Purpose
 

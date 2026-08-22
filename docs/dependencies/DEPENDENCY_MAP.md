@@ -41,6 +41,7 @@ Compact form (full dependency sections live in each spec; every edge verified bi
 | F33 js errors/message/frames (M3) | F31, F32, F3 (frame half, as reference), ADR-0003, ADR-0009 | F34+ (the decoder and everything above it) |
 | F34 js decoder (M3) | F31 (numeric), F32 (profile), F33 (frames/errors/message), F3/F6/F22 as reference | F35+ (parse, semantics, everything above) |
 | F35 js intake/inflate/parse/result (M3) | F31–F34, F4/F5/F11/F15 as reference, ADR-0002 | F36+ (semantics fills the activity block) |
+| F36 js semantics (M3) | F31–F35, F7–F10/F15/F17/F21 as reference, ADR-0005 | F37 (CLI), F38+ |
 
 ## Module Dependencies
 
@@ -67,7 +68,9 @@ No cycles; `decode` never imports `semantics`; `profile` and `errors` remain lea
 index ─→ canonical
 canonical ─→ (leaf — imports nothing, not even numeric: formatting is String(x), not rounding)
 numeric ─→ (leaf; INTERNAL — absent from the exports map, no Python analogue)
-api ─→ intake, frames, decode, result, errors, numeric, sha256
+api ─→ intake, frames, decode, semantics/build, result, errors, numeric, sha256
+semantics/build ─→ decode(epoch), model, message, errors, numeric, semantics/{timers,gaps,reconcile,plausibility}
+model ─→ (leaf)
 intake ─→ inflate, errors
 result ─→ canonical, errors, message
 inflate, sha256 ─→ (leaves; no Python twin)
@@ -113,6 +116,7 @@ import executes at module load anywhere in `js/src` — enforced by `js/scripts/
 | 2026-08-17 | F1: dev/baselines dependency groups declared; runtime pinned at zero |
 | 2026-08-18 | M1+M2 shipped: module layering recorded; runtime dependencies still ZERO |
 | 2026-08-18 | M2.5 wrap: feature matrix filled (F1–F21); metrics module added (optional import only); pandas as optional extra — runtime core still ZERO |
+| 2026-08-21 | F36 (M3): `model` + `semantics/*` added; `decode` still never imports `semantics`. Numeric kernel grew `pySum`/`pyFixed`/`pyFloatStr`. Runtime dependencies still ZERO |
 | 2026-08-21 | F35 (M3): `intake`/`inflate`/`sha256`/`result` added; `api` gains `parse()`. `inflate` and `sha256` are the only modules with no Python counterpart — forced by zero-deps + sync + browser. Runtime dependencies still ZERO |
 | 2026-08-21 | F34 (M3): `decode.ts` added above frames/profile/errors/numeric; `api` gains `iterMessages`. Runtime dependencies still ZERO |
 | 2026-08-21 | F33 (M3): `errors`/`codes`/`message`/`frames`/`api` added; `errors` is a leaf over the generated `codes.ts`; `frames` imports only `errors` and `profile/base-types`, matching Python. Runtime dependencies still ZERO |

@@ -428,6 +428,57 @@ def sha256_vectors() -> None:
     )
 
 
+def format_vectors() -> None:
+    """pySum / pyFixed / pyFloatStr against CPython (F36).
+
+    sum() is the least obvious of the three: since CPython 3.12 its float fast path
+    runs compensated (Neumaier) summation, not a loop of additions, and the
+    difference reaches canonical output through every derived average.
+    """
+    sums = [
+        [8.333] * 120,
+        [0.1] * 1000,
+        [1e16, 1.0, -1e16],
+        [0.1, 0.2, 0.3],
+        [],
+        [1.0],
+        [1e290, 1e290, -1e290],  # large but finite; JSON cannot carry Infinity
+        [3.6, 3.6, 3.6, 3.6, 3.6, 3.6, 3.6],
+        [0.7, 0.1, 0.3, 0.9, 0.5] * 40,
+    ]
+    fixed_vals = [
+        0.125,
+        0.135,
+        2.5,
+        2.675,
+        1.005,
+        0.0,
+        -0.0,
+        230.0,
+        55.0,
+        20.04,
+        99.995,
+        1234.5678,
+        -2.5,
+        -0.125,
+        3.14159,
+        0.05,
+        0.15,
+        0.25,
+        12.0,
+    ]
+    _write(
+        "format.json",
+        {
+            "pySum": [{"values": vals, "sum": sum(vals)} for vals in sums],
+            "pyFixed": [
+                {"x": v, "n": n, "text": f"{v:.{n}f}"} for v in fixed_vals for n in (0, 1, 2, 3)
+            ],
+            "pyFloatStr": [{"x": v, "text": str(v)} for v in fixed_vals],
+        },
+    )
+
+
 def crc_vectors() -> None:
     """crc16 over adversarial byte patterns (F33).
 
@@ -448,7 +499,11 @@ def crc_vectors() -> None:
 
 def _write(name: str, payload: object) -> None:
     path = OUT / name
-    path.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    # allow_nan=False: json.dumps writes bare NaN/Infinity by default, which no
+    # JSON parser accepts. A vector file that cannot be read is worse than a
+    # missing one, so this fails at generation rather than at test time.
+    text = json.dumps(payload, indent=2, ensure_ascii=True, allow_nan=False)
+    path.write_text(text + "\n", encoding="utf-8")
     print(f"wrote {path.relative_to(pathlib.Path.cwd())}")
 
 
@@ -462,6 +517,7 @@ def main() -> None:
     timestamp_vectors()
     inflate_vectors()
     sha256_vectors()
+    format_vectors()
 
 
 if __name__ == "__main__":

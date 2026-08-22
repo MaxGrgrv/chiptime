@@ -5,8 +5,10 @@
  */
 
 import { MAX_SAFE_INT, dumps } from "./canonical.js";
+import { fitTsToIso } from "./decode.js";
 import type { Diagnostic, FitError, ProvenanceEntry } from "./errors.js";
 import type { FieldValue, Message } from "./message.js";
+import type { Activity, Session, Totals } from "./model.js";
 
 export type Mode = "strict" | "lenient" | "forensic";
 
@@ -176,7 +178,10 @@ export class ParseResult {
         part.fileId === null
           ? null
           : Object.fromEntries([...part.fileId].map(([k, v]) => [k, jsonSafe(v)])),
-      activity: part.activity ?? null,
+      activity:
+        part.activity === null || part.activity === undefined
+          ? null
+          : activityJson(part.activity as Activity),
       messages: msgs.map((m) => this.messageJson(m)),
     };
   }
@@ -209,4 +214,122 @@ export class ParseResult {
     }
     return entry;
   }
+}
+
+/**
+ * `_iso(dt)` in Python: `strftime("%Y-%m-%dT%H:%M:%SZ")`, never `toISOString()`.
+ *
+ * Floors first. A model time can be fractional — `end = start + total_elapsed_time`
+ * where elapsed is a float — and Python holds that as a `datetime` carrying
+ * microseconds, which `strftime` then drops. The integer formatter needs whole
+ * seconds, so the truncation happens here rather than being smeared into the
+ * civil-date arithmetic.
+ */
+function iso(t: number | null): string | null {
+  return t === null ? null : fitTsToIso(Math.floor(t));
+}
+
+function totalsJson(t: Totals): unknown {
+  return {
+    elapsed_time_s: t.elapsedTimeS,
+    timer_time_s: t.timerTimeS,
+    moving_time_s: t.movingTimeS,
+    distance_m: t.distanceM,
+    ascent_m: t.ascentM,
+    descent_m: t.descentM,
+    calories_kcal: t.caloriesKcal,
+    avg: sortedMap(t.avg),
+    max: sortedMap(t.max),
+  };
+}
+
+function sortedMap(m: Map<string, number>): Record<string, number> {
+  return Object.fromEntries([...m.entries()].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
+}
+
+function sessionJson(s: Session): unknown {
+  return {
+    sport: s.sport,
+    sub_sport: s.subSport,
+    start_time: iso(s.startTime),
+    end_time: iso(s.endTime),
+    rebuilt: s.rebuilt,
+    declared: s.declared === null ? null : totalsJson(s.declared),
+    derived: totalsJson(s.derived),
+    discrepancies: s.discrepancies.map((d) => ({
+      field: d.field,
+      declared: d.declared,
+      derived: d.derived,
+      delta: d.delta,
+    })),
+    laps: s.laps.map((lap) => ({
+      message_index: lap.messageIndex,
+      start_time: iso(lap.startTime),
+      end_time: iso(lap.endTime),
+      sport: lap.sport,
+      declared: lap.declared === null ? null : totalsJson(lap.declared),
+    })),
+    lengths: s.lengths.map((ln) => ({
+      start_time: iso(ln.startTime),
+      end_time: iso(ln.endTime),
+      length_type: ln.lengthType,
+      swim_stroke: ln.swimStroke,
+      total_strokes: ln.totalStrokes,
+      total_elapsed_time_s: ln.totalElapsedTimeS,
+    })),
+    records: {
+      n: s.records.time.length,
+      time: s.records.time.map(iso),
+      streams: Object.fromEntries(
+        [...s.records.streams.entries()]
+          .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+          .map(([name, st]) => [
+            name,
+            { units: st.units, source: st.source, values: st.values.map(jsonSafe) },
+          ]),
+      ),
+    },
+  };
+}
+
+function activityJson(a: Activity): unknown {
+  return {
+    local_timestamp: a.localTimestamp,
+    utc_offset_s: a.utcOffsetS,
+    hrv_intervals_s: [...a.hrvIntervalsS],
+    device:
+      a.device === null
+        ? null
+        : {
+            manufacturer: a.device.manufacturer,
+            product: a.device.product,
+            product_name: a.device.productName,
+            serial_number: a.device.serialNumber,
+            software_version: a.device.softwareVersion,
+          },
+    athlete:
+      a.athlete === null
+        ? null
+        : {
+            friendly_name: a.athlete.friendlyName,
+            gender: a.athlete.gender,
+            age: a.athlete.age,
+            weight_kg: a.athlete.weightKg,
+            height_m: a.athlete.heightM,
+          },
+    events: a.events.map((e) => ({
+      time: iso(e.time),
+      event: e.event,
+      event_type: e.eventType,
+      data: e.data,
+    })),
+    gaps: a.gaps.map((g) => ({
+      start: iso(g.start),
+      end: iso(g.end),
+      duration_s: g.durationS,
+      kind: g.kind,
+      evidence: g.evidence,
+    })),
+    sessions: a.sessions.map(sessionJson),
+  };
 }

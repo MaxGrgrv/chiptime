@@ -132,5 +132,60 @@ function decimalString(scaled: bigint, n: number): string {
  */
 export function pyFloatStr(x: number): string {
   if (!Number.isFinite(x)) return x > 0 ? "inf" : Number.isNaN(x) ? "nan" : "-inf";
-  return Number.isInteger(x) ? `${x}.0` : String(x);
+  // `${-0}` is "0"; Python's str(-0.0) is "-0.0". Negative zero keeps its sign
+  // through formatting even though it compares equal to zero.
+  const sign = Object.is(x, -0) ? "-" : "";
+  return Number.isInteger(x) ? `${sign}${x}.0` : String(x);
+}
+
+/**
+ * `f"{x:.Nf}"` — fixed-point formatting with Python's rounding.
+ *
+ * `toFixed` rounds half away from zero; Python's format spec rounds half to even,
+ * so `f"{0.125:.2f}"` is `"0.12"` where `(0.125).toFixed(2)` is `"0.13"`. Rounds
+ * through `pyRoundN` first, then pads to exactly `n` decimals.
+ */
+export function pyFixed(x: number, n: number): string {
+  if (!Number.isFinite(x)) return Number.isNaN(x) ? "nan" : x > 0 ? "inf" : "-inf";
+  const rounded = pyRoundN(x, n);
+  // Formatting preserves the sign where `round()` does not: `f"{-0.125:.0f}"` is
+  // "-0", but `round(-0.125)` is the int 0, which has no negative zero.
+  const negative = x < 0 || Object.is(x, -0);
+  if (n === 0) return `${negative ? "-" : ""}${pyRound(Math.abs(x))}`;
+  const neg = negative;
+  const abs = Math.abs(rounded);
+  const whole = Math.floor(abs);
+  // Recover the fractional digits from the rounded value without re-rounding.
+  const frac = Math.round((abs - whole) * 10 ** n);
+  const carry = frac >= 10 ** n ? 1 : 0;
+  const digits = (carry ? 0 : frac).toString().padStart(n, "0");
+  return `${neg ? "-" : ""}${whole + carry}.${digits}`;
+}
+
+/**
+ * `sum(values)` for floats — **compensated**, not naive.
+ *
+ * This is the least obvious function in the kernel. CPython's builtin `sum()` looks
+ * like a loop of additions and is not: since 3.12 its float fast path runs the
+ * improved Kahan-Babuska algorithm by Neumaier, carrying a running compensation
+ * term. `sum([8.333] * 120)` is exactly `999.96`; the naive loop gives
+ * `999.959999999999`.
+ *
+ * The difference reaches canonical output through every derived average, and it is
+ * invisible to anyone reading the two sources side by side — `total += v` is what
+ * `sum()` appears to mean.
+ */
+export function pySum(values: readonly number[]): number {
+  let result = 0;
+  let c = 0;
+  for (const x of values) {
+    const t = result + x;
+    if (Math.abs(result) >= Math.abs(x)) {
+      c += result - t + x;
+    } else {
+      c += x - t + result;
+    }
+    result = t;
+  }
+  return result + c;
 }
