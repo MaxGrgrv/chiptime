@@ -2,7 +2,8 @@
 date: 2026-08-22
 categories: [field-notes]
 slug: inside-a-triathlon-fit-file
-description: A byte-level tour of a real IRONMAN 70.3 race file from a Suunto Race 2 — five sessions, a swim that shrank to 519 m, a heart-rate sensor that died quietly, and what honest parsing looks like.
+authors: [max]
+description: I raced IRONMAN 70.3 Venice-Jesolo, then took my Suunto's FIT file apart byte by byte — five sessions, a swim that shrank to 519 m, a heart-rate sensor that died quietly, and two button mistakes preserved in binary.
 ---
 
 # Inside a triathlon FIT file: what my watch really recorded at IRONMAN 70.3 Venice-Jesolo
@@ -13,10 +14,13 @@ seafront. My Suunto Race 2 recorded all of it into a single 411 KB `.fit`
 file — five sessions, 15,807 records, 4,819 heartbeat intervals, and two
 button mistakes I didn't know I'd made until I parsed the file.
 
-This post takes that file apart with [chiptime](../../getting-started.md).
-Not a race report — a data autopsy. It's a good specimen, because it's a
-*healthy* file recorded by a fallible human, and it shows why a parser
-should never take a workout file's word for anything.
+I've spent this year building [chiptime](../../getting-started.md), a FIT
+parser with a standing rule against taking a workout file's word for
+anything. So once the medal was on the shelf, I did what any
+data-inclined triathlete with a parser habit would do: I took my own race
+apart. Not a race report — a data autopsy. It turned out to be a great
+specimen precisely because it's a *healthy* file recorded by a fallible
+human.
 
 <!-- more -->
 
@@ -157,7 +161,7 @@ stuck register. If you ever wondered why your platform of choice showed a
 suspiciously tidy "avg HR 157" for a race where you nearly turned inside
 out — this is what it looks like at the byte level.
 
-Two chiptime contract rules make this analysis possible:
+Two rules I baked into chiptime's contract make this analysis possible:
 
 1. **Zero ≠ null, always.** A FIT field that's absent decodes to `null`,
    never to `0` — so dropouts can't drag an average down, and coverage is
@@ -252,13 +256,14 @@ chiptime analyze race.fit          # sport-aware analytics per session
 
 The rules that made this teardown possible — never lose data silently,
 zero ≠ null, declared *and* derived, classify gaps instead of guessing —
-are written down as [the contract](../../concepts/contract.md) and enforced
-by a [conformance corpus](conformance-corpus.md) on every commit.
+are the reason I started writing chiptime in the first place. They're
+pinned down as [the contract](../../concepts/contract.md) and enforced by
+a [conformance corpus](conformance-corpus.md) on every commit.
 
-The companion post does the same teardown on the opposite kind of file: a
-[Wahoo ELEMNT ROAM file from a full-distance IRONMAN bike
-leg](inside-a-wahoo-elemnt-fit-file.md) — eighteen streams, near-perfect
-sensor coverage, and a shutdown quirk that found a real bug in our own
+In the companion post I do the same teardown on the opposite kind of
+file: the [Wahoo ELEMNT ROAM file from my full-distance IRONMAN bike
+leg](inside-a-wahoo-elemnt-fit-file.md) — seventeen streams, near-perfect
+sensor coverage, and a shutdown quirk that found a real bug in my own
 timer heuristic.
 
 *Total damage in Venice: 4:51:12 from the first beep to the last, two

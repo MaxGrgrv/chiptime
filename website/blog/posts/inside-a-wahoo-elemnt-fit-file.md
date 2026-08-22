@@ -2,7 +2,8 @@
 date: 2026-08-22
 categories: [field-notes]
 slug: inside-a-wahoo-elemnt-fit-file
-description: Dissecting a Wahoo ELEMNT ROAM race file from a full-distance IRONMAN bike leg — 18 data streams, developer fields for everything from glucose to e-bike assist, zones read from the file itself, and a shutdown quirk that exposed a real parser bug.
+authors: [max]
+description: I took the Wahoo ELEMNT ROAM file from my full-distance IRONMAN bike leg apart stream by stream — 17 data streams, developer sockets for everything from glucose to e-bike assist, zones read from the file itself, and a shutdown quirk that exposed a bug in my own parser.
 ---
 
 # Inside a Wahoo ELEMNT ROAM FIT file: an IRONMAN bike leg, stream by stream
@@ -15,10 +16,11 @@ button mistakes, this one is the opposite specimen: 18,828 records, one
 per second for five and a quarter hours, with **seventeen parallel data
 streams and almost nothing missing**.
 
-It's the perfect file for a different kind of teardown: what a modern bike
-computer *actually* writes when everything works — and one small mystery
-at the very end that turned out to be a bug in our own parser. Let's take
-it apart with [chiptime](../../getting-started.md).
+It's the perfect file for a different question: what does a modern bike
+computer *actually* write when everything works? And since I build
+[chiptime](../../getting-started.md), my own race files double as its
+sternest code reviewers — this one, in its final five seconds, filed a
+genuine bug report. Let's take it apart.
 
 <!-- more -->
 
@@ -122,9 +124,9 @@ using "4" three separate times, which is exactly the kind of detail you
 only learn by reading the raw messages.
 
 The power story comes straight from the analytics layer. Zones need no
-configuration here, because **the rider's zone table is in the file** —
-the ELEMNT writes `power_zone` and `hr_zone` messages, and chiptime's
-resolution ladder is explicit settings → in-file zones → honestly absent,
+configuration here, because **my zone table is in the file** — the ELEMNT
+writes `power_zone` and `hr_zone` messages, and the resolution ladder I
+gave chiptime is explicit settings → in-file zones → honestly absent,
 never estimated:
 
 ```python
@@ -212,29 +214,31 @@ session stop_disable_all   13:55:20
 
 A `stop` followed by a `stop_all` in the same second is the ELEMNT's
 standard shutdown handshake — belt and braces, written by thousands of
-devices at the end of every ride. But chiptime's timer state machine has a
-defensive heuristic for crash-truncated files (taxonomy #45): *a stop with
-no preceding start opens an interval at the first record*. When the
-redundant `stop_all` arrived with no interval open, that heuristic fired —
-and manufactured a phantom interval spanning the entire ride:
+devices at the end of every ride. But I'd given chiptime's timer state
+machine a defensive heuristic for crash-truncated files (taxonomy #45):
+*a stop with no preceding start opens an interval at the first record*.
+When the redundant `stop_all` arrived with no interval open, that
+heuristic fired — and manufactured a phantom interval spanning the entire
+ride:
 
 ![The six shutdown events, the real 5:13:43 interval, and the phantom full-ride interval the heuristic created](images/tours-timer-events.svg)
 
 18,823 s of real riding + 5 s of dismount shuffle + 18,830 phantom seconds
-= 37,658. The device's number was right; the derived number was our
+= 37,658. The device's number was right; the derived number was my own
 heuristic misreading a completely ordinary shutdown pattern.
 
-Here's the thing: **this is the system working**. The wrong number didn't
+Here's the thing, and it's the whole reason I built the discrepancy
+system: **this is what working looks like**. The wrong number didn't
 sneak into an average or quietly inflate a training-load metric — it
 arrived loudly, in `discrepancies[]`, next to the declared value and a
 `TIMER_STOP_WITHOUT_START` warning, with the event log preserved for
 anyone to replay. A discrepancy flag is a starting gun, not a verdict:
-this one sent us straight to the six events above, and this exact
-shutdown pattern is now logged in chiptime's backlog as a taxonomy #45
+this one sent me straight to the six events above, and this exact
+shutdown pattern went straight into chiptime's backlog as a taxonomy #45
 sub-case, with this file destined for the [conformance
-corpus](conformance-corpus.md) so the fix can never regress. Parsers that
-show their work can be caught out — that's precisely the property you
-want in one.
+corpus](conformance-corpus.md) so the fix can never regress. A parser
+that shows its work can be caught out — in this case by me, on my own
+race file — and that's precisely the property you want in one.
 
 *(Until that fix lands: the two-interval arithmetic from the event log —
 18,828 s — is the number to trust, as the device declared.)*
@@ -261,9 +265,10 @@ chiptime parse ride.fit --json       # every stream, deterministic JSON
 
 The principles this teardown leaned on — zero ≠ null, declared *and*
 derived with disagreements surfaced, unknown messages preserved, every
-parser decision in a machine-readable log — are chiptime's
-[contract](../../concepts/contract.md), pinned by a conformance corpus
-that this very file is about to make one case stronger.
+parser decision in a machine-readable log — are the
+[contract](../../concepts/contract.md) I hold chiptime to, pinned by a
+conformance corpus that this very file is about to make one case
+stronger.
 
 *Final tally for Tours: 179.2 km, 5:13:49, 3,282 kJ, fifteen degrees of
 warming, 18% of a battery, one parser bug flushed out of hiding. A good
