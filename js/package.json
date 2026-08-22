@@ -1,6 +1,6 @@
 {
   "name": "chiptime",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Recovery-grade FIT file processing: parse anything, lose nothing silently, explain everything.",
   "license": "MIT",
   "author": "Maxim Grigoryev",
@@ -87,6 +87,21 @@
       "types": "./dist/esm/cli.d.ts",
       "import": "./dist/esm/cli.js",
       "require": "./dist/cjs/cli.js"
+    },
+    "./encode": {
+      "types": "./dist/esm/encode.d.ts",
+      "import": "./dist/esm/encode.js",
+      "require": "./dist/cjs/encode.js"
+    },
+    "./repair": {
+      "types": "./dist/esm/repair.d.ts",
+      "import": "./dist/esm/repair.js",
+      "require": "./dist/cjs/repair.js"
+    },
+    "./validate": {
+      "types": "./dist/esm/validate.d.ts",
+      "import": "./dist/esm/validate.js",
+      "require": "./dist/cjs/validate.js"
     }
   },
   "files": ["dist", "bin", "README.md", "LICENSE"],
@@ -95,7 +110,7 @@
     "node": ">=20"
   },
   "parity": {
-    "python": "0.1.0",
+    "python": "0.2.0",
     "note": "npm 0.N.0 mirrors the feature surface of PyPI 0.N.0 (ADR-0009 \u00a79)."
   },
   "//": "Contract: the core has ZERO runtime dependencies. Any addition requires an ADR (ADR-0009 \u00a77).",

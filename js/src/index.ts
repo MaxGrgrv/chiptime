@@ -19,6 +19,9 @@ export { iterFrames, iterMessages, parse } from "./api.js";
 export type { ParseOptions } from "./api.js";
 export type { FitPart, RecoveryReport, SourceInfo } from "./result.js";
 export { ParseResult } from "./result.js";
+export type { RepairResult } from "./repair.js";
+export { NotRepairableError, repair } from "./repair.js";
+// `validate` stays at chiptime/validate: Python's __all__ does not hoist it.
 export {
   CrcMismatchError,
   EmptyFileError,

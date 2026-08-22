@@ -32,6 +32,10 @@ from chiptime.cli import main as py_main  # isort:skip
 # Invocation shapes, applied to every corpus case.
 INVOCATIONS = [
     ["parse", "{file}"],
+    ["repair", "{file}", "-o", "{out}"],
+    ["validate", "{file}"],
+    ["validate", "{file}", "--platform", "garmin-connect"],
+    ["validate", "{file}", "--platform", "strava"],
     ["parse", "{file}", "--json"],
     ["parse", "{file}", "--mode", "forensic"],
     ["parse", "{file}", "--strip-pii"],
@@ -59,6 +63,7 @@ process.stdout.write(JSON.stringify(out));
 def python_side(cases: list[tuple[str, list[str]]]) -> dict[str, dict]:
     out: dict[str, dict] = {}
     for key, argv in cases:
+        argv = [a.replace(".SIDE.fit", ".py.fit") for a in argv]
         # A TextIOWrapper over BytesIO, because `parse --json` writes canonical bytes
         # to sys.stdout.buffer -- a StringIO has no .buffer and the capture would
         # crash on exactly the invocation that matters most.
@@ -80,7 +85,7 @@ def typescript_side(cases: list[tuple[str, list[str]]]) -> dict[str, dict]:
     subprocess.run(["npm", "run", "build"], cwd=js_dir, check=True, capture_output=True)
     runner = js_dir / "dist" / "esm" / "_clirun.mjs"
     runner.write_text(RUNNER_JS, encoding="utf-8")
-    payload = json.dumps([[k, a] for k, a in cases])
+    payload = json.dumps([[k, [x.replace(".SIDE.fit", ".ts.fit") for x in a]] for k, a in cases])
     try:
         res = subprocess.run(
             ["node", str(runner), payload], cwd=js_dir, capture_output=True, text=True
@@ -106,10 +111,18 @@ def first_difference(a: str, b: str) -> str:
 def main() -> None:
     corpus = ROOT / "corpus" / "cases"
     cases: list[tuple[str, list[str]]] = []
+    outdir = pathlib.Path("/tmp/chiptime-cli-parity")
+    outdir.mkdir(exist_ok=True)
     for path in sorted(corpus.glob("*/*/input.fit")):
         name = f"{path.parent.parent.name}/{path.parent.name}"
+        slug = name.replace("/", "_")
         for inv in INVOCATIONS:
-            argv = [a.replace("{file}", str(path)) for a in inv]
+            # {out} resolves per side so the two runs cannot clobber each other;
+            # the bytes are compared afterwards.
+            argv = [
+                a.replace("{file}", str(path)).replace("{out}", str(outdir / f"{slug}.SIDE.fit"))
+                for a in inv
+            ]
             cases.append((f"{name}::{' '.join(inv)}", argv))
     for inv in GLOBAL_INVOCATIONS:
         cases.append((f"<global>::{' '.join(inv) or '(no args)'}", list(inv)))
@@ -128,7 +141,22 @@ def main() -> None:
             failures.append((key, f"exit code python={p_res['code']} typescript={t_res['code']}"))
             continue
         if p_res["stdout"] != t_res["stdout"]:
-            failures.append((key, first_difference(p_res["stdout"], t_res["stdout"])))
+            # The repair stdout names the output path, which legitimately differs
+            # (.py.fit vs .ts.fit); normalize before comparing.
+            a = p_res["stdout"].replace(".py.fit", ".fit")
+            b = t_res["stdout"].replace(".ts.fit", ".fit")
+            if a != b:
+                failures.append((key, first_difference(a, b)))
+                continue
+        if "repair" in key and p_res["code"] in (0, 2):
+            slug = key.split("::")[0].replace("/", "_")
+            base = pathlib.Path("/tmp/chiptime-cli-parity")
+            pb = (base / f"{slug}.py.fit").read_bytes()
+            tb = (base / f"{slug}.ts.fit").read_bytes()
+            if pb != tb:
+                failures.append(
+                    (key, f"repaired FILE bytes differ: py {len(pb)}B vs ts {len(tb)}B")
+                )
 
     if failures:
         print(f"cli parity: {len(failures)} of {len(cases)} invocation(s) diverged")

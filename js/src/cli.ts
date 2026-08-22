@@ -24,9 +24,11 @@ import { iterFrames, parse } from "./api.js";
 import { ERROR_CODES, FitError, NotFitError, PROVENANCE_CODES, WARNING_CODES } from "./errors.js";
 import type { Session } from "./model.js";
 import { pyFixed, pyFloatStr, pyG } from "./numeric.js";
+import { NotRepairableError, repair } from "./repair.js";
 import type { ParseResult } from "./result.js";
+import { type Platform, validate } from "./validate.js";
 
-const USAGE = `usage: chiptime [-h] {parse,inspect,codes} ...
+const USAGE = `usage: chiptime [-h] {parse,inspect,repair,validate,codes} ...
 
 Recovery-grade FIT file processing.
 
@@ -34,6 +36,8 @@ positional arguments:
   {parse,inspect,codes}
     parse               parse a FIT file
     inspect             wire-level frame table (forensics)
+    repair              salvage + synthesize + write a valid .fit
+    validate            check platform acceptance (heuristic)
     codes               print the error/warning/provenance code registry
 `;
 
@@ -317,6 +321,123 @@ function cmdInspect(argv: string[], out: (s: string) => void, err: (s: string) =
   return 0;
 }
 
+function cmdRepair(argv: string[], out: (s: string) => void, err: (s: string) => void): number {
+  let mode: "lenient" | "forensic" = "lenient";
+  let output: string | null = null;
+  const positional: string[] = [];
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i] as string;
+    if (a === "--mode") {
+      const v = argv[++i];
+      if (v !== "lenient" && v !== "forensic") {
+        err(USAGE.trimEnd());
+        err(
+          `error: argument --mode: invalid choice: '${v ?? ""}' (choose from 'lenient', 'forensic')`,
+        );
+        return 64;
+      }
+      mode = v;
+    } else if (a === "-o" || a === "--output") {
+      const v = argv[++i];
+      if (v === undefined) {
+        err(USAGE.trimEnd());
+        err(`error: argument ${a}: expected one argument`);
+        return 64;
+      }
+      output = v;
+    } else if (a.startsWith("-")) {
+      err(USAGE.trimEnd());
+      err(`error: unrecognized arguments: ${a}`);
+      return 64;
+    } else {
+      positional.push(a);
+    }
+  }
+  if (positional.length !== 1 || output === null) {
+    err(USAGE.trimEnd());
+    err(
+      `error: the following arguments are required: ${positional.length !== 1 ? "file" : "-o/--output"}`,
+    );
+    return 64;
+  }
+
+  let data: Uint8Array;
+  try {
+    data = readFileBytes(positional[0] as string);
+  } catch (e) {
+    err(`cannot read ${positional[0]}: ${(e as Error).message}`);
+    return 64;
+  }
+  let rr: ReturnType<typeof repair>;
+  try {
+    rr = repair(data, { mode });
+  } catch (e) {
+    if (e instanceof NotRepairableError) {
+      err(`${e.code}: ${e.detail}`);
+      if (e.suggestion) err(`suggestion: ${e.suggestion}`);
+      return 3;
+    }
+    if (e instanceof FitError) {
+      err(`${e.code}: ${e.detail}`);
+      return 3;
+    }
+    throw e;
+  }
+  writeFileBytes(output, rr.data);
+  for (const pv of rr.provenance) out(`repair: [${pv.code}] ${pv.detail}`);
+  if (rr.parseResult !== null && rr.parseResult.recovery !== null) {
+    const rec = rr.parseResult.recovery;
+    out(`salvage: ${rec.recoveredRecords} messages, ${rec.bytesSkipped}B skipped`);
+  }
+  out(
+    `wrote ${output} (${rr.data.length} bytes); strict-valid: ${rr.outputStrictOk ? "True" : "False"}`,
+  );
+  return rr.outputStrictOk ? 0 : 2;
+}
+
+function cmdValidate(argv: string[], out: (s: string) => void, err: (s: string) => void): number {
+  let platform: Platform = "strict-spec";
+  const positional: string[] = [];
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i] as string;
+    if (a === "--platform") {
+      const v = argv[++i];
+      if (v !== "strict-spec" && v !== "garmin-connect" && v !== "strava") {
+        err(USAGE.trimEnd());
+        err(
+          `error: argument --platform: invalid choice: '${v ?? ""}' (choose from 'strict-spec', 'garmin-connect', 'strava')`,
+        );
+        return 64;
+      }
+      platform = v;
+    } else if (a.startsWith("-")) {
+      err(USAGE.trimEnd());
+      err(`error: unrecognized arguments: ${a}`);
+      return 64;
+    } else {
+      positional.push(a);
+    }
+  }
+  if (positional.length !== 1) {
+    err(USAGE.trimEnd());
+    err("error: the following arguments are required: file");
+    return 64;
+  }
+  let data: Uint8Array;
+  try {
+    data = readFileBytes(positional[0] as string);
+  } catch (e) {
+    err(`cannot read ${positional[0]}: ${(e as Error).message}`);
+    return 64;
+  }
+  const findings = validate(data, platform);
+  for (const f of findings) out(`${f.level}: [${f.code}] ${f.detail}`);
+  if (findings.some((f) => f.level === "error")) return 3;
+  if (findings.length > 0) return 2;
+  out(`valid for ${platform}`);
+  return 0;
+}
+
 function cmdCodes(out: (s: string) => void): number {
   const tables: [string, Readonly<Record<string, string>>][] = [
     ["errors", ERROR_CODES],
@@ -352,10 +473,12 @@ export function main(
   }
   if (command === "parse") return cmdParse(rest, out, err);
   if (command === "inspect") return cmdInspect(rest, out, err);
+  if (command === "repair") return cmdRepair(rest, out, err);
+  if (command === "validate") return cmdValidate(rest, out, err);
   if (command === "codes") return cmdCodes(out);
   err(USAGE.trimEnd());
   err(
-    `error: argument command: invalid choice: '${command}' (choose from 'parse', 'inspect', 'codes')`,
+    `error: argument command: invalid choice: '${command}' (choose from 'parse', 'inspect', 'repair', 'validate', 'codes')`,
   );
   return 64;
 }
