@@ -8,9 +8,11 @@ case in `corpus/` — that shared corpus, not shared code, is the contract betwe
 ([ADR-0001](../docs/architecture/adrs/0001-corpus-format.md),
 [ADR-0009](../docs/architecture/adrs/0009-cross-language-parity.md)).
 
-> **Status: pre-release scaffolding (F31).** Not published. The parsing surface arrives at F34/F35 —
-> see [the M3 plan](../docs/m3-typescript-plan.md). What exists today is the determinism contract:
-> the canonical serializer and the number kernel, both differentially tested against CPython.
+> **`0.1.0` — parity with PyPI `0.1.0`.** Decode, recovery, the semantic model, canonical JSON, and
+> the `parse`/`inspect`/`codes` CLI. All **72 corpus cases produce byte-identical canonical output**
+> to the Python implementation, and 507 CLI invocations produce identical stdout and exit codes.
+> The remaining verbs (`repair`, `validate`, `analyze`, `edit`, `trim`, `reveal`/`scrub`, `doctor`)
+> arrive on the ladder below.
 
 ## Parity
 
@@ -37,6 +39,29 @@ merge when npm catches up to the then-current Python version, not at a fixed num
 - **Synchronous, everywhere.** Node, browsers, Deno and Bun run the same code path; container
   unwrapping uses an internal inflate rather than `node:zlib` or the async `DecompressionStream`.
 - **No environment assumptions in `src/`.** No DOM lib, no `node:` import at module load.
+
+## Usage
+
+```js
+import { parse } from "chiptime";
+import { readFileSync } from "node:fs";
+
+const result = parse(new Uint8Array(readFileSync("ride.fit")));
+result.ok;                       // usable output produced?
+result.fileType;                 // "activity" | "course" | "workout" | ...
+result.recovery;                 // null unless salvage engaged
+result.provenance;               // every drop, repair and synthesis, typed
+result.toCanonicalJson();        // RFC 8785 bytes — byte-identical to Python's
+```
+
+```bash
+npx chiptime parse ride.fit --json
+npx chiptime inspect ride.fit
+npx chiptime codes
+```
+
+Exit codes: `0` clean · `2` recovered with data loss · `3` unusable · `4` not a FIT file ·
+`64` usage error.
 
 ## Development
 

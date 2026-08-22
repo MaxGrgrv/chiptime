@@ -1,7 +1,6 @@
 {
   "name": "chiptime",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "Recovery-grade FIT file processing: parse anything, lose nothing silently, explain everything.",
   "license": "MIT",
   "author": "Maxim Grigoryev",
@@ -96,8 +95,8 @@
     "node": ">=20"
   },
   "parity": {
-    "python": null,
-    "note": "npm 0.N.0 mirrors the feature surface of PyPI 0.N.0 (ADR-0009 \u00a79). null = pre-parity scaffolding."
+    "python": "0.1.0",
+    "note": "npm 0.N.0 mirrors the feature surface of PyPI 0.N.0 (ADR-0009 \u00a79)."
   },
   "//": "Contract: the core has ZERO runtime dependencies. Any addition requires an ADR (ADR-0009 \u00a77).",
   "dependencies": {},
