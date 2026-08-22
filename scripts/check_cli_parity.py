@@ -99,9 +99,11 @@ INVOCATIONS = [
 GLOBAL_INVOCATIONS = [["codes"], ["nosuchcommand"], []]
 
 RUNNER_JS = """
+import { readFileSync } from "node:fs";
 import { main } from "./cli.js";
 
-const cases = JSON.parse(process.argv[2]);
+// The case list is far past Linux's per-argument limit; it travels by file.
+const cases = JSON.parse(readFileSync(process.argv[2], "utf-8"));
 const out = {};
 for (const [key, argv] of cases) {
   const lines = [];
@@ -138,12 +140,15 @@ def typescript_side(cases: list[tuple[str, list[str]]]) -> dict[str, dict]:
     runner = js_dir / "dist" / "esm" / "_clirun.mjs"
     runner.write_text(RUNNER_JS, encoding="utf-8")
     payload = json.dumps([[k, [x.replace(".SIDE.fit", ".ts.fit") for x in a]] for k, a in cases])
+    payload_file = js_dir / "dist" / "esm" / "_clirun_cases.json"
+    payload_file.write_text(payload, encoding="utf-8")
     try:
         res = subprocess.run(
-            ["node", str(runner), payload], cwd=js_dir, capture_output=True, text=True
+            ["node", str(runner), str(payload_file)], cwd=js_dir, capture_output=True, text=True
         )
     finally:
         runner.unlink(missing_ok=True)
+        payload_file.unlink(missing_ok=True)
     if res.returncode != 0:
         raise SystemExit(f"running the TypeScript CLI failed:\n{res.stderr.strip()}")
     return json.loads(res.stdout)
