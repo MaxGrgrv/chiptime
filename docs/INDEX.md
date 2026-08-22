@@ -75,7 +75,7 @@ Plan: [m3-typescript-plan.md](m3-typescript-plan.md) · contract: [ADR-0009](arc
 | F40 edit: metadata surgery (npm 0.5.0) | DONE | [spec+impl](features/f40-js-edit.md) | — |
 | F41 trim: crop + rebuild totals (npm 0.6.0) | DONE | [spec+impl](features/f41-js-trim.md) | — |
 | F42 reveal + scrub: privacy (npm 0.7.0) | DONE | [spec+impl](features/f42-js-privacy.md) | — |
-| F43 Catch-up: mirror Python features shipped during the port | PLANNED | — | — |
+| F43 doctor: diagnose + prescribe (npm 0.8.0, version parity) | DONE | [spec+impl](features/f43-js-doctor.md) | — |
 | F44 Browser build, docs tabs, parity CI, parity release | PLANNED | — | — |
 
 ## ADRs

@@ -37,3 +37,5 @@ export type { TrimOptions, TrimResult } from "./trim.js";
 export { TrimError, trim } from "./trim.js";
 export type { PrivacyFinding, ScrubOptions, ScrubResult } from "./privacy.js";
 export { PrivacyReport, ScrubError, reveal, scrub } from "./privacy.js";
+export type { DoctorOptions, Remedy } from "./doctor.js";
+export { Diagnosis, doctor } from "./doctor.js";

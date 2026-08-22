@@ -21,6 +21,7 @@
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { iterFrames, parse } from "./api.js";
+import { type Diagnosis, doctor } from "./doctor.js";
 import { edit } from "./edit.js";
 import { ERROR_CODES, FitError, NotFitError, PROVENANCE_CODES, WARNING_CODES } from "./errors.js";
 import {
@@ -38,7 +39,7 @@ import type { ParseResult } from "./result.js";
 import { trim } from "./trim.js";
 import { type Platform, validate } from "./validate.js";
 
-const USAGE = `usage: chiptime [-h] {parse,inspect,repair,validate,edit,trim,reveal,scrub,analyze,codes} ...
+const USAGE = `usage: chiptime [-h] {parse,inspect,repair,validate,edit,trim,doctor,reveal,scrub,analyze,codes} ...
 
 Recovery-grade FIT file processing.
 
@@ -51,6 +52,7 @@ positional arguments:
     analyze             per-sport workout report + insights (optional layer)
     edit                change what a file says about itself (metadata)
     trim                crop an activity and rebuild its totals
+    doctor              why won't this upload, and what should I run?
     reveal              what does this file disclose about you?
     scrub               remove personal data and write a clean file
     codes               print the error/warning/provenance code registry
@@ -1133,6 +1135,128 @@ function cmdScrub(argv: string[], out: (s: string) => void, err: (s: string) => 
   return 0;
 }
 
+/** `json.dumps(diagnosis.to_dict(), sort_keys=True, separators=(",",":"))` — no
+ * floats in this tree, so key-sorted `JSON.stringify` shapes suffice. */
+function doctorJson(d: Diagnosis): string {
+  const finding = (f: { code: string; detail: string }) => ({ code: f.code, detail: f.detail });
+  return JSON.stringify({
+    advisory: d.advisory.map(finding),
+    blocking: d.blocking.map(finding),
+    platform: d.platform,
+    remedies: d.remedies.map((r) => ({
+      codes: [...r.codes],
+      command: r.command,
+      reason: r.reason,
+    })),
+    summary: d.summary,
+    unresolved: d.unresolved.map(finding),
+    will_upload: d.willUpload,
+  }).replace(
+    // json.dumps defaults to ensure_ascii=True: non-ASCII escapes as \uXXXX.
+    /[\u0080-\uffff]/g,
+    (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`,
+  );
+}
+
+function cmdDoctor(argv: string[], out: (s: string) => void, err: (s: string) => void): number {
+  let platform: "strict-spec" | "garmin-connect" | "strava" = "garmin-connect";
+  let mode: Mode = "lenient";
+  let json = false;
+  const positional: string[] = [];
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i] as string;
+    if (a === "--platform") {
+      const v = argv[++i];
+      if (v !== "strict-spec" && v !== "garmin-connect" && v !== "strava") {
+        err(USAGE.trimEnd());
+        err(
+          `error: argument --platform: invalid choice: '${v ?? ""}' (choose from 'strict-spec', 'garmin-connect', 'strava')`,
+        );
+        return 64;
+      }
+      platform = v;
+    } else if (a === "--mode") {
+      const v = argv[++i];
+      if (v !== "strict" && v !== "lenient" && v !== "forensic") {
+        err(USAGE.trimEnd());
+        err(
+          `error: argument --mode: invalid choice: '${v ?? ""}' (choose from 'strict', 'lenient', 'forensic')`,
+        );
+        return 64;
+      }
+      mode = v;
+    } else if (a === "--json") {
+      json = true;
+    } else if (a.startsWith("-")) {
+      err(USAGE.trimEnd());
+      err(`error: unrecognized arguments: ${a}`);
+      return 64;
+    } else {
+      positional.push(a);
+    }
+  }
+  if (positional.length !== 1) {
+    err(USAGE.trimEnd());
+    err("error: the following arguments are required: file");
+    return 64;
+  }
+  const file = positional[0] as string;
+
+  let data: Uint8Array;
+  try {
+    data = readFileBytes(file);
+  } catch (e) {
+    err(`cannot read ${file}: ${(e as Error).message}`);
+    return 64;
+  }
+  let diagnosis: Diagnosis;
+  try {
+    diagnosis = doctor(data, { platform, mode, srcName: file });
+  } catch (e) {
+    if (e instanceof NotFitError) {
+      err(`${e.code}: ${e.detail}`);
+      return 4;
+    }
+    if (e instanceof FitError) {
+      err(`${e.code}: ${e.detail}`);
+      return 3;
+    }
+    throw e;
+  }
+
+  if (json) {
+    out(doctorJson(diagnosis));
+    return diagnosis.willUpload ? 0 : diagnosis.remedies.length > 0 ? 2 : 3;
+  }
+
+  out(`${file} → ${diagnosis.platform}`);
+  out(`  ${diagnosis.summary}`);
+  if (diagnosis.willUpload) {
+    out("");
+    out("  ✓ nothing blocking; this file should upload");
+  } else {
+    out("");
+    out(`  ✗ ${diagnosis.blocking.length} blocking issue(s):`);
+    for (const f of diagnosis.blocking) out(`      ${f.code}: ${f.detail}`);
+  }
+  for (const f of diagnosis.advisory) out(`  ! ${f.code}: ${f.detail}`);
+  if (diagnosis.remedies.length > 0) {
+    out("");
+    out("  try:");
+    for (const remedy of diagnosis.remedies) {
+      out(`      ${remedy.command}`);
+      out(`        ${remedy.reason}`);
+    }
+  }
+  if (diagnosis.unresolved.length > 0) {
+    out("");
+    out("  no automatic fix for:");
+    for (const f of diagnosis.unresolved) out(`      ${f.code}: ${f.detail}`);
+  }
+  if (diagnosis.willUpload) return 0;
+  return diagnosis.remedies.length > 0 ? 2 : 3;
+}
+
 /**
  * Run the CLI. `out` and `err` are injected so the parity harness can capture
  * output without spawning a process per case.
@@ -1159,13 +1283,14 @@ export function main(
   if (command === "validate") return cmdValidate(rest, out, err);
   if (command === "edit") return cmdEdit(rest, out, err);
   if (command === "trim") return cmdTrim(rest, out, err);
+  if (command === "doctor") return cmdDoctor(rest, out, err);
   if (command === "reveal") return cmdReveal(rest, out, err);
   if (command === "scrub") return cmdScrub(rest, out, err);
   if (command === "analyze") return cmdAnalyze(rest, out, err);
   if (command === "codes") return cmdCodes(out);
   err(USAGE.trimEnd());
   err(
-    `error: argument command: invalid choice: '${command}' (choose from 'parse', 'inspect', 'repair', 'validate', 'edit', 'trim', 'reveal', 'scrub', 'analyze', 'codes')`,
+    `error: argument command: invalid choice: '${command}' (choose from 'parse', 'inspect', 'repair', 'validate', 'edit', 'trim', 'doctor', 'reveal', 'scrub', 'analyze', 'codes')`,
   );
   return 64;
 }
