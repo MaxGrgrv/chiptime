@@ -1,5 +1,5 @@
 ---
-description: Every chiptime machine code — 108 errors, warnings, provenance entries, and insight codes — each with its own page.
+description: Every chiptime machine code — 110 errors, warnings, provenance entries, and insight codes — each with its own page.
 ---
 
 # Codes registry
@@ -104,6 +104,8 @@ its own page; the complete agent-facing contract (schema, exit codes) lives in
 | [`ENHANCED_PAIR_MERGED`](enhanced-pair-merged.md) | provenance | enhanced_speed/altitude merged into the base stream (enhanced preferred, taxonomy #28). |
 | [`RECORDS_REORDERED`](records-reordered.md) | provenance | Records were not in chronological order; stably sorted (ADR-0005 §1). |
 | [`TIMER_STOP_SYNTHESIZED`](timer-stop-synthesized.md) | provenance | No final timer stop; timer closed at the last record. |
+| [`TIMER_REDUNDANT_STOP`](timer-redundant-stop.md) | provenance | Timer stop arrived with no interval open; ignored as redundant (device shutdown / multisport boundary pattern). |
+| [`TIMER_REDUNDANT_START`](timer-redundant-start.md) | provenance | Timer start with no timer time after it; ignored as redundant (multisport boundary pattern). |
 | [`SESSION_REBUILT`](session-rebuilt.md) | provenance | No session message; session synthesized from records (#95). |
 | [`GPS_SPIKES_DROPPED`](gps-spikes-dropped.md) | provenance | Physically impossible GPS bounce spikes removed (lenient) or flagged (forensic) (#53). |
 | [`NULL_ISLAND_DROPPED`](null-island-dropped.md) | provenance | Records at exactly (0,0) nulled or flagged (#51). |

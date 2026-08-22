@@ -1,0 +1,24 @@
+{
+  "slug": "boundary-timer-events",
+  "category": "multisport",
+  "taxonomy": [
+    45,
+    75
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "multisport_timer_events"
+    }
+  ],
+  "input_sha256": "b0a4c45ee5d2449bf6a675407282ce76b329503cd89a4725e67be8d9a817ff3f",
+  "source": "synthetic",
+  "notes": "Suunto-style multisport: session N's boundary stop_all leaks into session N+1's event window; must not warn TIMER_STOP_WITHOUT_START, per-session timers stay exact"
+}

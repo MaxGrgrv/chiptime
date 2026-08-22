@@ -30,8 +30,16 @@ policy; record the decision").
    Local-time math never mutates the UTC stream (#47).
 5. **Timer machine** (#45): start/stop(_all) build running intervals.
    Stop-without-start opens an interval at the first record (warning
-   `TIMER_STOP_WITHOUT_START`); a missing final stop closes at the last record
-   (provenance `TIMER_STOP_SYNTHESIZED`). `derived.timer_time_s` = interval sum.
+   `TIMER_STOP_WITHOUT_START`) — but only for the genuine crash class: no
+   intervals built yet AND the first record strictly precedes the stop.
+   Otherwise the stop is redundant — device shutdown writes `stop_all` after
+   the final stop (Wahoo ELEMNT), and multisport slicing leaks a session's
+   boundary stop into the next session's window (Suunto) — and is a no-op
+   recorded as provenance `TIMER_REDUNDANT_STOP` (F45). A missing final stop
+   closes at the last record (provenance `TIMER_STOP_SYNTHESIZED`) — only when
+   the close yields a non-empty interval; a dangling start at/after the last
+   record is the boundary leak's mirror image and is a no-op recorded as
+   `TIMER_REDUNDANT_START`. `derived.timer_time_s` = interval sum.
 6. **Moving time** (#46): within running intervals, per-record dt (capped at
    30 s) counts as moving when speed > 0.1 m/s; with no speed stream, moving
    time is honestly None — never guessed from positions in M1.

@@ -29,6 +29,42 @@ def test_missing_final_stop_synthesized() -> None:
     assert s.derived.timer_time_s == 29.0  # start → last record
 
 
+def test_redundant_stop_all_is_noop() -> None:
+    # Wahoo shutdown (#45): stop_all after the final stop must not open a
+    # phantom interval at the first record.
+    result = chiptime.parse(build_fit.wahoo_shutdown())
+    s = result.activity.sessions[0]
+    assert s.derived.timer_time_s == 65.0  # 60 + 5, no phantom span
+    assert not any(w.code == "TIMER_STOP_WITHOUT_START" for w in result.warnings)
+    assert any(
+        p.code == "TIMER_REDUNDANT_STOP" and p.action == "ignored" for p in result.provenance
+    )
+    assert s.discrepancies == []
+
+
+def test_multisport_boundary_timer_events_quiet() -> None:
+    # Suunto boundary pattern (#45/#75): events leaked across a shared boundary
+    # second must not warn; per-session timers stay exact.
+    result = chiptime.parse(build_fit.multisport_timer_events())
+    timers = [s.derived.timer_time_s for s in result.activity.sessions]
+    assert timers == [100.0, 200.0]
+    assert not any(w.code == "TIMER_STOP_WITHOUT_START" for w in result.warnings)
+    codes = [p.code for p in result.provenance]
+    assert "TIMER_REDUNDANT_STOP" in codes
+    assert "TIMER_REDUNDANT_START" in codes
+    assert "TIMER_STOP_SYNTHESIZED" not in codes
+
+
+def test_genuine_stop_without_start_still_warns() -> None:
+    # Crash class (#45): records precede the first stop; the interval opens at
+    # the first record and the warning stays.
+    result = chiptime.parse(build_fit.stop_without_start())
+    s = result.activity.sessions[0]
+    assert s.derived.timer_time_s == 40.0  # [first record, stop] + [start, stop_all]
+    assert any(w.code == "TIMER_STOP_WITHOUT_START" for w in result.warnings)
+    assert not any(p.code.startswith("TIMER_REDUNDANT") for p in result.provenance)
+
+
 def test_nonmonotonic_sorted_with_provenance() -> None:
     result = chiptime.parse(build_fit.nonmonotonic())
     s = result.activity.sessions[0]

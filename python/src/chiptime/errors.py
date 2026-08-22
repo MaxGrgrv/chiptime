@@ -213,6 +213,10 @@ PROVENANCE_CODES: dict[str, str] = {
     " (enhanced preferred, taxonomy #28).",
     "RECORDS_REORDERED": "Records were not in chronological order; stably sorted (ADR-0005 §1).",
     "TIMER_STOP_SYNTHESIZED": "No final timer stop; timer closed at the last record.",
+    "TIMER_REDUNDANT_STOP": "Timer stop arrived with no interval open; ignored as"
+    " redundant (device shutdown / multisport boundary pattern).",
+    "TIMER_REDUNDANT_START": "Timer start with no timer time after it; ignored as"
+    " redundant (multisport boundary pattern).",
     "SESSION_REBUILT": "No session message; session synthesized from records (#95).",
     "GPS_SPIKES_DROPPED": "Physically impossible GPS bounce spikes removed (lenient) or"
     " flagged (forensic) (#53).",

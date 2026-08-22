@@ -9,14 +9,14 @@ Compact form (full dependency sections live in each spec; every edge verified bi
 | Feature | Depends on | Depended on by |
 |---|---|---|
 | F1 scaffolding | — | all (incl. F31, which mirrors its repo/CI conventions in `js/`) |
-| F2 corpus+canonical | F1 | F3+ (all corpus-tested), F31 (`canonical.py` is the port's reference) |
+| F2 corpus+canonical | F1 | F3+ (all corpus-tested), F31 (`canonical.py` is the port's reference), F45 |
 | F3 decode core | F1, F2 | F4–F21 |
 | F4 intake | F3 | F5, F13 |
 | F5 recovery/resync | F3, F4 | F10, F13, F15, F17 |
 | F6 dev fields | F3 | F7, F12 |
 | F7 semantic model | F3, F6 | F8–F10, F13, F21 |
-| F8 timers/gaps | F5, F7 | F9, F13, F14, F21(zones dt policy) |
-| F9 reconcile/rebuild | F7, F8 | F13, F14, F15, F17 |
+| F8 timers/gaps | F5, F7 | F9, F13, F14, F21(zones dt policy), F45 |
+| F9 reconcile/rebuild | F7, F8 | F13, F14, F15, F17, F45 |
 | F10 gps plausibility | F7 | F13, F15(pattern), F20(prefilter) |
 | F11 cli/M1 wrap | F1–F10 | F13, F14 (CLI verbs) |
 | F12 encoder | F3, F6 | F13, F14, F16 |
@@ -41,8 +41,9 @@ Compact form (full dependency sections live in each spec; every edge verified bi
 | F33 js errors/message/frames (M3) | F31, F32, F3 (frame half, as reference), ADR-0003, ADR-0009 | F34+ (the decoder and everything above it) |
 | F34 js decoder (M3) | F31 (numeric), F32 (profile), F33 (frames/errors/message), F3/F6/F22 as reference | F35+ (parse, semantics, everything above) |
 | F35 js intake/inflate/parse/result (M3) | F31–F34, F4/F5/F11/F15 as reference, ADR-0002 | F36+ (semantics fills the activity block) |
-| F36 js semantics (M3) | F31–F35, F7–F10/F15/F17/F21 as reference, ADR-0005 | F37 (CLI), F38+ |
+| F36 js semantics (M3) | F31–F35, F7–F10/F15/F17/F21 as reference, ADR-0005 | F37 (CLI), F38+, F45 |
 | F37 js CLI (M3, npm 0.1.0) | F31–F36, F11 as reference | F38+ (each verb extends the CLI) |
+| F45 timer redundant-stop fix | F8 (timer machine), F9 (session slicing interplay, unchanged), F36 (TS twin), F2 (corpus infra) | — (behavior fix; interval consumers — gaps, moving time, reconcile — inherit it) |
 
 ## Module Dependencies
 

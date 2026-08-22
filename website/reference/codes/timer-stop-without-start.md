@@ -10,6 +10,10 @@ description: "TIMER_STOP_WITHOUT_START: Timer stop event had no preceding start;
 
 Warning — chiptime saw something suspicious, handled it, and continued. Appears in `warnings[]` on the result in every mode.
 
+## Proven by corpus cases
+
+This code's behavior is pinned by committed conformance cases: [`temporal/stop-without-start`](https://github.com/MaxGrgrv/chiptime/tree/main/corpus/cases/temporal/stop-without-start)
+
 ## Handling it
 
 ```python

@@ -1,0 +1,23 @@
+{
+  "slug": "stop-without-start",
+  "category": "temporal",
+  "taxonomy": [
+    45
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "stop_without_start"
+    }
+  ],
+  "input_sha256": "e286b03c68e5353dce32208fe3f188987f8774ec720217759f14abe14995675e",
+  "source": "synthetic",
+  "notes": "genuine crash class: records precede the first (stop) event; interval opens at the first record with TIMER_STOP_WITHOUT_START"
+}

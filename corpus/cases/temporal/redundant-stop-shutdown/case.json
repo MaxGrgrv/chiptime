@@ -1,0 +1,23 @@
+{
+  "slug": "redundant-stop-shutdown",
+  "category": "temporal",
+  "taxonomy": [
+    45
+  ],
+  "tier": 2,
+  "expect": "ok",
+  "modes": {
+    "strict": "ok",
+    "lenient": "ok",
+    "forensic": "ok"
+  },
+  "build": [
+    {
+      "op": "seed",
+      "name": "wahoo_shutdown"
+    }
+  ],
+  "input_sha256": "5ec81cb8b1c212a1106a72ae3737e9ed1624c3393cffcf891d8ca273d533bd74",
+  "source": "synthetic",
+  "notes": "Wahoo ELEMNT shutdown: redundant stop_all at the same second as the final stop must be a no-op (TIMER_REDUNDANT_STOP), never a phantom interval"
+}

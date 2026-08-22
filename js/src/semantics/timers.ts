@@ -68,9 +68,25 @@ export function buildTimerState(
       if (openStart === null) openStart = t;
     } else {
       if (openStart === null) {
+        const anchor = firstRecord ?? t;
+        if (intervals.length > 0 || anchor >= t) {
+          // Redundant stop (#45): shutdown patterns write stop_all after the final
+          // stop (Wahoo), and multisport slicing leaks the previous session's
+          // boundary stop into the next window (Suunto). Nothing is open to close:
+          // ignored.
+          provenance.push({
+            code: "TIMER_REDUNDANT_STOP",
+            action: "ignored",
+            scope,
+            detail: "timer stop event with no interval open ignored as redundant",
+            byteOffset: null,
+            data: {},
+          });
+          continue;
+        }
         // Stop without start (#45): interval opened at the first record.
         stopWithoutStart = true;
-        openStart = firstRecord ?? t;
+        openStart = anchor;
         warnings.push({
           code: "TIMER_STOP_WITHOUT_START",
           detail: "timer stop event with no preceding start; interval opened at the first record",
@@ -86,16 +102,30 @@ export function buildTimerState(
   if (openStart !== null) {
     // Missing final stop (crash class, #45): close at the last record.
     const end = lastRecord ?? openStart;
-    if (openStart <= end) intervals.push([openStart, end]);
-    synthesized = true;
-    provenance.push({
-      code: "TIMER_STOP_SYNTHESIZED",
-      action: "synthesized",
-      scope,
-      detail: "no final timer stop event; timer closed at the last record",
-      byteOffset: null,
-      data: {},
-    });
+    if (openStart < end) {
+      intervals.push([openStart, end]);
+      synthesized = true;
+      provenance.push({
+        code: "TIMER_STOP_SYNTHESIZED",
+        action: "synthesized",
+        scope,
+        detail: "no final timer stop event; timer closed at the last record",
+        byteOffset: null,
+        data: {},
+      });
+    } else {
+      // Start at or after the last record (#45): the mirror of the redundant
+      // stop — multisport slicing leaks the next session's boundary start into
+      // this window. No timer time evidence: ignored.
+      provenance.push({
+        code: "TIMER_REDUNDANT_START",
+        action: "ignored",
+        scope,
+        detail: "timer start event with no timer time after it ignored as redundant",
+        byteOffset: null,
+        data: {},
+      });
+    }
   }
   if (startsStops.length === 0 && firstRecord !== null && lastRecord !== null) {
     // No timer events at all (minimal encoders, #88 class): the record span is the

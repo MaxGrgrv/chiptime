@@ -61,9 +61,23 @@ def build_timer_state(
             # start-while-running: ignore (consecutive starts seen in the wild)
         else:
             if open_start is None:
+                anchor = first_record if first_record is not None else t
+                if intervals or anchor >= t:
+                    # Redundant stop (#45): shutdown patterns write stop_all
+                    # after the final stop (Wahoo), and multisport slicing
+                    # leaks the previous session's boundary stop into the next
+                    # window (Suunto). Nothing is open to close: ignored.
+                    provenance.append(
+                        ProvenanceEntry(
+                            "TIMER_REDUNDANT_STOP",
+                            "ignored",
+                            scope,
+                            "timer stop event with no interval open ignored as redundant",
+                        )
+                    )
+                    continue
                 # Stop without start (#45): interval opened at first record.
                 stop_without_start = True
-                anchor = first_record or t
                 warnings.append(
                     Diagnostic(
                         "TIMER_STOP_WITHOUT_START",
@@ -81,17 +95,29 @@ def build_timer_state(
     if open_start is not None:
         # Missing final stop (crash class, #45): close at the last record.
         end = last_record or open_start
-        if open_start <= end:
+        if open_start < end:
             intervals.append((open_start, end))
-        synthesized = True
-        provenance.append(
-            ProvenanceEntry(
-                "TIMER_STOP_SYNTHESIZED",
-                "synthesized",
-                scope,
-                "no final timer stop event; timer closed at the last record",
+            synthesized = True
+            provenance.append(
+                ProvenanceEntry(
+                    "TIMER_STOP_SYNTHESIZED",
+                    "synthesized",
+                    scope,
+                    "no final timer stop event; timer closed at the last record",
+                )
             )
-        )
+        else:
+            # Start at or after the last record (#45): the mirror of the
+            # redundant stop — multisport slicing leaks the next session's
+            # boundary start into this window. No timer time evidence: ignored.
+            provenance.append(
+                ProvenanceEntry(
+                    "TIMER_REDUNDANT_START",
+                    "ignored",
+                    scope,
+                    "timer start event with no timer time after it ignored as redundant",
+                )
+            )
     if not starts_stops and first_record and last_record:
         # No timer events at all (minimal encoders, #88 class): the record
         # span is the best available timer estimate; recorded as-is, not

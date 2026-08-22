@@ -56,6 +56,7 @@ Master index of all documentation. Updated with every feature change.
 | F27 `trim` crop + rebuild (M2.8) | DONE | [spec](features/f27-trim.md) | [impl](implementation/f27-trim.md) |
 | F28 `reveal` + `scrub` privacy (M2.8) | DONE | [spec](features/f28-privacy-scrub.md) | [impl](implementation/f28-privacy-scrub.md) |
 | F29 `doctor` + distance calibration (M2.8) | DONE | [spec](features/f29-make-it-upload.md) | [impl](implementation/f29-make-it-upload.md) |
+| F45 Timer redundant-stop fix (both languages) | DONE | [spec](features/f45-timer-redundant-stop.md) | [impl](implementation/f45-timer-redundant-stop.md) |
 
 ### M3 — TypeScript twin on npm
 

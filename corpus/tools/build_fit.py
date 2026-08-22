@@ -839,6 +839,135 @@ def missing_final_stop() -> bytes:
     return b.build()
 
 
+def wahoo_shutdown() -> bytes:
+    """Wahoo ELEMNT shutdown pattern: a redundant stop_all at the same second
+    as the final stop, then a session-scoped stop_disable_all (taxonomy #45)."""
+    b = FitBuilder()
+    t0 = fit_ts(T0)
+    b.define(0, FILE_ID, [(0, "enum", 1), (1, "uint16", 1), (4, "uint32", 1)])
+    b.data(0, 4, 32, t0)  # manufacturer=wahoo_fitness
+    b.define(4, EVENT, [(253, "uint32", 1), (0, "enum", 1), (1, "enum", 1), (3, "uint32", 1)])
+    b.define(1, RECORD, [(253, "uint32", 1), (5, "uint32", 1), (6, "uint16", 1), (3, "uint8", 1)])
+    b.data(4, t0, 0, 0, 0)  # timer start
+    dist = 0
+    for i in range(60):
+        dist += 833
+        b.data(1, t0 + i, dist, 8333, 140 + (i % 10))
+    b.data(4, t0 + 60, 0, 1, 1)  # timer stop (auto pause at the finish chute)
+    b.data(4, t0 + 62, 0, 0, 0)  # timer start
+    for i in range(62, 67):
+        dist += 833
+        b.data(1, t0 + i, dist, 8333, 150)
+    b.data(4, t0 + 67, 0, 1, 0)  # final timer stop (manual)
+    b.data(4, t0 + 67, 0, 4, 0)  # redundant stop_all, same second
+    b.data(4, t0 + 67, 8, 9, 0)  # session stop_disable_all (not a timer event)
+    sess = [
+        (253, "uint32", 1),
+        (254, "uint16", 1),
+        (0, "enum", 1),
+        (1, "enum", 1),
+        (2, "uint32", 1),
+        (5, "enum", 1),
+        (6, "enum", 1),
+        (7, "uint32", 1),
+        (8, "uint32", 1),
+        (9, "uint32", 1),
+    ]
+    b.define(6, SESSION, sess)
+    # declares the device's own (correct) timer: 60 + 5 = 65 s
+    b.data(6, t0 + 67, 0, 8, 1, t0, 2, 0, 67000, 65000, 0xFFFFFFFF)
+    b.define(
+        7,
+        ACTIVITY,
+        [
+            (253, "uint32", 1),
+            (0, "uint32", 1),
+            (1, "uint16", 1),
+            (2, "enum", 1),
+            (3, "enum", 1),
+            (4, "enum", 1),
+            (5, "uint32", 1),
+        ],
+    )
+    b.data(7, t0 + 67, 65000, 1, 1, 26, 1, t0 + 67 + 7200)
+    return b.build()
+
+
+def multisport_timer_events() -> bytes:
+    """Suunto-style multisport: per-session timer start/stop_all pairs sharing
+    boundary seconds + session stop_disable_all events (taxonomy #45/#75)."""
+    b = FitBuilder()
+    t0 = fit_ts(T0)
+    b.define(0, FILE_ID, [(0, "enum", 1), (1, "uint16", 1), (4, "uint32", 1)])
+    b.data(0, 4, 23, t0)  # manufacturer=suunto
+    b.define(4, EVENT, [(253, "uint32", 1), (0, "enum", 1), (1, "enum", 1), (3, "uint32", 1)])
+    b.define(1, RECORD, [(253, "uint32", 1), (5, "uint32", 1), (6, "uint16", 1), (3, "uint8", 1)])
+    # session 1: swim, t0 .. t0+100
+    b.data(4, t0, 0, 0, 0)  # timer start
+    dist = 0
+    for i in range(0, 100):
+        dist += 150
+        b.data(1, t0 + i, dist, 1500, 120 + (i % 15))
+    b.data(4, t0 + 100, 0, 4, 0)  # timer stop_all at the boundary
+    b.data(4, t0 + 100, 8, 9, 0)  # session stop_disable_all
+    # session 2: bike, t0+100 .. t0+300, starting the same boundary second
+    b.data(4, t0 + 100, 0, 0, 0)  # timer start
+    for i in range(100, 300):
+        dist += 1000
+        b.data(1, t0 + i, dist, 10000, 140 + (i % 25))
+    b.data(4, t0 + 300, 0, 4, 0)  # timer stop_all
+    b.data(4, t0 + 300, 8, 9, 0)  # session stop_disable_all
+    sess = [
+        (253, "uint32", 1),
+        (254, "uint16", 1),
+        (0, "enum", 1),
+        (1, "enum", 1),
+        (2, "uint32", 1),
+        (5, "enum", 1),
+        (6, "enum", 1),
+        (7, "uint32", 1),
+        (8, "uint32", 1),
+        (9, "uint32", 1),
+    ]
+    b.define(6, SESSION, sess)
+    b.data(6, t0 + 100, 0, 8, 1, t0, 5, 18, 100000, 100000, 0xFFFFFFFF)  # swim
+    b.data(6, t0 + 300, 1, 8, 1, t0 + 100, 2, 0, 200000, 200000, 0xFFFFFFFF)  # bike
+    b.define(
+        7,
+        ACTIVITY,
+        [
+            (253, "uint32", 1),
+            (0, "uint32", 1),
+            (1, "uint16", 1),
+            (2, "enum", 1),
+            (3, "enum", 1),
+            (4, "enum", 1),
+            (5, "uint32", 1),
+        ],
+    )
+    b.data(7, t0 + 300, 300000, 2, 1, 26, 1, t0 + 300 + 7200)
+    return b.build()
+
+
+def stop_without_start() -> bytes:
+    """File begins mid-activity: records first, then a stop with no preceding
+    start — the genuine crash/restart class (taxonomy #45)."""
+    b = FitBuilder()
+    t0 = fit_ts(T0)
+    b.define(0, FILE_ID, [(0, "enum", 1), (1, "uint16", 1), (4, "uint32", 1)])
+    b.data(0, 4, 1, t0)
+    b.define(4, EVENT, [(253, "uint32", 1), (0, "enum", 1), (1, "enum", 1), (3, "uint32", 1)])
+    _rec_def(b)
+    for i in range(30):
+        b.data(1, t0 + i, 8333, 150 + (i % 5))
+    b.data(4, t0 + 30, 0, 1, 0)  # stop with no start seen: crash class
+    b.data(4, t0 + 40, 0, 0, 0)  # timer start
+    for i in range(40, 50):
+        b.data(1, t0 + i, 8333, 160)
+    b.data(4, t0 + 50, 0, 4, 0)  # stop_all
+    return b.build()
+
+
 def nonmonotonic() -> bytes:
     """GPS resync jumped the clock backwards; plus a duplicate second
     (taxonomy #41/#42)."""
@@ -1572,6 +1701,9 @@ SEEDS: dict[str, object] = {
     "zero_duration": zero_duration,
     "gaps_timers": gaps_timers,
     "missing_final_stop": missing_final_stop,
+    "wahoo_shutdown": wahoo_shutdown,
+    "multisport_timer_events": multisport_timer_events,
+    "stop_without_start": stop_without_start,
     "nonmonotonic": nonmonotonic,
     "zwift_local1989": zwift_local1989,
     "old_timestamps": old_timestamps,
