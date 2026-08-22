@@ -31,3 +31,5 @@ export {
   ProtocolError,
   TruncatedError,
 } from "./errors.js";
+export type { EditOptions, EditResult } from "./edit.js";
+export { EditError, edit } from "./edit.js";

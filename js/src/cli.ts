@@ -21,6 +21,7 @@
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { iterFrames, parse } from "./api.js";
+import { edit } from "./edit.js";
 import { ERROR_CODES, FitError, NotFitError, PROVENANCE_CODES, WARNING_CODES } from "./errors.js";
 import {
   type AthleteSettings,
@@ -35,7 +36,7 @@ import { NotRepairableError, repair } from "./repair.js";
 import type { ParseResult } from "./result.js";
 import { type Platform, validate } from "./validate.js";
 
-const USAGE = `usage: chiptime [-h] {parse,inspect,repair,validate,analyze,codes} ...
+const USAGE = `usage: chiptime [-h] {parse,inspect,repair,validate,edit,analyze,codes} ...
 
 Recovery-grade FIT file processing.
 
@@ -46,6 +47,7 @@ positional arguments:
     repair              salvage + synthesize + write a valid .fit
     validate            check platform acceptance (heuristic)
     analyze             per-sport workout report + insights (optional layer)
+    edit                change what a file says about itself (metadata)
     codes               print the error/warning/provenance code registry
 `;
 
@@ -649,6 +651,180 @@ function cmdCodes(out: (s: string) => void): number {
   return 0;
 }
 
+/** Accept plain seconds or ±HH:MM (the form humans think in for timezones). */
+function parseTimeShift(raw: string | null, err: (s: string) => void): number | null | false {
+  if (raw === null) return null;
+  let text = raw.trim();
+  const sign = text.startsWith("-") ? -1 : 1;
+  text = text.replace(/^[+-]+/, "");
+  const asInt = (s: string): number | null => (/^\d+$/.test(s) ? Number(s) : null);
+  if (text.includes(":")) {
+    const at = text.indexOf(":");
+    const hours = asInt(text.slice(0, at));
+    const minutes = asInt(text.slice(at + 1));
+    if (hours === null || minutes === null) {
+      err(`error: --time-shift expects seconds or ±HH:MM, got ${JSON.stringify(raw)}`);
+      return false;
+    }
+    return sign * (hours * 3600 + minutes * 60);
+  }
+  const secs = asInt(text);
+  if (secs === null) {
+    err(`error: --time-shift expects seconds or ±HH:MM, got ${JSON.stringify(raw)}`);
+    return false;
+  }
+  return sign * secs;
+}
+
+function cmdEdit(argv: string[], out: (s: string) => void, err: (s: string) => void): number {
+  let mode: Mode = "lenient";
+  let output: string | null = null;
+  let sport: string | null = null;
+  let subSport: string | null = null;
+  let manufacturer: string | null = null;
+  let product: number | null = null;
+  let totalDistance: number | null = null;
+  let timeShiftRaw: string | null = null;
+  const positional: string[] = [];
+  const takeStr = (flag: string): string | false => {
+    const v = argv[++i];
+    if (v === undefined) {
+      err(USAGE.trimEnd());
+      err(`error: argument ${flag}: expected one argument`);
+      return false;
+    }
+    return v;
+  };
+  let i = 0;
+  for (; i < argv.length; i++) {
+    const a = argv[i] as string;
+    if (a === "--mode") {
+      const v = argv[++i];
+      if (v !== "strict" && v !== "lenient" && v !== "forensic") {
+        err(USAGE.trimEnd());
+        err(
+          `error: argument --mode: invalid choice: '${v ?? ""}' (choose from 'strict', 'lenient', 'forensic')`,
+        );
+        return 64;
+      }
+      mode = v;
+    } else if (a === "-o" || a === "--output") {
+      const v = takeStr(a);
+      if (v === false) return 64;
+      output = v;
+    } else if (a === "--sport") {
+      const v = takeStr(a);
+      if (v === false) return 64;
+      sport = v;
+    } else if (a === "--sub-sport") {
+      const v = takeStr(a);
+      if (v === false) return 64;
+      subSport = v;
+    } else if (a === "--manufacturer") {
+      const v = takeStr(a);
+      if (v === false) return 64;
+      manufacturer = v;
+    } else if (a === "--product") {
+      const v = takeStr(a);
+      if (v === false) return 64;
+      const n = Number(v);
+      if (!/^[+-]?\d+$/.test(v.trim()) || !Number.isSafeInteger(n)) {
+        err(USAGE.trimEnd());
+        err(`error: argument --product: invalid int value: '${v}'`);
+        return 64;
+      }
+      product = n;
+    } else if (a === "--total-distance") {
+      const v = takeStr(a);
+      if (v === false) return 64;
+      const n = Number(v);
+      if (v.trim() === "" || Number.isNaN(n)) {
+        err(USAGE.trimEnd());
+        err(`error: argument --total-distance: invalid float value: '${v}'`);
+        return 64;
+      }
+      totalDistance = n;
+    } else if (a === "--time-shift") {
+      const v = takeStr(a);
+      if (v === false) return 64;
+      timeShiftRaw = v;
+    } else if (a.startsWith("-")) {
+      err(USAGE.trimEnd());
+      err(`error: unrecognized arguments: ${a}`);
+      return 64;
+    } else {
+      positional.push(a);
+    }
+  }
+  if (positional.length !== 1 || output === null) {
+    err(USAGE.trimEnd());
+    err(
+      `error: the following arguments are required: ${positional.length !== 1 ? "file" : "-o/--output"}`,
+    );
+    return 64;
+  }
+
+  const shift = parseTimeShift(timeShiftRaw, err);
+  if (shift === false) return 64;
+  // Python truthiness: a parsed shift of 0 does not count as a requested change.
+  if (
+    !sport &&
+    !subSport &&
+    !manufacturer &&
+    product === null &&
+    !shift &&
+    totalDistance === null
+  ) {
+    err("error: edit requires at least one change");
+    err(
+      "suggestion: --sport / --sub-sport / --manufacturer / --product /" +
+        " --time-shift / --total-distance",
+    );
+    return 64;
+  }
+
+  let data: Uint8Array;
+  try {
+    data = readFileBytes(positional[0] as string);
+  } catch (e) {
+    err(`cannot read ${positional[0]}: ${(e as Error).message}`);
+    return 64;
+  }
+  let result: ReturnType<typeof edit>;
+  try {
+    result = edit(data, {
+      sport,
+      subSport,
+      manufacturer,
+      product,
+      timeShiftS: shift,
+      totalDistanceM: totalDistance,
+      mode,
+    });
+  } catch (e) {
+    if (e instanceof NotFitError) {
+      err(`${e.code}: ${e.detail}`);
+      return 4;
+    }
+    if (e instanceof FitError) {
+      err(`${e.code}: ${e.detail}`);
+      if (e.suggestion) err(`suggestion: ${e.suggestion}`);
+      return 3;
+    }
+    throw e;
+  }
+
+  writeFileBytes(output, result.data);
+  for (const entry of result.provenance) out(`${entry.code}: ${entry.detail}`);
+  for (const warn of result.warnings) err(`${warn.code}: ${warn.detail}`);
+  out(`wrote ${output} (${result.data.length} bytes)`);
+  if (!result.outputStrictOk) {
+    err("warning: the edited file does not parse in strict mode; inspect before uploading");
+    return 2;
+  }
+  return 0;
+}
+
 /**
  * Run the CLI. `out` and `err` are injected so the parity harness can capture
  * output without spawning a process per case.
@@ -673,11 +849,12 @@ export function main(
   if (command === "inspect") return cmdInspect(rest, out, err);
   if (command === "repair") return cmdRepair(rest, out, err);
   if (command === "validate") return cmdValidate(rest, out, err);
+  if (command === "edit") return cmdEdit(rest, out, err);
   if (command === "analyze") return cmdAnalyze(rest, out, err);
   if (command === "codes") return cmdCodes(out);
   err(USAGE.trimEnd());
   err(
-    `error: argument command: invalid choice: '${command}' (choose from 'parse', 'inspect', 'repair', 'validate', 'analyze', 'codes')`,
+    `error: argument command: invalid choice: '${command}' (choose from 'parse', 'inspect', 'repair', 'validate', 'edit', 'analyze', 'codes')`,
   );
   return 64;
 }

@@ -72,7 +72,7 @@ Plan: [m3-typescript-plan.md](m3-typescript-plan.md) · contract: [ADR-0009](arc
 | F37 CLI + exit codes (npm 0.1.0) | DONE | [spec](features/f37-js-cli.md) | [impl](implementation/f37-js-cli.md) |
 | F38 Encoder, repair, validate (npm 0.2.0) | DONE | [spec+impl](features/f38-js-encode-repair-validate.md) | — |
 | F39 Analytics: metrics + analyze (npm 0.4.0) | DONE | [spec+impl](features/f39-js-analytics.md) | — |
-| F40 `edit` (npm 0.5.0) | PLANNED | — | — |
+| F40 edit: metadata surgery (npm 0.5.0) | DONE | [spec+impl](features/f40-js-edit.md) | — |
 | F41 `trim` (npm 0.6.0) | PLANNED | — | — |
 | F42 `reveal` + `scrub` (npm 0.7.0) | PLANNED | — | — |
 | F43 Catch-up: mirror Python features shipped during the port | PLANNED | — | — |

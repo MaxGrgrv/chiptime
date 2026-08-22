@@ -33,6 +33,13 @@ from chiptime.cli import main as py_main  # isort:skip
 INVOCATIONS = [
     ["parse", "{file}"],
     ["repair", "{file}", "-o", "{out}"],
+    ["edit", "{file}", "-o", "{out}", "--sport", "cycling"],
+    ["edit", "{file}", "-o", "{out}", "--sport", "running", "--sub-sport", "trail"],
+    ["edit", "{file}", "-o", "{out}", "--manufacturer", "garmin", "--product", "2480"],
+    ["edit", "{file}", "-o", "{out}", "--time-shift", "+01:00"],
+    ["edit", "{file}", "-o", "{out}", "--total-distance", "5000"],
+    ["edit", "{file}", "-o", "{out}", "--sport", "flying-carpet"],
+    ["edit", "{file}", "-o", "{out}"],
     ["validate", "{file}"],
     ["validate", "{file}", "--platform", "garmin-connect"],
     ["validate", "{file}", "--platform", "strava"],
@@ -149,19 +156,25 @@ def first_difference(a: str, b: str) -> str:
 def main() -> None:
     corpus = ROOT / "corpus" / "cases"
     cases: list[tuple[str, list[str]]] = []
+    outfiles: dict[str, str] = {}
     outdir = pathlib.Path("/tmp/chiptime-cli-parity")
     outdir.mkdir(exist_ok=True)
     for path in sorted(corpus.glob("*/*/input.fit")):
         name = f"{path.parent.parent.name}/{path.parent.name}"
         slug = name.replace("/", "_")
-        for inv in INVOCATIONS:
-            # {out} resolves per side so the two runs cannot clobber each other;
-            # the bytes are compared afterwards.
+        for idx, inv in enumerate(INVOCATIONS):
+            # {out} resolves per side AND per invocation shape so runs cannot
+            # clobber each other; the bytes are compared afterwards.
             argv = [
-                a.replace("{file}", str(path)).replace("{out}", str(outdir / f"{slug}.SIDE.fit"))
+                a.replace("{file}", str(path)).replace(
+                    "{out}", str(outdir / f"{slug}.i{idx}.SIDE.fit")
+                )
                 for a in inv
             ]
-            cases.append((f"{name}::{' '.join(inv)}", argv))
+            key = f"{name}::{' '.join(inv)}"
+            cases.append((key, argv))
+            if "{out}" in inv:
+                outfiles[key] = str(outdir / f"{slug}.i{idx}.SIDE.fit")
     for inv in GLOBAL_INVOCATIONS:
         cases.append((f"<global>::{' '.join(inv) or '(no args)'}", list(inv)))
 
@@ -179,7 +192,7 @@ def main() -> None:
             failures.append((key, f"exit code python={p_res['code']} typescript={t_res['code']}"))
             continue
         if p_res["stdout"] != t_res["stdout"]:
-            # The repair stdout names the output path, which legitimately differs
+            # repair/edit stdout names the output path, which legitimately differs
             # (.py.fit vs .ts.fit); normalize before comparing.
             a = p_res["stdout"].replace(".py.fit", ".fit")
             b = t_res["stdout"].replace(".ts.fit", ".fit")
@@ -192,15 +205,12 @@ def main() -> None:
                         pass
                 failures.append((key, first_difference(a, b)))
                 continue
-        if "repair" in key and p_res["code"] in (0, 2):
-            slug = key.split("::")[0].replace("/", "_")
-            base = pathlib.Path("/tmp/chiptime-cli-parity")
-            pb = (base / f"{slug}.py.fit").read_bytes()
-            tb = (base / f"{slug}.ts.fit").read_bytes()
+        if key in outfiles and p_res["code"] in (0, 2):
+            template = outfiles[key]
+            pb = pathlib.Path(template.replace(".SIDE.fit", ".py.fit")).read_bytes()
+            tb = pathlib.Path(template.replace(".SIDE.fit", ".ts.fit")).read_bytes()
             if pb != tb:
-                failures.append(
-                    (key, f"repaired FILE bytes differ: py {len(pb)}B vs ts {len(tb)}B")
-                )
+                failures.append((key, f"output FILE bytes differ: py {len(pb)}B vs ts {len(tb)}B"))
 
     if failures:
         print(f"cli parity: {len(failures)} of {len(cases)} invocation(s) diverged")
