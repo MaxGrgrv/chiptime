@@ -148,7 +148,15 @@ intensity ~0.74 of the file's FTP-260 zone layout, 3,282 kJ of work — and
 a variability index of 1.10 that would have been closer to 1.05 if the
 course hadn't kept serving punchy rollers (12 minutes above 312 W is *not*
 the textbook way to ride the first half of an Ironman; the textbook and I
-have agreed to differ). The insights layer reads the fatigue for free:
+have agreed to differ). For calibration: [my 70.3 bike six weeks
+earlier](inside-a-triathlon-fit-file.md) came out at VI 1.035 — flat
+course, one wattage, defended all day. The Loire kept asking questions.
+
+The 3,282 kJ is also the fuelling bill. Cycling's tidy coincidence —
+mechanical kJ and metabolic kcal nearly cancel — makes that roughly 3,300
+kcal burned, of which a stomach at race intensity can absorb maybe half.
+The other half is a debt, and the marathon is the collector. The insights
+layer reads the fatigue for free:
 
 ```text
 PACING_POSITIVE_SPLIT: Second half 10.9% slower than the first.
@@ -156,10 +164,12 @@ HR_DRIFT_HIGH: Output per heartbeat fell 8.6% from first half to second — aero
 ```
 
 First half 35.4 km/h, second half 32.9. Heart rate drifting *down*
-(156→152) while power fell faster. The fastest moment of the day — 55.9
-km/h at km 138 — was, of course, downhill. And across 5 hours 13 minutes
-of racing, the speed stream registers a standstill for a grand total of
-**4 seconds**: an Ironman bike leg has no red lights.
+(156→152) while power fell faster — heat and five hours doing what they
+do to everyone: the same heartbeat buying fewer watts. The fastest moment
+of the day — 55.9 km/h at km 138 — was, of course, downhill. And across
+5 hours 13 minutes of racing, the speed stream registers a standstill for
+a grand total of **4 seconds**: an Ironman bike leg has no red lights, no
+café stops, and no mercy.
 
 Two streams you probably never look at deserve a frame of their own:
 
@@ -167,9 +177,11 @@ Two streams you probably never look at deserve a frame of their own:
 
 The thermometer tells the race-nutrition story better than I could — a
 15 °C morning start turning into a 30 °C early afternoon, one degree at a
-time. The battery log answers a question every long-course athlete has
-asked: an ELEMNT ROAM burns about 3.5% per hour with three ANT+ sensors,
-Di2, and full-time GPS. It would have survived a double.
+time: the full span from arm-warmer weather to warm-bottle weather, with
+a marathon still owed at the end of it. The battery log answers a
+question every long-course athlete has asked: an ELEMNT ROAM burns about
+3.5% per hour with three ANT+ sensors, Di2, and full-time GPS. It would
+have survived a double.
 
 ## The cadence disagreement that's really a definition
 

@@ -3,7 +3,7 @@ date: 2026-08-22
 categories: [field-notes]
 slug: inside-a-triathlon-fit-file
 authors: [max]
-description: I raced IRONMAN 70.3 Venice-Jesolo, then took my Suunto's FIT file apart byte by byte — five sessions, a swim that shrank to 519 m, a heart-rate sensor that died quietly, and two button mistakes preserved in binary.
+description: I raced IRONMAN 70.3 Venice-Jesolo, then took my race FIT files apart byte by byte — five sessions, a swim that shrank to 519 m, a heart-rate sensor that died quietly, two button mistakes preserved in binary, and the bike computer file that settled the score.
 ---
 
 # Inside a triathlon FIT file: what my watch really recorded at IRONMAN 70.3 Venice-Jesolo
@@ -20,7 +20,9 @@ anything. So once the medal was on the shelf, I did what any
 data-inclined triathlete with a parser habit would do: I took my own race
 apart. Not a race report — a data autopsy. It turned out to be a great
 specimen precisely because it's a *healthy* file recorded by a fallible
-human.
+human — and because, as I discovered when I later exported the ELEMNT
+file from my handlebars, this race left behind *two* recordings that
+could cross-examine each other.
 
 <!-- more -->
 
@@ -92,6 +94,8 @@ the classification tells you *why*.
 For what it's worth, the 519 recorded metres were good ones — the first
 auto-lap says 1:00 for the opening 100 m (race-start adrenaline, plus a
 little open-water GPS optimism), settling to ~2:00/100 m by the fifth.
+Every open-water racer knows that shape: sprint for clear water, then the
+sea collects its tax.
 
 ## Mistake #2: the transition that was secretly a bike leg
 
@@ -125,7 +129,10 @@ really ~89.5.
 
 Two lessons from one race: session boundaries in a multisport file are
 *button presses, not ground truth* — and per-second streams are the
-receipts that let you audit them.
+receipts that let you audit them. In my defence: if you've never tried
+operating a wrist computer during a flying mount with your heart rate in
+the 160s and your brain still somewhere in the Adriatic, know that
+button-pressing is the first skill to go.
 
 ## The heart-rate sensor died quietly, and the file knows exactly how
 
@@ -171,7 +178,8 @@ Two rules I baked into chiptime's contract make this analysis possible:
    average computed before the samples were lost; the records' 122.8 is
    polluted by whatever garbage the dying sensor did write. Neither number
    deserves your trust, and now you know that — which beats a dashboard
-   confidently displaying either one.
+   confidently displaying either one. (Keep this strap in mind: a second
+   witness takes the stand in the next section.)
 
 While we're auditing summaries: this file also contains a lap message
 claiming a **5,000 m swim lap completed in 8:30**, another claiming
@@ -180,7 +188,7 @@ counts of 2 kcal for the swim and 661 kcal for the eight-minute T1.
 Summary messages are where firmware bookkeeping goes to improvise.
 Streams don't improvise.
 
-## The power stream paradox: 8,872 zeros and one honest number
+## The power paradox: 8,872 zeros, and the file that had the answer
 
 The bike power stream is a lovely inversion of the null rule:
 
@@ -189,11 +197,12 @@ power = bike.records.stream("power")
 set(power.values)                   # {0} — 100% coverage, all zeros
 ```
 
-I raced without a power meter, and the Suunto wrote a *literal zero* for
-every one of the 8,872 seconds of the bike leg. Those aren't sentinels —
-they're real encoded values, so chiptime faithfully reports an average of
-0 W, and the analytics layer calls the situation out rather than
-manufacturing a number:
+There *was* a power meter on that bike — the Suunto just wasn't paired to
+it — so the watch wrote a *literal zero* for every one of the 8,872
+seconds of the bike leg. Those aren't sentinels — they're real encoded
+values, so chiptime faithfully reports an average of 0 W, and the
+analytics layer calls the situation out rather than manufacturing a
+number:
 
 ```text
 session 3: cycling
@@ -206,10 +215,69 @@ paired* — the opposite failure mode of the heart-rate strap (real sensor,
 missing values). You need both concepts, zero and null, to tell those
 stories apart, which is exactly why chiptime refuses to conflate them.
 
-Meanwhile the run has genuine power — 100% coverage from Suunto's
-wrist-based running power model, averaging 260 W. Same file, same field
-name, completely different provenance. Check coverage and uniqueness
-before you trust any stream; it's three lines of code.
+But the watts weren't lost — the ELEMNT ROAM on my handlebars was running
+its own recording, paired to the 4iiii meter the watch never met. Its
+file starts at 06:46:07, two seconds after I finally pressed the Suunto's
+leg button: minute one of my bike leg was evidently device administration
+at 32 km/h (see mistake #2). Parse the second file, and the ride my watch
+couldn't see appears in full:
+
+```python
+from chiptime import metrics
+
+wahoo = chiptime.parse("venice-bike-elemnt.fit")
+ride = metrics.analyze(wahoo).sessions[0]
+ride.power_zones["basis"]     # 'file:power_zone' — zones from the file itself
+ride.weighted_avg_power       # 207.1
+ride.variability_ratio        # 1.035
+ride.work_kj                  # 1751.2
+ride.power_curve              # {5: 745.2, 60: 279.2, 300: 226.4, 1200: 211.3}
+```
+
+![Time in power zones for the same bike leg, from the ELEMNT file: most of the ride between 145 and 234 W](images/venice-bike-power-zones.svg)
+
+Now the bike leg finally makes athlete-sense. 200 W average, 207 W
+weighted, and a variability index of 1.035 — on a course with 15 m of
+climbing you pick one wattage and defend it, and the file says I did.
+Against the FTP-260 zone table the ELEMNT wrote into the file, that's an
+intensity right around 0.80: the textbook ceiling for a 70.3 bike, hard
+enough to matter, restrained enough to leave a run in the legs. The
+4:47/km half marathon that followed is the receipt. The fuelling bill was
+1,751 kJ — cycling's tidy coincidence makes that roughly 1,750 kcal
+burned before the run even started — and the one moment of drama the
+power curve remembers is a 745 W, five-second surge at km 15, from 29 to
+40 km/h. Somebody got overtaken properly.
+
+Two recorders, one ride — and the agreement between them is the most
+reassuring table in this post:
+
+| | Suunto Race 2 (wrist) | ELEMNT ROAM (bars) |
+|---|---|---|
+| Distance | 88,885 m | 88,929 m |
+| Avg speed (from streams) | 36.2 km/h | 36.6 km/h |
+| HR samples heard | 2,119 (23.9%) | 2,120 (24.3%) |
+| Declared avg HR | 152 | **77** |
+| Power | 8,872 zeros | 200 W avg, 100% coverage |
+
+Forty-four metres of disagreement across 89 km. And the strap gets its
+verdict: **two independent recorders each heard ~2,120 heartbeats from a
+sensor that only spoke a quarter of the time**, while their two *summary*
+averages — 152 and 77 — miss in opposite directions. The culprit even has
+a name in the second file's device roster: a Wahoo TICKR, faithfully
+logged by a Wahoo head unit while it failed. The autopsy stands,
+cross-examined: the strap was the problem, and no single summary number
+was ever going to tell me that.
+
+(The ELEMNT file also trips the same `stop → stop_all` shutdown quirk I
+dissect in the [Tours teardown](inside-a-wahoo-elemnt-fit-file.md) —
+same device, same six-line shutdown handshake, same honest flag in
+`discrepancies[]`.)
+
+Meanwhile the Suunto's *run* has genuine power — 100% coverage from its
+wrist-based running power model, averaging 260 W. Same field name in the
+same file as the 8,872 zeros, completely different provenance. Check
+coverage and uniqueness before you trust any stream; it's three lines of
+code.
 
 ## What held up beautifully
 
@@ -219,7 +287,11 @@ Plenty did — this is a good watch having a hard day, not a bad file.
 
 The run is textbook: 20.46 km at 4:47/km on 1 km auto-laps, fastest
 kilometre 4:32, slowest 5:00, a 4.6% positive split that chiptime's
-analytics flag without ceremony (`PACING_POSITIVE_SPLIT`). The bike's
+analytics flag without ceremony (`PACING_POSITIVE_SPLIT`). A 4.6% fade is
+the polite amount — the kind you negotiate with at km 16 rather than
+surrender to, and the direct dividend of that 0.80-intensity bike. The
+wrist sensor logged a running cadence of 87.7 rpm — a 175
+steps-per-minute metronome that barely wavered. The bike's
 sixteen full 5 km auto-laps sit between 7:54 and 8:50 — 36.2 km/h moving
 average with a total elevation gain of **15 metres in 88.9 km**, which is
 the flattest ride I will ever do. The barometric altimeter spent the whole
@@ -267,5 +339,7 @@ sensor coverage, and a shutdown quirk that found a real bug in my own
 timer heuristic.
 
 *Total damage in Venice: 4:51:12 from the first beep to the last, two
-button mistakes, one dead heart-rate sensor, zero bytes lost. The file
-remembers it all — you just need a parser that repeats it honestly.*
+button mistakes, one dead heart-rate sensor — and, thanks to the second
+recorder on the handlebars, a bike leg recovered in full: 200 W held for
+2:26, priced exactly right to run 4:47s afterwards. The files remember
+everything. You just need a parser that repeats them honestly.*
