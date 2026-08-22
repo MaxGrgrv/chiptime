@@ -94,6 +94,17 @@ jobs:
         # --provenance attaches a signed attestation linking the tarball to this
         # commit and this workflow run. For a library whose entire claim is
         # deterministic, auditable output, "you can verify what built this" is the
-        # same argument one layer down.
+        # same argument one layer down. It works with either auth path below,
+        # because it rides on the OIDC token this job already requests.
+        #
+        # Auth: NODE_AUTH_TOKEN if the NPM_TOKEN secret exists, otherwise npm's
+        # trusted publishing via OIDC. The token path exists because trusted
+        # publishing is configured per package on npmjs.com and generally needs the
+        # package to exist first -- and because passkey-only 2FA has no OTP to type,
+        # so an automation token (which bypasses 2FA by design) is the way in.
+        # Once trusted publishing is configured, delete the secret and this keeps
+        # working unchanged.
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --provenance --access public
         working-directory: js
